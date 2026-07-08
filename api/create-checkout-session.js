@@ -6,30 +6,29 @@ import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Moms: kurspriserna i katalogen är exkl. moms. Vid direktbetalning läggs 25 % på.
-// Sätt till 1 om ni istället aktiverar Stripe Tax eller vill hantera moms på annat sätt.
+// Moms: kurspriserna i katalogen är exkl. moms. Vid betalning läggs 25 % på.
 const MOMS = 1.25;
 
 // Kurskatalog: id -> { titel, pris i kr exkl. moms }
 // OBS: håll denna i synk med kurslistan i index.html när priser ändras.
 const COURSES = {
-  'lou-grund':   { title: 'Grunderna i offentlig upphandling och LOU', price: 4900 },
-  'lou-praktik': { title: 'LOU i praktiken', price: 5900 },
-  'luf-praktik': { title: 'LUF i praktiken', price: 5900 },
-  'ejur':        { title: 'Entreprenadjuridik — AB 04, ABT 06 och ABK 09', price: 7900 },
-  'ab-abt':      { title: 'AB 04 och ABT 06', price: 5900 },
-  'abk':         { title: 'ABK 09', price: 4900 },
-  'ata':         { title: 'ÄTA-hantering', price: 4900 },
-  'lyft':        { title: 'Säkra lyft', price: 1900 },
-  'bas':         { title: 'BAS-P och BAS-U', price: 3900 },
-  'apv':         { title: 'APV steg 1', price: 1900 },
-  'ama-hus':     { title: 'AMA Hus', price: 4900 },
-  'ama-anl':     { title: 'AMA Anläggning', price: 4900 },
-  'kma':         { title: 'KMA', price: 3900 },
-  'pl':          { title: 'Projektledning', price: 5900 },
-  'prl':         { title: 'Projekteringsledning', price: 5900 },
-  'tid':         { title: 'Tidsplanering i byggprojekt', price: 3900 },
-  'kalk':        { title: 'Kalkylering för entreprenader', price: 4900 },
+  'anbud':       { title: 'Analysera och kvalitetssäkra offentliga anbud', price: 599 },
+  'lou-praktik': { title: 'LOU i praktiken — offentlig upphandling', price: 699 },
+  'luf-praktik': { title: 'LUF i praktiken — upphandling inom försörjningssektorerna', price: 699 },
+  'ejur':        { title: 'Entreprenadjuridik — AB 04, ABT 06 och ABK 09', price: 1099 },
+  'ab-abt':      { title: 'AB 04 och ABT 06 — standardavtalen i bygg', price: 899 },
+  'abk':         { title: 'ABK 09 — avtal och ansvar i konsultuppdrag', price: 399 },
+  'ata':         { title: 'ÄTA-hantering — från teori till praktik', price: 899 },
+  'lyft':        { title: 'Säkra lyft — riskbedömning och utrustning', price: 699 },
+  'bas':         { title: 'BAS-P och BAS-U — säkert byggprojekt från start', price: 1499 },
+  'apv':         { title: 'APV Steg 1 — säker vägarbetsplats', price: 1099 },
+  'ama-hus':     { title: 'AMA Hus — från kod till kvalitet', price: 799 },
+  'ama-anl':     { title: 'AMA Anläggning — kvalitet på bygget', price: 799 },
+  'kma':         { title: 'KMA i praktiken — bygg och anläggning', price: 1299 },
+  'pl':          { title: 'Projektledning — från start till mål', price: 899 },
+  'prl':         { title: 'Projekteringsledning i bygg- och anläggningsprojekt', price: 899 },
+  'tid':         { title: 'Tidsplanering i byggprojekt — från plan till produktion', price: 799 },
+  'kalk':        { title: 'Kalkylering för entreprenader — från anbud till vinst', price: 699 },
 };
 
 export default async function handler(req, res) {
@@ -42,7 +41,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Ogiltig beställning' });
     }
 
-    // Bygg Stripes radposter från serverns prislista
     const line_items = items.map((it) => {
       const c = COURSES[it.courseId];
       if (!c) throw new Error('Okänd kurs: ' + it.courseId);
@@ -51,7 +49,7 @@ export default async function handler(req, res) {
         quantity: qty,
         price_data: {
           currency: 'sek',
-          unit_amount: Math.round(c.price * MOMS * 100), // öre, inkl. moms
+          unit_amount: Math.round(c.price * MOMS * 100), // öre, inkl. 25 % moms
           product_data: {
             name: c.title,
             description: 'Distanskurs · Nordic Agir Academy · inkl. 25 % moms',
@@ -60,8 +58,6 @@ export default async function handler(req, res) {
       };
     });
 
-    // Deltagarna följer med som metadata så att webhooken kan skicka ut inloggningar.
-    // (Stripe tillåter max 500 tecken per metadatafält — därför delas listan upp vid behov.)
     const participants = items.flatMap((it) =>
       (it.participants || []).map((p) => ({ k: it.courseId, n: p.name, e: p.email }))
     );
@@ -82,14 +78,12 @@ export default async function handler(req, res) {
       mode: 'payment',
       line_items,
       customer_email: buyer.email,
-      // Betalmetoder (kort, Swish, Klarna, Apple/Google Pay) styrs i Stripe Dashboard:
-      // Settings → Payment methods. Aktivera Swish och Klarna där så dyker de upp här automatiskt.
       metadata,
       success_url: `${siteUrl}/?betalning=klar&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/?betalning=avbruten`,
       locale: 'sv',
       billing_address_collection: 'auto',
-      invoice_creation: { enabled: true }, // Stripe skapar kvitto/faktura-PDF till kunden
+      invoice_creation: { enabled: true },
     });
 
     return res.status(200).json({ url: session.url });
