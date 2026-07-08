@@ -586,7 +586,7 @@ body.course-mode{overflow:hidden}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v2.8</span>
+    <span>Alla rättigheter förbehållna · v2.9</span>
   </div>
 </footer>
 
@@ -685,11 +685,11 @@ const COURSES=[
  {id:'ata',cat:'juridik',abbr:'ÄTA-hantering',sub:'Från teori till praktik',title:'ÄTA-hantering — från teori till praktik',desc:'Det arbete du utför ska du få betalt för. Underrätta i rätt tid, dokumentera rätt och stå stadigt om det blir diskussion.',dur:'ca 3 tim',price:899,img:IMG('1554224155-6726b3ff858f'),kw:'äta ändring tillägg avgående underrättelse'},
  {id:'lyft',cat:'bygg',abbr:'Säkra lyft',sub:'Riskbedömning och utrustning',title:'Säkra lyft — riskbedömning och utrustning',desc:'För dig som kopplar last eller dirigerar lyft: rätt redskap, rätt riskbedömning och rutiner som gör att alla går hem hela.',dur:'ca 2 tim',price:699,img:IMG('1504307651254-35680f356dfd'),kw:'säkra lyft kran lastkoppling signalman afs riskbedömning'},
  {id:'bas',cat:'bygg',abbr:'BAS-P och BAS-U',sub:'Säkert byggprojekt från start',title:'BAS-P och BAS-U — säkert byggprojekt från start',desc:'Bli trygg som byggarbetsmiljösamordnare: ansvaret, arbetsmiljöplanen och samordningen som håller från planering till utförande.',dur:'ca 4 tim',price:1499,img:IMG('1541888946425-d81bb19240f5'),kw:'bas-p bas-u byggarbetsmiljösamordnare arbetsmiljö arbetsmiljöplan'},
- {id:'apv',cat:'bygg',abbr:'APV Steg 1',sub:'Säker vägarbetsplats',title:'APV Steg 1 — säker vägarbetsplats',desc:'Grundkompetensen för alla som jobbar på eller vid väg, enligt Trafikverkets krav. Tydlig, snabb och direkt användbar.',dur:'ca 2 tim',price:1099,img:IMG('1449965408869-eaa3f722e40d'),kw:'apv arbete på väg trafikverket steg 1 vägarbetsplats'},
+ {id:'apv',cat:'bygg',abbr:'Arbete på väg',sub:'APV Steg 1 · 1.1 · 1.2 · 1.3',title:'Arbete på väg — APV Steg 1 (1.1, 1.2 och 1.3)',desc:'Grundkompetensen för alla som arbetar på eller vid väg, enligt Trafikverkets krav — hela steg 1 med kompetenserna 1.1, 1.2 och 1.3.',dur:'ca 2 tim',price:1099,img:IMG('1449965408869-eaa3f722e40d'),kw:'apv arbete på väg trafikverket steg 1 1.1 1.2 1.3 vägarbetsplats väghållningsfordon'},
  {id:'ama-hus',cat:'bygg',abbr:'AMA Hus',sub:'Från kod till kvalitet',title:'AMA Hus — från kod till kvalitet',desc:'Lär dig läsa och skriva tekniska beskrivningar för husbyggnad: koder, rubriker och pyramidregeln — utan huvudvärk.',dur:'ca 3 tim',price:799,img:IMG('1503387762-592deb58ef4e'),kw:'ama hus beskrivning kod rubrik husbyggnad'},
  {id:'ama-anl',cat:'bygg',abbr:'AMA Anläggning',sub:'Kvalitet på bygget',title:'AMA Anläggning — kvalitet på bygget',desc:'AMA och MER för mark- och anläggningsjobb: struktur, mätregler och kopplingen som gör att kalkylen stämmer med verkligheten.',dur:'ca 3 tim',price:799,img:IMG('1581094794329-c8112a89af12'),kw:'ama anläggning mark mängdförteckning mer mätregler'},
  {id:'kma',cat:'bygg',abbr:'KMA i praktiken',sub:'Bygg och anläggning',title:'KMA i praktiken — bygg och anläggning',desc:'Kvalitet, miljö och arbetsmiljö som fungerar ute i produktionen: egenkontroller, KMA-planer och dokumentation som håller.',dur:'ca 3 tim',price:1299,img:IMG('1581091226825-a6a2a5aee158'),kw:'kma kvalitet miljö arbetsmiljö egenkontroll'},
- {id:'pl',cat:'projekt',abbr:'Projektledning',sub:'Från start till mål',title:'Projektledning — från start till mål',desc:'Att leda byggprojekt handlar om människor lika mycket som planer. Här får du verktygen för båda — från startmöte till överlämning.',dur:'ca 4 tim',price:899,img:IMG('1517048676732-d65bc937f952'),kw:'projektledning projektledare styrning ledarskap'},
+ {id:'pl',cat:'projekt',abbr:'Projektledning',sub:'Från start till mål',title:'Projektledning — från start till mål',desc:'Att leda byggprojekt handlar om människor lika mycket som planer. Här får du verktygen för båda — från startmöte till överlämning.',dur:'ca 4 tim',price:899,img:IMG('1552664730-d307ca884978'),kw:'projektledning projektledare styrning ledarskap'},
  {id:'prl',cat:'projekt',abbr:'Projekteringsledning',sub:'I bygg- och anläggningsprojekt',title:'Projekteringsledning i bygg- och anläggningsprojekt',desc:'Håll ihop projekteringen: styr konsultgruppen, hantera gränssnitten och se till att handlingarna håller måttet — i tid.',dur:'ca 3 tim',price:899,img:IMG('1581092160562-40aa08e78837'),kw:'projekteringsledning projektering konsultgrupp handlingar'},
  {id:'tid',cat:'projekt',abbr:'Tidsplanering',sub:'Från plan till produktion',title:'Tidsplanering i byggprojekt — från plan till produktion',desc:'Tidplaner som håller även när verkligheten stökar: kritiska linjen, resurssättning och uppföljning som fångar avvikelser i tid.',dur:'ca 2 tim',price:799,img:IMG('1506784983877-45594efa4cbe'),kw:'tidplan tidsplanering kritiska linjen gantt produktion'},
  {id:'kalk',cat:'projekt',abbr:'Kalkylering',sub:'Från anbud till vinst',title:'Kalkylering för entreprenader — från anbud till vinst',desc:'Från mängdförteckning till anbudssumma: metoder, påslag och risktänk som vinner jobben utan att du förlorar pengar på dem.',dur:'ca 3 tim',price:699,img:IMG('1460925895917-afdab827c52f'),kw:'kalkyl kalkylering anbud mängd prissättning vinst'}
@@ -799,13 +799,13 @@ const DETAILS={
    {t:'Examen',d:'Kunskapsprov online med obegränsade försök.'}
   ]},
  'apv':{
-  audience:'För alla som utför arbete på eller vid väg där Trafikverket är beställare — steg 1 är grundkompetensen som krävs för att över huvud taget vara på arbetsplatsen.',
-  goals:['Förstå riskerna med arbete på väg — för dig och trafikanterna','Känna till Trafikverkets kompetenskrav och ditt eget ansvar','Arbeta rätt innanför och utanför skyddsanordningar','Känna igen korrekt utmärkning och veta varför den ser ut som den gör'],
+  audience:'För alla som arbetar på eller vid väg där Trafikverket ställer kompetenskrav. Kursen täcker hela APV Steg 1 — kompetenserna 1.1, 1.2 och 1.3 — och ger den dokumenterade grundkompetens som krävs för att vistas och arbeta på vägarbetsplatsen.',
+  goals:['Uppfylla Trafikverkets krav på allmän grundkompetens (steg 1.1)','Känna till kraven för dig som framför väghållningsfordon (steg 1.2)','Arbeta säkert med vägarbete nära passerande trafik (steg 1.3)','Förstå din egen roll, ditt ansvar och riskerna på vägarbetsplatsen'],
   modules:[
-   {t:'Vägen som arbetsplats',d:'Riskbilden, olycksstatistiken och varför reglerna finns.'},
-   {t:'Regelverk och kompetenskrav',d:'Trafikverkets krav (steg 1.1–1.3), arbetsmiljölagen och trafikförordningen.'},
-   {t:'Skydd och utmärkning',d:'Skyddsanordningar, vägmärken och zonindelning på arbetsplatsen.'},
-   {t:'Ditt beteende på arbetsplatsen',d:'Varselkläder, fordon, backning och det egna ansvaret i vardagen.'},
+   {t:'Vägen som arbetsplats',d:'Riskbilden, olycksstatistiken och varför reglerna finns — för din och trafikanternas säkerhet.'},
+   {t:'Steg 1.1 — Allmän grundkompetens',d:'Grunderna alla på arbetsplatsen måste kunna: regelverket, skyddsanordningar, zonindelning och personlig skyddsutrustning.'},
+   {t:'Steg 1.2 — Förare av väghållningsfordon',d:'Kraven för dig som kör väghållnings-, service- och arbetsfordon på och vid vägen.'},
+   {t:'Steg 1.3 — Vägarbete nära trafik',d:'För dig som utför själva vägarbetet: säkra arbetssätt intill passerande trafik och korrekt tillfällig utmärkning.'},
    {t:'Examen',d:'Kunskapsprov online med obegränsade försök.'}
   ]},
  'ama-hus':{
