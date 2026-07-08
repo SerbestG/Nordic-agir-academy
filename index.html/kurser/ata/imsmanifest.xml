@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest identifier="courseau-5ef7b500-19c2-4a26-9d02-92fce9c95e71" version="1.0" xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2" xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsproject.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd http://www.imsglobal.org/xsd/imsmd_rootv1p2p1 imsmd_rootv1p2p1.xsd http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd">
+	<metadata>
+		<schema>ADL SCORM</schema>
+		<schemaversion>1.2</schemaversion>
+	</metadata>
+	<organizations default="courseau_org">
+		<organization identifier="courseau_org">
+			<title>ÄTA-hantering: Från teori till praktik</title>
+			<item identifier="sco_id" identifierref="sco_ref" isvisible="false">
+				<title>ÄTA-hantering: Från teori till praktik</title>
+			</item>
+		</organization>
+	</organizations>
+	<resources>
+	        <resource identifier="sco_ref" type="webcontent" href="index.html" adlcp:scormtype="sco">
+			<file href="index.html" />
+		</resource>
+	</resources>
+</manifest>
