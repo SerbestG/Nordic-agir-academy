@@ -107,8 +107,10 @@ export default async function handler(req, res) {
           buyer_name: s.metadata.buyer_name || '',
           buyer_company: s.metadata.buyer_company || '',
           buyer_email: (s.customer_email || '').toLowerCase(),
+          buyer_orgnr: s.metadata.buyer_orgnr || '',
           course_id: p.k,
           name: p.n,
+          personnummer: p.pn || '',
           email,
           status: 'ej',
         });
