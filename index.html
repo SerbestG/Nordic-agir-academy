@@ -586,7 +586,7 @@ body.course-mode{overflow:hidden}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v4.2</span>
+    <span>Alla rättigheter förbehållna · v4.3</span>
   </div>
 </footer>
 
@@ -1771,10 +1771,10 @@ async function openPlayer(rowId){
         ?`<iframe class="player-frame" id="playerFrame" allowtransparency="true" allow="fullscreen; downloads; autoplay" allowfullscreen></iframe>`
         :`<div class="player-missing"><h3 style="font-family:var(--display);font-weight:800;color:var(--coal);margin-bottom:8px">Kursen kopplas inom kort</h3><p>Kursinnehållet läggs in av Nordic Agir Academy och dyker upp här automatiskt.</p></div>`}
       <div class="player-actions">
-        <p style="font-size:13px;color:var(--text-dim);max-width:520px">Kursen avslutas med ett kunskapsprov — gör om det så många gånger du behöver. När du klarat provet registreras det automatiskt. Händer inget kan du markera själv med knappen.</p>
+        <p style="font-size:13px;color:var(--text-dim);max-width:520px">Kursen avslutas med ett kunskapsprov — gör om det så många gånger du behöver. När du klarat provet registreras din examen automatiskt.</p>
         ${r.status==='klar'
           ?`<span class="pill klar">Slutförd${r.cert_id?' — certifikat '+r.cert_id:' — certifikatet är på väg'}</span>`
-          :`<button class="btn btn-blue" id="playerDone" onclick="markDone('${r.id}')">Jag är klar med kursen och provet ✓</button>`}
+          :``}
       </div>
     </div>`;
   const frame=document.getElementById('playerFrame');
@@ -1784,15 +1784,6 @@ async function openPlayer(rowId){
     else frame.src=url;                                          // lokalt: ladda direkt
   }
 }
-async function markDone(rowId){
-  const r=myRows.find(x=>String(x.id)===String(rowId));
-  if(!r)return;
-  r.status='klar';
-  if(supa)await supa.from('enrollments').update({status:'klar'}).eq('id',r.id);
-  toast('Grattis! Vi registrerar din examen och skickar certifikatet inom kort.');
-  openPlayer(rowId);
-}
-
 /* Återställ inloggad session vid sidladdning */
 if(supa){
   supa.auth.getSession().then(({data})=>{
