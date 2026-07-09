@@ -5,8 +5,8 @@
 //   3. Deltagaren mejlas sina inloggningsuppgifter till portalen
 //   4. Ni mejlas orderdetaljerna
 //
-// Miljövariabler som behövs: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET,
-// SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY (för mejl), SITE_URL, ADMIN_EMAIL
+// Miljövariabler: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET,
+// SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY, SITE_URL, ADMIN_EMAIL
 
 import Stripe from 'stripe';
 
@@ -20,15 +20,19 @@ async function rawBody(req) {
 }
 
 async function sendMail(to, subject, html) {
-  if (!process.env.RESEND_API_KEY) { console.log('[MEJL]', to, subject); return; }
-  await fetch('https://api.resend.com/emails', {
+  if (!process.env.RESEND_API_KEY) { console.log('[MEJL saknar nyckel]', to, subject); return; }
+  const r = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ from: 'Nordic Agir Academy <academy@nordicagir.se>', to: [to], subject, html }),
   });
+  if (!r.ok) console.error('MEJLFEL', to, r.status, await r.text().catch(() => ''));
 }
 
-const SUPA = process.env.SUPABASE_URL;
+// Tål att URL:en råkat sparas med /rest/v1/ eller snedstreck på slutet
+const SUPA = (process.env.SUPABASE_URL || '')
+  .replace(/\/rest\/v1\/?$/, '')
+  .replace(/\/+$/, '');
 const SUPA_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supaHeaders = {
   apikey: SUPA_KEY,
@@ -49,16 +53,24 @@ async function ensureUser(email) {
     headers: supaHeaders,
     body: JSON.stringify({ email, password, email_confirm: true }),
   });
-  if (res.ok) return password;          // nytt konto
-  return null;                          // fanns redan — behåller sitt lösenord
+  if (res.ok) { console.log('KONTO skapat:', email); return password; }
+  const t = await res.text().catch(() => '');
+  if (res.status === 422 || /already/i.test(t)) { console.log('KONTO fanns redan:', email); return null; }
+  console.error('KONTOFEL', email, res.status, t);
+  return null;
 }
 
 async function insertEnrollment(row) {
-  await fetch(`${SUPA}/rest/v1/enrollments`, {
+  const res = await fetch(`${SUPA}/rest/v1/enrollments`, {
     method: 'POST',
     headers: { ...supaHeaders, Prefer: 'return=minimal' },
     body: JSON.stringify(row),
   });
+  if (!res.ok) {
+    console.error('REGISTRERINGSFEL', row.email, row.course_id, res.status, await res.text().catch(() => ''));
+  } else {
+    console.log('REGISTRERING sparad:', row.email, row.course_id);
+  }
 }
 
 export default async function handler(req, res) {
@@ -69,6 +81,7 @@ export default async function handler(req, res) {
     const body = await rawBody(req);
     event = stripe.webhooks.constructEvent(body, req.headers['stripe-signature'], process.env.STRIPE_WEBHOOK_SECRET);
   } catch (err) {
+    console.error('SIGNATURFEL:', err.message);
     return res.status(400).send('Ogiltig signatur');
   }
 
@@ -79,32 +92,37 @@ export default async function handler(req, res) {
     for (let i = 0; s.metadata['participants_' + i] !== undefined; i++) pJson += s.metadata['participants_' + i];
     let participants = [];
     try { participants = JSON.parse(pJson || '[]'); } catch (_) {}
+    console.log('KÖP:', s.id, '— deltagare:', participants.length);
 
     const portalUrl = (process.env.SITE_URL || '') + '/#minasidor';
 
     for (const p of participants) {
+      const email = (p.e || '').trim().toLowerCase(); // alltid små bokstäver — matchar inloggningen
+      if (!email) continue;
       let newPassword = null;
       if (SUPA && SUPA_KEY) {
-        newPassword = await ensureUser(p.e);
+        newPassword = await ensureUser(email);
         await insertEnrollment({
           order_ref: s.id,
           buyer_name: s.metadata.buyer_name || '',
           buyer_company: s.metadata.buyer_company || '',
-          buyer_email: s.customer_email || '',
+          buyer_email: (s.customer_email || '').toLowerCase(),
           course_id: p.k,
           name: p.n,
-          email: p.e,
+          email,
           status: 'ej',
         });
+      } else {
+        console.error('SUPABASE saknas: SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY inte satta');
       }
       await sendMail(
-        p.e,
+        email,
         'Dina inloggningsuppgifter — Nordic Agir Academy',
-        `<p>Hej ${p.n.split(' ')[0]}!</p>
+        `<p>Hej ${(p.n || email).split(' ')[0]}!</p>
          <p>Välkommen till Nordic Agir Academy — din kurs är redo att påbörjas.</p>
          <p><b>Så loggar du in:</b><br>
          Gå till <a href="${portalUrl}">${portalUrl}</a><br>
-         E-post: <b>${p.e}</b><br>
+         E-post: <b>${email}</b><br>
          ${newPassword
            ? `Lösenord: <b>${newPassword}</b><br><i>Byt gärna lösenordet efter första inloggningen.</i>`
            : `Lösenord: samma som tidigare — använd ”Glömt lösenord?” på inloggningssidan om du behöver ett nytt.`}</p>
