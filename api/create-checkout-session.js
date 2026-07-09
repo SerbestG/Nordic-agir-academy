@@ -59,11 +59,12 @@ export default async function handler(req, res) {
     });
 
     const participants = items.flatMap((it) =>
-      (it.participants || []).map((p) => ({ k: it.courseId, n: p.name, e: p.email }))
+      (it.participants || []).map((p) => ({ k: it.courseId, n: p.name, e: p.email, pn: p.pnr || '' }))
     );
     const metadata = {
       buyer_name: (buyer.name || '').slice(0, 400),
       buyer_company: (buyer.company || '').slice(0, 400),
+      buyer_orgnr: (buyer.orgnr || '').slice(0, 100),
       buyer_phone: (buyer.phone || '').slice(0, 100),
       buyer_invoice: (buyer.invoice || '').slice(0, 400),
     };
