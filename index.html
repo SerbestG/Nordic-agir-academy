@@ -586,7 +586,7 @@ body.course-mode{overflow:hidden}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v3.6</span>
+    <span>Alla rättigheter förbehållna · v3.7</span>
   </div>
 </footer>
 
@@ -648,9 +648,10 @@ body.course-mode{overflow:hidden}
     <div class="admin-login">
       <h2>Logga in</h2>
       <p class="sub">Adminportalen för Nordic Agir Academy.</p>
+      <div class="field"><label>E-post</label><input type="email" id="adminEmail" placeholder="admin@nordicagir.se" autocomplete="email"></div>
       <div class="field"><label>Lösenord</label><input type="password" id="adminPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()"></div>
       <button class="btn btn-blue" style="width:100%;justify-content:center" onclick="adminLogin()">Logga in</button>
-      <p class="admin-note">Demo-lösenord: <b>agir2026</b> — byts vid skarp drift.</p>
+      <p class="admin-note">Endast administratörskonton har åtkomst.</p>
     </div>
   </div>
   <div id="adminDash" style="display:none">
@@ -1203,7 +1204,22 @@ function finishOrder(data,method){
 let adminLoggedIn=false,adminTab='orders';
 const PROG={ej:'Ej påbörjad',pagar:'Pågår',klar:'Klar'};
 
-function adminLogin(){
+async function adminLogin(){
+  if(supa){
+    const email=(document.getElementById('adminEmail')?.value||'').trim().toLowerCase();
+    const pass=document.getElementById('adminPass').value;
+    if(!email){toast('Fyll i din e-post');return;}
+    const {error}=await supa.auth.signInWithPassword({email,password:pass});
+    if(error){toast('Fel e-post eller lösenord — prova igen');return;}
+    const {data:adm}=await supa.from('admins').select('email').eq('email',email);
+    if(!adm||!adm.length){toast('Kontot saknar adminbehörighet');await supa.auth.signOut();return;}
+    adminLoggedIn=true;
+    document.getElementById('adminLoginWrap').style.display='none';
+    document.getElementById('adminDash').style.display='block';
+    document.getElementById('logoutBtn').style.display='inline-block';
+    renderAdmin();
+    return;
+  }
   if(document.getElementById('adminPass').value==='agir2026'){
     adminLoggedIn=true;
     document.getElementById('adminLoginWrap').style.display='none';
@@ -1224,18 +1240,51 @@ function setTab(t){
   document.querySelectorAll('.atab').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
   renderAdmin();
 }
+let adminRows=[];
+async function loadAdminRows(){
+  const {data,error}=await supa.from('enrollments').select('*').order('created_at',{ascending:false});
+  if(error){toast('Kunde inte hämta data: '+error.message);adminRows=[];return;}
+  adminRows=data||[];
+}
 function allEnrollments(){
+  if(supa){
+    return adminRows.map(row=>({
+      rowId:row.id,
+      order:{
+        id:(row.order_ref||'').startsWith('cs_')?'ST-'+row.order_ref.slice(-6).toUpperCase():(row.order_ref||'—'),
+        refFull:row.order_ref||('rad-'+row.id),
+        date:(row.created_at||'').slice(0,10),
+        buyer:{name:row.buyer_name||'',company:row.buyer_company||'',email:row.buyer_email||''}
+      },
+      courseId:row.course_id,
+      p:{name:row.name||row.email,email:row.email,login:'Automatisk',progress:row.status||'ej',certDate:row.cert_date||'',certId:row.cert_id||''}
+    }));
+  }
   const rows=[];
   ORDERS.forEach(o=>o.items.forEach(it=>it.participants.forEach(p=>{
     rows.push({order:o,courseId:it.courseId,p});
   })));
   return rows;
 }
-function renderAdmin(){
+function adminOrders(){
+  if(!supa)return ORDERS;
+  const map={};
+  allEnrollments().forEach(r=>{
+    const k=r.order.refFull;
+    if(!map[k])map[k]={id:r.order.id,date:r.order.date,buyer:r.order.buyer,items:[],total:0,_c:{}};
+    const o=map[k];
+    if(!o._c[r.courseId]){o._c[r.courseId]={courseId:r.courseId,participants:[]};o.items.push(o._c[r.courseId]);}
+    o._c[r.courseId].participants.push(r.p);
+    o.total+=(COURSES.find(c=>c.id===r.courseId)||{price:0}).price;
+  });
+  return Object.values(map);
+}
+async function renderAdmin(){
   const body=document.getElementById('adminBody');
+  if(supa)await loadAdminRows();
   const enr=allEnrollments();
   const stats=`<div class="admin-cards">
-    <div class="acard"><span class="an">${ORDERS.length}</span><span class="al">Beställningar</span></div>
+    <div class="acard"><span class="an">${adminOrders().length}</span><span class="al">Beställningar</span></div>
     <div class="acard"><span class="an">${enr.length}</span><span class="al">Deltagarplatser</span></div>
     <div class="acard"><span class="an">${enr.filter(r=>r.p.progress==='pagar').length}</span><span class="al">Pågående kurser</span></div>
     <div class="acard"><span class="an">${enr.filter(r=>r.p.progress==='klar').length}</span><span class="al">Godkända — certifikat</span></div>
@@ -1244,14 +1293,14 @@ function renderAdmin(){
   if(adminTab==='orders'){
     body.innerHTML=stats+`<div class="atable-wrap"><table>
       <thead><tr><th>Order</th><th>Datum</th><th>Beställare</th><th>Kurser</th><th>Summa</th><th>Inloggning</th></tr></thead>
-      <tbody>${ORDERS.map(o=>{
+      <tbody>${adminOrders().map(o=>{
         const n=o.items.reduce((s,i)=>s+i.participants.length,0);
         const sent=o.items.every(i=>i.participants.every(p=>p.login));
         return `<tr>
           <td style="font-family:var(--mono);font-size:12px">${o.id}</td>
           <td>${o.date}</td>
           <td><b>${o.buyer.name}</b><br><span style="font-size:12px;color:var(--text-dim)">${o.buyer.company||''} · ${o.buyer.email}</span></td>
-          <td>${o.items.map(i=>COURSES.find(c=>c.id===i.courseId).title).join('<br>')}<br><span style="font-size:12px;color:var(--text-dim)">${n} deltagare</span></td>
+          <td>${o.items.map(i=>(COURSES.find(c=>c.id===i.courseId)||{title:i.courseId}).title).join('<br>')}<br><span style="font-size:12px;color:var(--text-dim)">${n} deltagare</span></td>
           <td style="white-space:nowrap">${fmt(o.total)}</td>
           <td>${sent?'<span class="pill skickad">Skickad</span>':`<button class="mini-btn" onclick="sendLogins('${o.id}')">Skicka inloggning</button>`}</td>
         </tr>`;
@@ -1263,7 +1312,7 @@ function renderAdmin(){
     body.innerHTML=stats+`<div class="atable-wrap"><table>
       <thead><tr><th>Deltagare</th><th>Kurs</th><th>Order</th><th>Inloggning</th><th>Status</th><th></th></tr></thead>
       <tbody>${enr.map((r,i)=>{
-        const c=COURSES.find(x=>x.id===r.courseId);
+        const c=COURSES.find(x=>x.id===r.courseId)||{title:r.courseId};
         return `<tr>
           <td><b>${r.p.name}</b><br><span style="font-size:12px;color:var(--text-dim)">${r.p.email}</span></td>
           <td>${c.title}</td>
@@ -1287,7 +1336,7 @@ function renderAdmin(){
         <div class="field"><label>Välj godkänd deltagare</label>
           <select id="certPick" onchange="fillCertFromPick()">
             <option value="">— Välj eller fyll i manuellt —</option>
-            ${done.map((r,i)=>`<option value="${enr.indexOf(r)}">${r.p.name} · ${COURSES.find(c=>c.id===r.courseId).title}</option>`).join('')}
+            ${done.map((r,i)=>`<option value="${enr.indexOf(r)}">${r.p.name} · ${(COURSES.find(c=>c.id===r.courseId)||{title:r.courseId}).title}</option>`).join('')}
           </select>
         </div>
         <div class="field"><label>Namn</label><input id="certName" oninput="paintCert()"></div>
@@ -1340,12 +1389,15 @@ function sendLogins(orderId){
   toast('Inloggningsuppgifter skickade till '+o.items.reduce((s,i)=>s+i.participants.length,0)+' deltagare');
   renderAdmin();
 }
-function setProgress(i,val){
+async function setProgress(i,val){
   const r=allEnrollments()[i];
-  r.p.progress=val;
-  if(val==='klar'&&!r.p.certDate){
-    r.p.certDate=new Date().toISOString().slice(0,10);
-    r.p.certId='NAA-2026-'+String(Math.floor(1000+Math.random()*9000));
+  const certDate=(val==='klar'&&!r.p.certDate)?new Date().toISOString().slice(0,10):r.p.certDate||null;
+  const certId=(val==='klar'&&!r.p.certId)?('NAA-2026-'+String(Math.floor(1000+Math.random()*9000))):r.p.certId||null;
+  if(supa&&r.rowId){
+    const {error}=await supa.from('enrollments').update({status:val,cert_date:certDate,cert_id:certId}).eq('id',r.rowId);
+    if(error){toast('Kunde inte spara: '+error.message);return;}
+  }else{
+    r.p.progress=val;r.p.certDate=certDate;r.p.certId=certId;
   }
   renderAdmin();
 }
@@ -1355,7 +1407,7 @@ function fillCertFromPick(){
   if(v===''){paintCert();return;}
   const r=allEnrollments()[+v];
   document.getElementById('certName').value=r.p.name;
-  document.getElementById('certCourse').value=COURSES.find(c=>c.id===r.courseId).title;
+  document.getElementById('certCourse').value=(COURSES.find(c=>c.id===r.courseId)||{title:r.courseId}).title;
   document.getElementById('certDate').value=r.p.certDate||new Date().toISOString().slice(0,10);
   paintCert(r.p.certId);
 }
