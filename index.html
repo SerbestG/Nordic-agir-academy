@@ -586,7 +586,7 @@ body.course-mode{overflow:hidden}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v3.9</span>
+    <span>Alla rättigheter förbehållna · v4.0</span>
   </div>
 </footer>
 
@@ -1030,6 +1030,10 @@ function openCheckout(){
           <div class="field"><label>Företag</label><input id="bCompany"></div>
         </div>
         <div class="form-row">
+          <div class="field"><label>Organisationsnummer</label><input id="bOrgnr" placeholder="XXXXXX-XXXX"></div>
+          <div class="field"></div>
+        </div>
+        <div class="form-row">
           <div class="field"><label>E-post *</label><input required type="email" id="bEmail"></div>
           <div class="field"><label>Telefon</label><input type="tel" id="bPhone"></div>
         </div>
@@ -1037,16 +1041,21 @@ function openCheckout(){
       </div>
       <div class="checkout-section">
         <h4>Vem ska gå kursen?</h4>
-        <p style="font-size:14px;color:var(--text-dim);margin-bottom:14px">Fyll i namn och e-post för varje deltagare — det är dit inloggningen till kursen skickas.</p>
+        <p style="font-size:14px;color:var(--text-dim);margin-bottom:14px">Fyll i uppgifterna för varje deltagare. Inloggningen skickas till deltagarens e-post, och personnumret skrivs på certifikatet vid godkänd examen.</p>
         ${cart.map(i=>{const c=COURSES.find(x=>x.id===i.id);
           return Array.from({length:i.qty},(_,k)=>{
             const idx=pIdx++;
             return `<div class="participant-block">
               <h5>${c.title} — deltagare ${k+1}</h5>
               <div class="form-row">
-                <div class="field" style="margin:0"><label>Namn *</label><input required data-p="${idx}" data-course="${c.id}" class="pName"></div>
+                <div class="field" style="margin:0 0 10px"><label>Förnamn *</label><input required data-p="${idx}" data-course="${c.id}" class="pFname"></div>
+                <div class="field" style="margin:0 0 10px"><label>Efternamn *</label><input required data-p="${idx}" class="pLname"></div>
+              </div>
+              <div class="form-row">
+                <div class="field" style="margin:0"><label>Personnummer *</label><input required data-p="${idx}" class="pPnr" placeholder="ÅÅÅÅMMDD-XXXX" pattern="[0-9]{6,8}[-+]?[0-9]{4}" title="Skriv personnumret med siffror, t.ex. 19850412-1234"></div>
                 <div class="field" style="margin:0"><label>E-post *</label><input required type="email" data-p="${idx}" class="pEmail"></div>
               </div>
+              <p style="font-size:11.5px;color:var(--text-dim);margin:8px 0 0">Personnumret används endast för certifikatet och hanteras säkert.</p>
             </div>`;
           }).join('');
         }).join('')}
@@ -1080,16 +1089,20 @@ function closeCheckout(){document.getElementById('checkoutVeil').classList.remov
 const API_BASE='';
 
 function collectOrder(){
-  const names=[...document.querySelectorAll('.pName')];
+  const fnames=[...document.querySelectorAll('.pFname')];
+  const lnames=[...document.querySelectorAll('.pLname')];
+  const pnrs=[...document.querySelectorAll('.pPnr')];
   const emails=[...document.querySelectorAll('.pEmail')];
   const items=cart.map(i=>({courseId:i.id,qty:i.qty,participants:[]}));
-  names.forEach((n,idx)=>{
+  fnames.forEach((n,idx)=>{
     items.find(it=>it.courseId===n.dataset.course).participants.push({
-      name:n.value.trim(),email:emails[idx].value.trim()
+      name:(n.value.trim()+' '+lnames[idx].value.trim()).trim(),
+      pnr:pnrs[idx].value.trim(),
+      email:emails[idx].value.trim()
     });
   });
   return {
-    buyer:{name:bName.value,company:bCompany.value,email:bEmail.value,phone:bPhone.value,invoice:bInvoice.value},
+    buyer:{name:bName.value,company:bCompany.value,orgnr:bOrgnr.value,email:bEmail.value,phone:bPhone.value,invoice:bInvoice.value},
     items,total:cartTotal()
   };
 }
@@ -1159,13 +1172,15 @@ function finishOrder(data,method){
 (function handleStripeReturn(){
   const p=new URLSearchParams(location.search);
   if(p.get('betalning')==='klar'){
-    document.getElementById('checkoutTitle').textContent='Betalningen är klar!';
+    document.getElementById('checkoutTitle').textContent='Tack för ditt köp! 🎉';
     document.getElementById('checkoutBody').innerHTML=`
       <div class="confirm-box">
         <div class="check">✓</div>
-        <h3>Tack — betalningen gick igenom!</h3>
-        <p>Ett kvitto har skickats till din e-post, och varje deltagare får sina inloggningsuppgifter till kursen inom kort.</p>
-        <p>Har du frågor? Hör av dig till <a href="mailto:info@nordicagir.se" style="color:var(--cyan-deep)">info@nordicagir.se</a> så hjälper vi dig.</p>
+        <h3>Betalningen gick igenom — välkommen till Nordic Agir Academy!</h3>
+        <p>Inom några minuter landar ett mejl hos varje deltagare, på den e-postadress som angavs i beställningen. Mejlet innehåller <b>inloggningsuppgifter och instruktioner</b> för att komma igång med kursen direkt.</p>
+        <p style="font-size:13.5px;color:var(--text-dim)">Ser du inget mejl? Titta i skräpposten — första mejlet från oss hamnar ibland där. Ett kvitto på betalningen skickas separat.</p>
+        <p>Kurserna görs i egen takt via <a href="#" onclick="closeCheckout();location.hash='minasidor';return false" style="color:var(--cyan-deep)">Mina sidor</a>, och efter godkänd examen skickas certifikatet per mejl.</p>
+        <p>Frågor? Hör av dig till <a href="mailto:academy@nordicagir.se" style="color:var(--cyan-deep)">academy@nordicagir.se</a> så hjälper vi dig.</p>
         <button class="btn btn-blue" onclick="closeCheckout();history.replaceState(null,'',location.pathname)" style="margin-top:10px">Fortsätt utforska kurser</button>
       </div>`;
     document.getElementById('checkoutVeil').classList.add('open');
@@ -1257,7 +1272,7 @@ function allEnrollments(){
         buyer:{name:row.buyer_name||'',company:row.buyer_company||'',email:row.buyer_email||''}
       },
       courseId:row.course_id,
-      p:{name:row.name||row.email,email:row.email,login:'Automatisk',progress:row.status||'ej',certDate:row.cert_date||'',certId:row.cert_id||''}
+      p:{name:row.name||row.email,email:row.email,pnr:row.personnummer||'',login:'Automatisk',progress:row.status||'ej',certDate:row.cert_date||'',certId:row.cert_id||''}
     }));
   }
   const rows=[];
@@ -1314,7 +1329,7 @@ async function renderAdmin(){
       <tbody>${enr.map((r,i)=>{
         const c=COURSES.find(x=>x.id===r.courseId)||{title:r.courseId};
         return `<tr>
-          <td><b>${r.p.name}</b><br><span style="font-size:12px;color:var(--text-dim)">${r.p.email}</span></td>
+          <td><b>${r.p.name}</b><br><span style="font-size:12px;color:var(--text-dim)">${r.p.email}${r.p.pnr?' · '+r.p.pnr:''}</span></td>
           <td>${c.title}</td>
           <td style="font-family:var(--mono);font-size:12px">${r.order.id}</td>
           <td>${r.p.login?`<span class="pill skickad">${r.p.login}</span>`:'<span class="pill ny">Ej skickad</span>'}</td>
@@ -1340,6 +1355,7 @@ async function renderAdmin(){
           </select>
         </div>
         <div class="field"><label>Namn</label><input id="certName" oninput="paintCert()"></div>
+        <div class="field"><label>Personnummer</label><input id="certPnr" oninput="paintCert()" placeholder="ÅÅÅÅMMDD-XXXX"></div>
         <div class="field"><label>Kurs</label><input id="certCourse" oninput="paintCert()"></div>
         <div class="field"><label>Datum för godkänd examen</label><input type="date" id="certDate" onchange="paintCert()"></div>
         <div class="field"><label>Deltagarens e-post</label><input type="email" id="certEmail" placeholder="namn@foretag.se"></div>
@@ -1358,6 +1374,7 @@ async function renderAdmin(){
             <div class="cert-title">Godkänd examen</div>
             <p class="cert-intro">Detta certifikat intygar att</p>
             <div class="cert-name" id="cName">Förnamn Efternamn</div>
+            <div id="cPnr" style="font-family:var(--mono);font-size:13px;letter-spacing:.08em;color:#6b6868;margin-top:6px"></div>
             <p class="cert-course-label">med godkänt resultat har genomfört utbildningen</p>
             <div class="cert-course" id="cCourse">Kursens namn</div>
             <div class="cert-meta">
@@ -1413,7 +1430,22 @@ function fillCertFromPick(){
   document.getElementById('certCourse').value=(COURSES.find(c=>c.id===r.courseId)||{title:r.courseId}).title;
   document.getElementById('certDate').value=r.p.certDate||new Date().toISOString().slice(0,10);
   document.getElementById('certEmail').value=r.p.email||'';
+  document.getElementById('certPnr').value=r.p.pnr||'';
   paintCert(r.p.certId);
+}
+function showInfoModal(title,bodyHtml){
+  const prev=document.getElementById('infoModal');if(prev)prev.remove();
+  const d=document.createElement('div');
+  d.id='infoModal';
+  d.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(20,20,22,.66);display:flex;align-items:center;justify-content:center;padding:20px';
+  d.innerHTML='<div style="background:#fff;max-width:520px;width:100%;padding:36px 32px;box-shadow:0 30px 80px rgba(0,0,0,.35);text-align:center;position:relative">'
+    +'<button onclick="document.getElementById(\'infoModal\').remove()" style="position:absolute;top:12px;right:14px;background:none;border:none;font-size:22px;cursor:pointer;color:#999">×</button>'
+    +'<h3 style="font-family:var(--display);font-weight:800;font-size:24px;color:var(--coal);margin-bottom:14px">'+title+'</h3>'
+    +'<div style="font-size:15px;line-height:1.65;color:var(--text)">'+bodyHtml+'</div>'
+    +'<button class="btn btn-blue" style="margin-top:22px;justify-content:center" onclick="document.getElementById(\'infoModal\').remove()">Stäng</button>'
+    +'</div>';
+  d.addEventListener('click',e=>{if(e.target===d)d.remove();});
+  document.body.appendChild(d);
 }
 function loadScript(src,globalName){
   return new Promise((ok,fail)=>{
@@ -1476,6 +1508,8 @@ async function emailCert(btn){
 }
 function paintCert(certId){
   const name=document.getElementById('certName').value||'Förnamn Efternamn';
+  const pnr=(document.getElementById('certPnr')?.value||'').trim();
+  document.getElementById('cPnr').textContent=pnr?('Personnummer: '+pnr):'';
   const course=document.getElementById('certCourse').value||'Kursens namn';
   const d=document.getElementById('certDate').value;
   document.getElementById('cName').textContent=name;
@@ -1704,7 +1738,10 @@ async function autoComplete(){
   if(!scormRow||scormRow.status==='klar')return;
   scormRow.status='klar';
   if(supa)await supa.from('enrollments').update({status:'klar'}).eq('id',scormRow.id);
-  toast('Grattis — kursen är slutförd! Ditt certifikat är på väg.');
+  showInfoModal('Grattis! 🎉',
+    '<p><b>Du har slutfört kursen med godkänt resultat.</b></p>'
+    +'<p>Ditt certifikat sammanställs nu och skickas till din e-post av Nordic Agir Academy. Det är giltigt i fem år från examensdatumet.</p>'
+    +'<p style="font-size:13px;color:var(--text-dim)">Tips: spara certifikatet digitalt när det kommer — och grattis igen till ett starkt genomfört arbete!</p>');
   const pill=document.getElementById('playerPill');
   if(pill){pill.className='pill klar';pill.textContent='Klar';}
   const act=document.getElementById('playerDone');
