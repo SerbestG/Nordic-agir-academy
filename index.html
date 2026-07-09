@@ -586,7 +586,7 @@ body.course-mode{overflow:hidden}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v3.4</span>
+    <span>Alla rättigheter förbehållna · v3.6</span>
   </div>
 </footer>
 
@@ -1383,6 +1383,15 @@ function paintCert(certId){
 const SUPABASE_URL='https://vmstcyojgnevnmzkmvrf.supabase.co';
 const SUPABASE_ANON_KEY='sb_publishable_TFlz1FpmksaFjZCR5Qlg1Q_NKFZsgvz';
 const supa=(SUPABASE_URL&&SUPABASE_ANON_KEY&&window.supabase)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+let recoveryMode=false;
+if(supa){supa.auth.onAuthStateChange((ev,session)=>{
+  if(ev==='PASSWORD_RECOVERY'){
+    recoveryMode=true;
+    portalUser={email:session?.user?.email||''};
+    location.hash='minasidor';
+    renderPortal();
+  }
+});}
 
 /* Kurslänkar: Courseaus SCORM-adress per kurs (från SCORM-exportens index.html).
    Spelaren bygger själv in Courseaus SCORM-omslag runt länken — inga extra
@@ -1443,6 +1452,18 @@ async function renderPortal(){
   document.getElementById('pvLogoutBtn').style.display=portalUser?'inline-block':'none';
   stopScormBridge();
 
+  if(recoveryMode&&portalUser){
+    el.innerHTML=`
+      <div class="pv-login">
+        <h2>Välj nytt lösenord</h2>
+        <p class="sub">Inloggad som <b>${portalUser.email}</b> — skriv ditt nya lösenord nedan.</p>
+        <div class="field"><label>Nytt lösenord (minst 8 tecken)</label><input type="password" id="pvNew1"></div>
+        <div class="field"><label>Upprepa lösenordet</label><input type="password" id="pvNew2" onkeydown="if(event.key==='Enter')portalSetNewPass()"></div>
+        <button class="btn btn-blue" style="width:100%;justify-content:center" onclick="portalSetNewPass()">Spara nytt lösenord</button>
+      </div>`;
+    return;
+  }
+
   if(!portalUser){
     el.innerHTML=`
       <div class="pv-login">
@@ -1457,8 +1478,10 @@ async function renderPortal(){
     return;
   }
 
+  let portalErr=null;
   if(supa){
-    const {data}=await supa.from('enrollments').select('*').eq('email',portalUser.email).order('created_at');
+    const {data,error}=await supa.from('enrollments').select('*').eq('email',portalUser.email).order('created_at');
+    if(error)portalErr=error.message+(error.code?' (kod '+error.code+')':'');
     myRows=data||[];
     await loadCourseUrls();
   }else myRows=DEMO_ROWS;
@@ -1472,7 +1495,7 @@ async function renderPortal(){
         <p>Här är dina kurser. Plugga i din egen takt — din status sparas medan du jobbar.</p>
       </div>
       ${myRows.length?`<div class="pv-grid">${myRows.map(pvCard).join('')}</div>`
-       :`<div class="pv-empty"><h3>Inga kurser ännu</h3><p>När du köper en kurs dyker den upp här. <a href="#" onclick="location.hash='';return false" style="color:var(--cyan-deep)">Titta i kurskatalogen →</a></p></div>`}
+       :`<div class="pv-empty"><h3>Inga kurser ännu</h3><p>När du köper en kurs dyker den upp här. <a href="#" onclick="location.hash='';return false" style="color:var(--cyan-deep)">Titta i kurskatalogen →</a></p>${portalErr?`<p style="margin-top:14px;font-family:var(--mono);font-size:11px;color:#c0392b">Teknisk info: ${portalErr} · inloggad som ${portalUser.email}</p>`:`<p style="margin-top:14px;font-family:var(--mono);font-size:11px;color:var(--text-dim)">Teknisk info: databasen svarade utan fel men fann 0 rader · inloggad som ${portalUser.email}</p>`}</div>`}
     </div>`;
 }
 
@@ -1504,10 +1527,20 @@ async function portalLogin(){
   }else portalUser={email};
   renderPortal();
 }
+async function portalSetNewPass(){
+  const p1=document.getElementById('pvNew1').value, p2=document.getElementById('pvNew2').value;
+  if(p1.length<8){toast('Minst 8 tecken, tack');return;}
+  if(p1!==p2){toast('Lösenorden matchar inte');return;}
+  const {error}=await supa.auth.updateUser({password:p1});
+  if(error){toast('Kunde inte byta: '+error.message);return;}
+  recoveryMode=false;
+  toast('Klart! Ditt nya lösenord gäller nu');
+  renderPortal();
+}
 async function portalReset(){
   const email=(document.getElementById('pvEmail')?.value||'').trim();
   if(!email){toast('Fyll i din e-post först');return;}
-  if(supa)await supa.auth.resetPasswordForEmail(email);
+  if(supa)await supa.auth.resetPasswordForEmail(email.toLowerCase(),{redirectTo:location.origin+location.pathname+'#minasidor'});
   toast('Om adressen finns hos oss skickas en återställningslänk dit');
 }
 async function portalLogout(){
