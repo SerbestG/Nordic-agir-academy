@@ -586,7 +586,7 @@ body.course-mode{overflow:hidden}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v3.7</span>
+    <span>Alla rättigheter förbehållna · v3.9</span>
   </div>
 </footer>
 
@@ -1342,7 +1342,10 @@ async function renderAdmin(){
         <div class="field"><label>Namn</label><input id="certName" oninput="paintCert()"></div>
         <div class="field"><label>Kurs</label><input id="certCourse" oninput="paintCert()"></div>
         <div class="field"><label>Datum för godkänd examen</label><input type="date" id="certDate" onchange="paintCert()"></div>
-        <button class="btn btn-blue" onclick="window.print()">Skriv ut / Spara som PDF</button>
+        <div class="field"><label>Deltagarens e-post</label><input type="email" id="certEmail" placeholder="namn@foretag.se"></div>
+        <button class="btn btn-blue" onclick="downloadCert(this)">⬇️ Ladda ner PDF</button>
+        <button class="btn btn-blue" style="background:var(--coal)" onclick="emailCert(this)">📧 Mejla certifikatet</button>
+        <button class="btn btn-blue" style="background:transparent;color:var(--coal);border:1.5px solid var(--coal)" onclick="window.print()">Skriv ut</button>
       </div>
       <div class="cert-stage">
         <div class="certificate" id="certEl">
@@ -1409,7 +1412,67 @@ function fillCertFromPick(){
   document.getElementById('certName').value=r.p.name;
   document.getElementById('certCourse').value=(COURSES.find(c=>c.id===r.courseId)||{title:r.courseId}).title;
   document.getElementById('certDate').value=r.p.certDate||new Date().toISOString().slice(0,10);
+  document.getElementById('certEmail').value=r.p.email||'';
   paintCert(r.p.certId);
+}
+function loadScript(src,globalName){
+  return new Promise((ok,fail)=>{
+    if(globalName&&window[globalName])return ok();
+    const s=document.createElement('script');s.src=src;
+    s.onload=ok;s.onerror=()=>fail(new Error('Kunde inte ladda hjälpbiblioteket'));
+    document.head.appendChild(s);
+  });
+}
+async function buildCertPdf(){
+  await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js','html2canvas');
+  await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js','jspdf');
+  const el=document.getElementById('certEl');
+  const canvas=await html2canvas(el,{scale:2,useCORS:true,backgroundColor:'#ffffff'});
+  const img=canvas.toDataURL('image/jpeg',0.92);
+  const pdf=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  pdf.addImage(img,'JPEG',0,0,297,210);
+  return pdf;
+}
+function certFileName(){
+  const id=(document.getElementById('cId').textContent||'').replace('Certifikat-ID: ','').replace(/[^A-Za-z0-9-]/g,'')||'NAA';
+  const namn=(document.getElementById('certName').value||'certifikat').trim().replace(/\s+/g,'-').replace(/[^A-Za-zÅÄÖåäö0-9-]/g,'');
+  return 'Certifikat-'+namn+'-'+id+'.pdf';
+}
+async function downloadCert(btn){
+  const orig=btn.textContent;btn.disabled=true;btn.textContent='Skapar PDF …';
+  try{
+    const pdf=await buildCertPdf();
+    pdf.save(certFileName());
+    toast('PDF nedladdad ✓');
+  }catch(e){toast('Fel: '+e.message);}
+  btn.disabled=false;btn.textContent=orig;
+}
+async function emailCert(btn){
+  const email=(document.getElementById('certEmail').value||'').trim().toLowerCase();
+  if(!email.includes('@')){toast('Fyll i deltagarens e-post');return;}
+  if(!supa){toast('Mejlutskick kräver skarp drift');return;}
+  const orig=btn.textContent;btn.disabled=true;btn.textContent='Skapar PDF …';
+  try{
+    const pdf=await buildCertPdf();
+    const b64=pdf.output('datauristring').split(',')[1];
+    btn.textContent='Skickar …';
+    const {data:{session}}=await supa.auth.getSession();
+    const res=await fetch('/api/send-certificate',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        token:session?.access_token||'',
+        to:email,
+        name:document.getElementById('certName').value,
+        course:document.getElementById('certCourse').value,
+        certId:(document.getElementById('cId').textContent||'').replace('Certifikat-ID: ',''),
+        pdf:b64
+      })
+    });
+    const out=await res.json().catch(()=>({}));
+    if(res.ok)toast('Certifikatet är mejlat till '+email+' 🎉');
+    else toast('Kunde inte skicka: '+(out.error||('fel '+res.status)));
+  }catch(e){toast('Fel: '+e.message);}
+  btn.disabled=false;btn.textContent=orig;
 }
 function paintCert(certId){
   const name=document.getElementById('certName').value||'Förnamn Efternamn';
