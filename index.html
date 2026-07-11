@@ -441,6 +441,34 @@ body.course-mode{overflow:hidden}
   .reveal{opacity:1;transform:none}
   html{scroll-behavior:auto}
 }
+
+/* ================= CHATT ================= */
+.chat-fab{position:fixed;right:22px;bottom:22px;z-index:8000;width:58px;height:58px;border-radius:50%;background:var(--cyan);border:none;cursor:pointer;box-shadow:0 12px 34px rgba(0,173,239,.45);display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.chat-fab:hover{transform:scale(1.07)}
+.chat-fab svg{width:26px;height:26px}
+.chat-panel{position:fixed;right:22px;bottom:92px;z-index:8001;width:min(370px,calc(100vw - 32px));max-height:min(560px,calc(100vh - 120px));background:#fff;box-shadow:0 30px 90px rgba(20,20,22,.35);display:none;flex-direction:column;overflow:hidden}
+.chat-panel.open{display:flex}
+.chat-head{background:var(--coal);color:#fff;padding:16px 18px;display:flex;align-items:center;gap:12px}
+.chat-head .dot{width:9px;height:9px;border-radius:50%;background:#3ddc84;flex-shrink:0}
+.chat-head h4{font-family:var(--display);font-weight:800;font-size:15px;letter-spacing:.03em;margin:0}
+.chat-head p{font-size:11px;opacity:.75;margin:2px 0 0}
+.chat-head button{margin-left:auto;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;opacity:.8}
+.chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:var(--paper,#f7f5f1)}
+.chat-msg{max-width:85%;padding:10px 14px;font-size:13.5px;line-height:1.55}
+.chat-msg.bot{background:#fff;border:1px solid var(--line-light);align-self:flex-start}
+.chat-msg.user{background:var(--cyan);color:#fff;align-self:flex-end}
+.chat-msg a{color:var(--cyan-deep);cursor:pointer;text-decoration:underline}
+.chat-chips{display:flex;flex-wrap:wrap;gap:7px;padding:0 16px 10px;background:var(--paper,#f7f5f1)}
+.chat-chip{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;background:#fff;border:1px solid var(--line-light);padding:7px 11px;cursor:pointer;transition:all .15s}
+.chat-chip:hover{border-color:var(--cyan);color:var(--cyan-deep)}
+.chat-input{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line-light);background:#fff}
+.chat-input input{flex:1;border:1px solid var(--line-light);padding:11px 13px;font-size:13.5px;font-family:var(--body);outline:none}
+.chat-input input:focus{border-color:var(--cyan)}
+.chat-input button{background:var(--cyan);color:#fff;border:none;padding:0 16px;cursor:pointer;font-size:16px}
+.chat-form{display:flex;flex-direction:column;gap:8px;background:#fff;border:1px solid var(--line-light);padding:12px;align-self:stretch}
+.chat-form input,.chat-form textarea{border:1px solid var(--line-light);padding:9px 11px;font-size:13px;font-family:var(--body);outline:none;resize:vertical}
+.chat-form button{background:var(--coal);color:#fff;border:none;padding:10px;cursor:pointer;font-size:13px;font-family:var(--display);font-weight:700}
+@media print{.chat-fab,.chat-panel{display:none!important}}
 </style>
 </head>
 <body>
@@ -587,7 +615,7 @@ body.course-mode{overflow:hidden}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v4.4</span>
+    <span>Alla rättigheter förbehållna · v4.6</span>
   </div>
 </footer>
 
@@ -665,6 +693,22 @@ body.course-mode{overflow:hidden}
   </div>
 </div>
 
+<button class="chat-fab" id="chatFab" onclick="toggleChat()" aria-label="Öppna chatten">
+  <svg viewBox="0 0 24 24" fill="none"><path d="M21 12c0 4.4-4 8-9 8-1.1 0-2.2-.17-3.2-.5L3 21l1.6-4.2C3.6 15.4 3 13.8 3 12c0-4.4 4-8 9-8s9 3.6 9 8Z" stroke="#fff" stroke-width="1.9" stroke-linejoin="round"/><circle cx="8.5" cy="12" r="1.15" fill="#fff"/><circle cx="12" cy="12" r="1.15" fill="#fff"/><circle cx="15.5" cy="12" r="1.15" fill="#fff"/></svg>
+</button>
+<div class="chat-panel" id="chatPanel">
+  <div class="chat-head">
+    <span class="dot"></span>
+    <div><h4>Nordic Agir Academy</h4><p>Fråga oss om kurserna — vi svarar direkt</p></div>
+    <button onclick="toggleChat()" aria-label="Stäng">×</button>
+  </div>
+  <div class="chat-msgs" id="chatMsgs"></div>
+  <div class="chat-chips" id="chatChips"></div>
+  <div class="chat-input">
+    <input id="chatText" placeholder="Skriv din fråga …" onkeydown="if(event.key==='Enter')chatSend()">
+    <button onclick="chatSend()" aria-label="Skicka">➤</button>
+  </div>
+</div>
 <div class="toast" id="toast"><span class="t-ic">✓</span><span id="toastMsg"></span></div>
 
 <script>
@@ -1389,7 +1433,13 @@ async function renderAdmin(){
           </div>
           <div class="cert-footer">
             <div class="cert-sign"><div class="sig-line"></div><span>Nordic Agir Academy · Stockholm</span></div>
-            <div class="cert-id" id="cId">Certifikat-ID: —</div>
+            <div style="display:flex;align-items:center;gap:14px">
+              <div style="text-align:right">
+                <div class="cert-id" id="cId">Certifikat-ID: —</div>
+                <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:#9a9797;margin-top:4px">SKANNA FÖR ATT VERIFIERA ÄKTHET</div>
+              </div>
+              <div id="cQr" style="width:84px;height:84px;flex-shrink:0"></div>
+            </div>
           </div>
           <div class="cert-band"></div>
         </div>
@@ -1513,6 +1563,18 @@ async function emailCert(btn){
 function paintCert(certId){
   const name=document.getElementById('certName').value||'Förnamn Efternamn';
   const pnr=(document.getElementById('certPnr')?.value||'').trim();
+  // QR-kod som länkar till verifieringssidan
+  (async()=>{
+    try{
+      const qrEl=document.getElementById('cQr');
+      const idTxt=(document.getElementById('cId').textContent||'').replace('Certifikat-ID: ','').trim();
+      if(!qrEl)return;
+      qrEl.innerHTML='';
+      if(!idTxt||idTxt==='—')return;
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js','QRCode');
+      new QRCode(qrEl,{text:location.origin+'/#verifiera/'+encodeURIComponent(idTxt),width:84,height:84,correctLevel:QRCode.CorrectLevel.M});
+    }catch(e){}
+  })();
   document.getElementById('cPnr').textContent=pnr?('Personnummer: '+pnr):'';
   const course=document.getElementById('certCourse').value||'Kursens namn';
   const d=document.getElementById('certDate').value;
@@ -1550,23 +1612,23 @@ if(supa){supa.auth.onAuthStateChange((ev,session)=>{
    Spelaren bygger själv in Courseaus SCORM-omslag runt länken — inga extra
    filer behöver laddas upp. Kan även läsas från tabellen `courses` i Supabase. */
 const COURSE_URLS={
-  'anbud':'https://app.courseau.co/projects/2c993c0b-9ae3-46cf-a640-3f8f89af809f/preview?scorm=true&token=sct_N2lhwgWatNqS6aTheY-lMjUjWs_GwYJyqBDjD1itFSo',
-  'lou-praktik':'https://app.courseau.co/projects/98c7bf30-3b21-4872-a60d-90160eafbdce/preview?scorm=true&token=sct_VxhtgA8HzQsFB3g3HfzQBG7uABz1Xj-SD2z93bu-Csc',
-  'luf-praktik':'https://app.courseau.co/projects/404916b7-436f-4645-8163-50a19cef985e/preview?scorm=true&token=sct_cPjwlMjaZ8WpKi_xPbIKb1kJrNJm3fRxzKgDfeJqplc',
-  'ejur':'https://app.courseau.co/projects/43858c21-7546-478b-a2db-2440621d92fb/preview?scorm=true&token=sct_wqWySk8m9JVQ-HfT--FPNfgVaD-DraWOcT2PTxtJs_4',
-  'ab-abt':'https://app.courseau.co/projects/821040cd-b335-4fd1-bf05-ada8589bb191/preview?scorm=true&token=sct_OhXfy47G7Ay8uI9nQrwcQgnHJAzLicq7lxC_DNZOvUQ',
-  'abk':'https://app.courseau.co/projects/e0af61c2-98ee-4865-a316-d2702898b870/preview?scorm=true&token=sct_REk45Wk3YZWkNGotqSBXOxxBN_ojWaFvf8pAb7HTPXE',
-  'ata':'https://app.courseau.co/projects/5ef7b500-19c2-4a26-9d02-92fce9c95e71/preview?scorm=true&token=sct_3AmkGo8cafpow7vcm4qRV_kvTVrEfT1bF6Bm_m7TuJE',
-  'lyft':'https://app.courseau.co/projects/19ef11da-6e72-46ab-b037-ec5a4b3c70d7/preview?scorm=true&token=sct_4IBpoCTJEmOq9HWFYBhHFBy799jpgxhpxD-qYykbQ2s',
-  'bas':'https://app.courseau.co/projects/0061b3ff-dabf-41a2-99fd-4b9943632092/preview?scorm=true&token=sct_YVXaMfGevbj_XYeTyUihsfvaBAlz3XJStblyRlS-sjQ',
-  'apv':'https://app.courseau.co/projects/787f8262-6f01-4b70-9c2a-0afd32b75073/preview?scorm=true&token=sct_fugcUG0wAqnEYOZXg8njnumJQnUVlSj6SFFo1r7qQKc',
-  'ama-hus':'https://app.courseau.co/projects/33eddf11-6394-48c0-96be-2525955ade16/preview?scorm=true&token=sct_EWvsK1phVw9VlwlCQCjOep5UcnPmotxmLho6EBriX5Q',
-  'ama-anl':'https://app.courseau.co/projects/8b9d55dd-2bd4-463d-ab7f-97a65c77244f/preview?scorm=true&token=sct_A7pMB7hc9YKHB8JNX_QnSkMgwzfjP3FtXLCw3SRiSMM',
-  'kma':'https://app.courseau.co/projects/34ef0cd9-5cac-48d3-9e7c-ec4a9940e280/preview?scorm=true&token=sct_ZB5Zt7Qr-jwTG8APRA29zXrFUCC85GLBWbgrlEmoGms',
-  'pl':'https://app.courseau.co/projects/69e08267-91e3-4bdd-989c-0372515ed45d/preview?scorm=true&token=sct_sHKLK6KtCq7dDimtZlUxIC__be5SoYS8AqwWm7oMuJw',
-  'prl':'https://app.courseau.co/projects/d78a5cbb-7b4e-408f-bdc0-19b9f7a3a56e/preview?scorm=true&token=sct_ycr0atdUWIZzFx1x2AIxGqXaqoMZ9wt2D_-pfvnvPTQ',
-  'tid':'https://app.courseau.co/projects/30ea7004-fa78-4cbf-8a1b-66912c85409e/preview?scorm=true&token=sct_RZp9F7RyR7Yx3tjOWqu1-QcpiAQkDwkjXIRP9SmARCY',
-  'kalk':'https://app.courseau.co/projects/b2f18b9b-47b1-45ab-be8a-fb97a6c33ded/preview?scorm=true&token=sct_JB9k_OsXR_AG-6JTZKedciu7o00VcD13iI6sP7AG1L4'
+  'anbud':'https://app.courseau.co/projects/2c993c0b-9ae3-46cf-a640-3f8f89af809f/preview?scorm=true&token=sct_JQf9aQNePZFm_gMZk9Rmwxmc6ENVJbHz0Vsc-4rvJy4',
+  'lou-praktik':'https://app.courseau.co/projects/98c7bf30-3b21-4872-a60d-90160eafbdce/preview?scorm=true&token=sct_Qsl_xKRrPkBVa02njjVHPcc-Z0sjWcs2fUgYIVYFHkI',
+  'luf-praktik':'https://app.courseau.co/projects/404916b7-436f-4645-8163-50a19cef985e/preview?scorm=true&token=sct_TPz4wUNyhzPArejJfB1m0LGpygzIUilmH3jIOXiY2-g',
+  'ejur':'https://app.courseau.co/projects/43858c21-7546-478b-a2db-2440621d92fb/preview?scorm=true&token=sct_pDzcetYBtBvjmK3D2QvZ0PPWzco6tKLkJFAtyKQU-1I',
+  'ab-abt':'https://app.courseau.co/projects/821040cd-b335-4fd1-bf05-ada8589bb191/preview?scorm=true&token=sct_tdQjt_iJqwiniBCYcZkk4ziGVvsOb0WMBURenEDh9hc',
+  'abk':'https://app.courseau.co/projects/e0af61c2-98ee-4865-a316-d2702898b870/preview?scorm=true&token=sct_ZDhV28xVzXiUjRXqbTlqdP5BewSw0JAflZK4CeWTon4',
+  'ata':'https://app.courseau.co/projects/5ef7b500-19c2-4a26-9d02-92fce9c95e71/preview?scorm=true&token=sct_8B--l2NuWJ4Q-hyHdpgT2FcVReIgtpjWjE1-B5BczW0',
+  'lyft':'https://app.courseau.co/projects/19ef11da-6e72-46ab-b037-ec5a4b3c70d7/preview?scorm=true&token=sct_WJOGj9zPOm0YxItfX7_dOpAfrsacicB5fPCjwQk-Gi0',
+  'bas':'https://app.courseau.co/projects/0061b3ff-dabf-41a2-99fd-4b9943632092/preview?scorm=true&token=sct_fV9wCNky200TuMvsjuRKTGYkeNXrK-twCGnkO9bcelc',
+  'apv':'https://app.courseau.co/projects/787f8262-6f01-4b70-9c2a-0afd32b75073/preview?scorm=true&token=sct_V9wNIdVi-gdu8CU1nUX4qMSOhIWlRn8Tt5VPDWv4UZY',
+  'ama-hus':'https://app.courseau.co/projects/33eddf11-6394-48c0-96be-2525955ade16/preview?scorm=true&token=sct_ygmNP_AQ6UvKr4FYyYo69fFMVLQt35BQVcQ8SocheUU',
+  'ama-anl':'https://app.courseau.co/projects/8b9d55dd-2bd4-463d-ab7f-97a65c77244f/preview?scorm=true&token=sct_F2t5QOZvH2fc-COuKypB-fsxsCopNkBFeZsf666azXc',
+  'kma':'https://app.courseau.co/projects/34ef0cd9-5cac-48d3-9e7c-ec4a9940e280/preview?scorm=true&token=sct_D9aE7CA7SJbZ9hm3uYP-aWOGBjaP6TUvs61SjRHFcVI',
+  'pl':'https://app.courseau.co/projects/69e08267-91e3-4bdd-989c-0372515ed45d/preview?scorm=true&token=sct_yTtfV8tBPqvVT3Ooj6l8sWe0KZGF-Wn0KEBAhk7h094',
+  'prl':'https://app.courseau.co/projects/d78a5cbb-7b4e-408f-bdc0-19b9f7a3a56e/preview?scorm=true&token=sct_JZdYeOcAKaXWeUCWb4KuI75AgQtyPZECNYtz6dKg5Ps',
+  'tid':'https://app.courseau.co/projects/30ea7004-fa78-4cbf-8a1b-66912c85409e/preview?scorm=true&token=sct_bIFfbIo_w1sxefByNznErK3H6avwXR8IVWNgwaYGG54',
+  'kalk':'https://app.courseau.co/projects/b2f18b9b-47b1-45ab-be8a-fb97a6c33ded/preview?scorm=true&token=sct_-AdwO_-l7_I7e6IkJd8Hs7JlE3DRKtY8Lbx27l_bGSo'
 };
 /* Courseaus egna SCORM-skript (APIWrapper.js + init.js), inbäddade som base64 */
 const SCORM_APIW_B64='LyoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioKICoqCiAqKiBGaWxlTmFtZTogQVBJV3JhcHBlci5qcwogKioKICoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKiovCgovKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKgogKioKICoqIENvbmN1cnJlbnQgVGVjaG5vbG9naWVzIENvcnBvcmF0aW9uIChDVEMpIGdyYW50cyB5b3UgKCJMaWNlbnNlZSIpIGEgbm9uLQogKiogZXhjbHVzaXZlLCByb3lhbHR5IGZyZWUsIGxpY2Vuc2UgdG8gdXNlLCBtb2RpZnkgYW5kIHJlZGlzdHJpYnV0ZSB0aGlzCiAqKiBzb2Z0d2FyZSBpbiBzb3VyY2UgYW5kIGJpbmFyeSBjb2RlIGZvcm0sIHByb3ZpZGVkIHRoYXQgaSkgdGhpcyBjb3B5cmlnaHQKICoqIG5vdGljZSBhbmQgbGljZW5zZSBhcHBlYXIgb24gYWxsIGNvcGllcyBvZiB0aGUgc29mdHdhcmU7IGFuZCBpaSkgTGljZW5zZWUgZG9lcwogKiogbm90IHV0aWxpemUgdGhlIHNvZnR3YXJlIGluIGEgbWFubmVyIHdoaWNoIGlzIGRpc3BhcmFnaW5nIHRvIENUQy4KICoqCiAqKiBUaGlzIHNvZnR3YXJlIGlzIHByb3ZpZGVkICJBUyBJUywiIHdpdGhvdXQgYSB3YXJyYW50eSBvZiBhbnkga2luZC4gIEFMTAogKiogRVhQUkVTUyBPUiBJTVBMSUVEIENPTkRJVElPTlMsIFJFUFJFU0VOVEFUSU9OUyBBTkQgV0FSUkFOVElFUywgSU5DTFVESU5HIEFOWQogKiogSU1QTElFRCBXQVJSQU5UWSBPRiBNRVJDSEFOVEFCSUxJVFksIEZJVE5FU1MgRk9SIEEgUEFSVElDVUxBUiBQVVJQT1NFIE9SIE5PTi0KICoqIElORlJJTkdFTUVOVCwgQVJFIEhFUkVCWSBFWENMVURFRC4gIENUQyBBTkQgSVRTIExJQ0VOU09SUyBTSEFMTCBOT1QgQkUgTElBQkxFCiAqKiBGT1IgQU5ZIERBTUFHRVMgU1VGRkVSRUQgQlkgTElDRU5TRUUgQVMgQSBSRVNVTFQgT0YgVVNJTkcsIE1PRElGWUlORyBPUgogKiogRElTVFJJQlVUSU5HIFRIRSBTT0ZUV0FSRSBPUiBJVFMgREVSSVZBVElWRVMuICBJTiBOTyBFVkVOVCBXSUxMIENUQyAgT1IgSVRTCiAqKiBMSUNFTlNPUlMgQkUgTElBQkxFIEZPUiBBTlkgTE9TVCBSRVZFTlVFLCBQUk9GSVQgT1IgREFUQSwgT1IgRk9SIERJUkVDVCwKICoqIElORElSRUNULCBTUEVDSUFMLCBDT05TRVFVRU5USUFMLCBJTkNJREVOVEFMIE9SIFBVTklUSVZFIERBTUFHRVMsIEhPV0VWRVIKICoqIENBVVNFRCBBTkQgUkVHQVJETEVTUyBPRiBUSEUgVEhFT1JZIE9GIExJQUJJTElUWSwgQVJJU0lORyBPVVQgT0YgVEhFIFVTRSBPRgogKiogT1IgSU5BQklMSVRZIFRPIFVTRSBTT0ZUV0FSRSwgRVZFTiBJRiBDVEMgIEhBUyBCRUVOIEFEVklTRUQgT0YgVEhFIFBPU1NJQklMSVRZCiAqKiBPRiBTVUNIIERBTUFHRVMuCiAqKgogKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKi8KCi8qKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqCiAqKiBUaGlzIGZpbGUgaXMgcGFydCBvZiB0aGUgQURMIFNhbXBsZSBBUEkgSW1wbGVtZW50YXRpb24gaW50ZW5kZWQgdG8gcHJvdmlkZQogKiogYW4gZWxlbWVudGFyeSBleGFtcGxlIG9mIHRoZSBjb25jZXB0cyBwcmVzZW50ZWQgaW4gdGhlIEFETCBTaGFyYWJsZQogKiogQ29udGVudCBPYmplY3QgUmVmZXJlbmNlIE1vZGVsIChTQ09STSkuCiAqKgogKiogVGhlIHB1cnBvc2UgaW4gd3JhcHBpbmcgdGhlIGNhbGxzIHRvIHRoZSBBUEkgaXMgdG8gKDEpIHByb3ZpZGUgYQogKiogY29uc2lzdGVudCBtZWFucyBvZiBmaW5kaW5nIHRoZSBMTVMgQVBJIGltcGxlbWVudGF0aW9uIHdpdGhpbiB0aGUgd2luZG93CiAqKiBoaWVyYXJjaHkgYW5kICgyKSB0byB2YWxpZGF0ZSB0aGF0IHRoZSBkYXRhIGJlaW5nIGV4Y2hhbmdlZCB2aWEgdGhlCiAqKiBBUEkgY29uZm9ybXMgdG8gdGhlIGRlZmluZWQgQ01JIGRhdGEgdHlwZXMuCiAqKgogKiogVGhpcyBpcyBqdXN0IG9uZSBwb3NzaWJsZSBleGFtcGxlIGZvciBpbXBsZW1lbnRpbmcgdGhlIEFQSSBndWlkZWxpbmVzIGZvcgogKiogcnVudGltZSBjb21tdW5pY2F0aW9uIGJldHdlZW4gYW4gTE1TIGFuZCBleGVjdXRhYmxlIGNvbnRlbnQgY29tcG9uZW50cy4KICoqIFRoZXJlIGFyZSBzZXZlcmFsIG90aGVyIHBvc3NpYmxlIGltcGxlbWVudGF0aW9ucy4KICoqCiAqKiBVc2FnZTogRXhlY3V0YWJsZSBjb3Vyc2UgY29udGVudCBjYW4gY2FsbCB0aGUgQVBJIFdyYXBwZXIKICoqICAgICAgZnVuY3Rpb25zIGFzIGZvbGxvd3M6CiAqKgogKiogICAgamF2YXNjcmlwdDoKICoqICAgICAgICAgIHZhciByZXN1bHQgPSBkb0xNU0luaXRpYWxpemUoKTsKICoqICAgICAgICAgIGlmIChyZXN1bHQgIT0gdHJ1ZSkKICoqICAgICAgICAgIHsKICoqICAgICAgICAgICAgIC8vIGhhbmRsZSBlcnJvcgogKiogICAgICAgICAgfQogKioKICoqICAgIGF1dGhvcndhcmUKICoqICAgICAgICAgIHJlc3VsdCA6PSBSZWFkVVJMKCJqYXZhc2NyaXB0OmRvTE1TSW5pdGlhbGl6ZSgpIiwgMTAwKQogKioKICoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKiovCgp2YXIgX0RlYnVnID0gZmFsc2U7IC8vIHNldCB0aGlzIHRvIGZhbHNlIHRvIHR1cm4gZGVidWdnaW5nIG9mZgovLyBhbmQgZ2V0IHJpZCBvZiB0aG9zZSBhbm5veWluZyBhbGVydCBib3hlcy4KCi8vIERlZmluZSBleGNlcHRpb24vZXJyb3IgY29kZXMKdmFyIF9Ob0Vycm9yID0gMDsKdmFyIF9HZW5lcmFsRXhjZXB0aW9uID0gMTAxOwp2YXIgX1NlcnZlckJ1c3kgPSAxMDI7CnZhciBfSW52YWxpZEFyZ3VtZW50RXJyb3IgPSAyMDE7CnZhciBfRWxlbWVudENhbm5vdEhhdmVDaGlsZHJlbiA9IDIwMjsKdmFyIF9FbGVtZW50SXNOb3RBbkFycmF5ID0gMjAzOwp2YXIgX05vdEluaXRpYWxpemVkID0gMzAxOwp2YXIgX05vdEltcGxlbWVudGVkRXJyb3IgPSA0MDE7CnZhciBfSW52YWxpZFNldFZhbHVlID0gNDAyOwp2YXIgX0VsZW1lbnRJc1JlYWRPbmx5ID0gNDAzOwp2YXIgX0VsZW1lbnRJc1dyaXRlT25seSA9IDQwNDsKdmFyIF9JbmNvcnJlY3REYXRhVHlwZSA9IDQwNTsKCi8vIGxvY2FsIHZhcmlhYmxlIGRlZmluaXRpb25zCnZhciBhcGlIYW5kbGUgPSBudWxsOwp2YXIgQVBJID0gbnVsbDsKdmFyIGZpbmRBUElUcmllcyA9IDA7CgovKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKgogKioKICoqIEZ1bmN0aW9uOiBkb0xNU0luaXRpYWxpemUoKQogKiogSW5wdXRzOiAgTm9uZQogKiogUmV0dXJuOiAgQ01JQm9vbGVhbiB0cnVlIGlmIHRoZSBpbml0aWFsaXphdGlvbiB3YXMgc3VjY2Vzc2Z1bCwgb3IKICoqICAgICAgICAgIENNSUJvb2xlYW4gZmFsc2UgaWYgdGhlIGluaXRpYWxpemF0aW9uIGZhaWxlZC4KICoqCiAqKiBEZXNjcmlwdGlvbjoKICoqIEluaXRpYWxpemUgY29tbXVuaWNhdGlvbiB3aXRoIExNUyBieSBjYWxsaW5nIHRoZSBMTVNJbml0aWFsaXplCiAqKiBmdW5jdGlvbiB3aGljaCB3aWxsIGJlIGltcGxlbWVudGVkIGJ5IHRoZSBMTVMuCiAqKgogKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKi8KZnVuY3Rpb24gZG9MTVNJbml0aWFsaXplKCkgewogIHZhciBhcGkgPSBnZXRBUElIYW5kbGUoKTsKICBpZiAoYXBpID09IG51bGwpIHsKICAgIGFsZXJ0KCJVbmFibGUgdG8gbG9jYXRlIHRoZSBMTVMncyBBUEkgSW1wbGVtZW50YXRpb24uXG5MTVNJbml0aWFsaXplIHdhcyBub3Qgc3VjY2Vzc2Z1bC4iKTsKICAgIHJldHVybiAiZmFsc2UiOwogIH0KCiAgdmFyIHJlc3VsdCA9IGFwaS5MTVNJbml0aWFsaXplKCIiKTsKCiAgaWYgKHJlc3VsdC50b1N0cmluZygpICE9ICJ0cnVlIikgewogICAgdmFyIGVyciA9IEVycm9ySGFuZGxlcigpOwogIH0KCiAgcmV0dXJuIHJlc3VsdC50b1N0cmluZygpOwp9CgovKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKgogKioKICoqIEZ1bmN0aW9uIGRvTE1TRmluaXNoKCkKICoqIElucHV0czogIE5vbmUKICoqIFJldHVybjogIENNSUJvb2xlYW4gdHJ1ZSBpZiBzdWNjZXNzZnVsCiAqKiAgICAgICAgICBDTUlCb29sZWFuIGZhbHNlIGlmIGZhaWxlZC4KICoqCiAqKiBEZXNjcmlwdGlvbjoKICoqIENsb3NlIGNvbW11bmljYXRpb24gd2l0aCBMTVMgYnkgY2FsbGluZyB0aGUgTE1TRmluaXNoCiAqKiBmdW5jdGlvbiB3aGljaCB3aWxsIGJlIGltcGxlbWVudGVkIGJ5IHRoZSBMTVMKICoqCiAqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqLwpmdW5jdGlvbiBkb0xNU0ZpbmlzaCgpIHsKICB2YXIgYXBpID0gZ2V0QVBJSGFuZGxlKCk7CiAgaWYgKGFwaSA9PSBudWxsKSB7CiAgICBhbGVydCgiVW5hYmxlIHRvIGxvY2F0ZSB0aGUgTE1TJ3MgQVBJIEltcGxlbWVudGF0aW9uLlxuTE1TRmluaXNoIHdhcyBub3Qgc3VjY2Vzc2Z1bC4iKTsKICAgIHJldHVybiAiZmFsc2UiOwogIH0gZWxzZSB7CiAgICAvLyBjYWxsIHRoZSBMTVNGaW5pc2ggZnVuY3Rpb24gdGhhdCBzaG91bGQgYmUgaW1wbGVtZW50ZWQgYnkgdGhlIEFQSQoKICAgIHZhciByZXN1bHQgPSBhcGkuTE1TRmluaXNoKCIiKTsKICAgIGlmIChyZXN1bHQudG9TdHJpbmcoKSAhPSAidHJ1ZSIpIHsKICAgICAgdmFyIGVyciA9IEVycm9ySGFuZGxlcigpOwogICAgfQogIH0KCiAgcmV0dXJuIHJlc3VsdC50b1N0cmluZygpOwp9CgovKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKgogKioKICoqIEZ1bmN0aW9uIGRvTE1TR2V0VmFsdWUobmFtZSkKICoqIElucHV0czogIG5hbWUgLSBzdHJpbmcgcmVwcmVzZW50aW5nIHRoZSBjbWkgZGF0YSBtb2RlbCBkZWZpbmVkIGNhdGVnb3J5IG9yCiAqKiAgICAgICAgICAgICBlbGVtZW50IChlLmcuIGNtaS5jb3JlLnN0dWRlbnRfaWQpCiAqKiBSZXR1cm46ICBUaGUgdmFsdWUgcHJlc2VudGx5IGFzc2lnbmVkIGJ5IHRoZSBMTVMgdG8gdGhlIGNtaSBkYXRhIG1vZGVsCiAqKiAgICAgICBlbGVtZW50IGRlZmluZWQgYnkgdGhlIGVsZW1lbnQgb3IgY2F0ZWdvcnkgaWRlbnRpZmllZCBieSB0aGUgbmFtZQogKiogICAgICAgaW5wdXQgdmFsdWUuCiAqKgogKiogRGVzY3JpcHRpb246CiAqKiBXcmFwcyB0aGUgY2FsbCB0byB0aGUgTE1TIExNU0dldFZhbHVlIG1ldGhvZAogKioKICoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKiovCmZ1bmN0aW9uIGRvTE1TR2V0VmFsdWUobmFtZSkgewogIHZhciBhcGkgPSBnZXRBUElIYW5kbGUoKTsKICBpZiAoYXBpID09IG51bGwpIHsKICAgIGFsZXJ0KCJVbmFibGUgdG8gbG9jYXRlIHRoZSBMTVMncyBBUEkgSW1wbGVtZW50YXRpb24uXG5MTVNHZXRWYWx1ZSB3YXMgbm90IHN1Y2Nlc3NmdWwuIik7CiAgICByZXR1cm4gIiI7CiAgfSBlbHNlIHsKICAgIHZhciB2YWx1ZSA9IGFwaS5MTVNHZXRWYWx1ZShuYW1lKTsKICAgIHZhciBlcnJDb2RlID0gYXBpLkxNU0dldExhc3RFcnJvcigpLnRvU3RyaW5nKCk7CiAgICBpZiAoZXJyQ29kZSAhPSBfTm9FcnJvcikgewogICAgICAvLyBhbiBlcnJvciB3YXMgZW5jb3VudGVyZWQgc28gZGlzcGxheSB0aGUgZXJyb3IgZGVzY3JpcHRpb24KICAgICAgdmFyIGVyckRlc2NyaXB0aW9uID0gYXBpLkxNU0dldEVycm9yU3RyaW5nKGVyckNvZGUpOwogICAgICBjb25zb2xlLmVycm9yKCJMTVNHZXRWYWx1ZSgiICsgbmFtZSArICIpIGZhaWxlZC4gXG4iICsgZXJyRGVzY3JpcHRpb24pOwogICAgICByZXR1cm4gIiI7CiAgICB9IGVsc2UgewogICAgICByZXR1cm4gdmFsdWUudG9TdHJpbmcoKTsKICAgIH0KICB9Cn0KCi8qKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqCiAqKgogKiogRnVuY3Rpb24gZG9MTVNTZXRWYWx1ZShuYW1lLCB2YWx1ZSkKICoqIElucHV0czogIG5hbWUgLXN0cmluZyByZXByZXNlbnRpbmcgdGhlIGRhdGEgbW9kZWwgZGVmaW5lZCBjYXRlZ29yeSBvciBlbGVtZW50CiAqKiAgICAgICAgICB2YWx1ZSAtdGhlIHZhbHVlIHRoYXQgdGhlIG5hbWVkIGVsZW1lbnQgb3IgY2F0ZWdvcnkgd2lsbCBiZSBhc3NpZ25lZAogKiogUmV0dXJuOiAgQ01JQm9vbGVhbiB0cnVlIGlmIHN1Y2Nlc3NmdWwKICoqICAgICAgICAgIENNSUJvb2xlYW4gZmFsc2UgaWYgZmFpbGVkLgogKioKICoqIERlc2NyaXB0aW9uOgogKiogV3JhcHMgdGhlIGNhbGwgdG8gdGhlIExNUyBMTVNTZXRWYWx1ZSBmdW5jdGlvbgogKioKICoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKiovCmZ1bmN0aW9uIGRvTE1TU2V0VmFsdWUobmFtZSwgdmFsdWUpIHsKICB2YXIgYXBpID0gZ2V0QVBJSGFuZGxlKCk7CiAgaWYgKGFwaSA9PSBudWxsKSB7CiAgICBjb25zb2xlLmVycm9yKCJVbmFibGUgdG8gbG9jYXRlIHRoZSBMTVMncyBBUEkgSW1wbGVtZW50YXRpb24uXG5MTVNTZXRWYWx1ZSB3YXMgbm90IHN1Y2Nlc3NmdWwuIik7CiAgICByZXR1cm4gImZhbHNlIjsKICB9IGVsc2UgewogICAgdmFyIHJlc3VsdCA9IGFwaS5MTVNTZXRWYWx1ZShuYW1lLCB2YWx1ZSk7CiAgICBpZiAocmVzdWx0LnRvU3RyaW5nKCkgIT0gInRydWUiKSB7CiAgICAgIHZhciBlcnIgPSBFcnJvckhhbmRsZXIoKTsKICAgIH0KICB9CgogIHJldHVybiByZXN1bHQudG9TdHJpbmcoKTsKfQoKLyoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioKICoqCiAqKiBGdW5jdGlvbiBkb0xNU0NvbW1pdCgpCiAqKiBJbnB1dHM6ICBOb25lCiAqKiBSZXR1cm46ICBOb25lCiAqKgogKiogRGVzY3JpcHRpb246CiAqKiBDYWxsIHRoZSBMTVNDb21taXQgZnVuY3Rpb24KICoqCiAqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqLwpmdW5jdGlvbiBkb0xNU0NvbW1pdCgpIHsKICB2YXIgYXBpID0gZ2V0QVBJSGFuZGxlKCk7CiAgaWYgKGFwaSA9PSBudWxsKSB7CiAgICBjb25zb2xlLmVycm9yKCJVbmFibGUgdG8gbG9jYXRlIHRoZSBMTVMncyBBUEkgSW1wbGVtZW50YXRpb24uXG5MTVNDb21taXQgd2FzIG5vdCBzdWNjZXNzZnVsLiIpOwogICAgcmV0dXJuICJmYWxzZSI7CiAgfSBlbHNlIHsKICAgIHZhciByZXN1bHQgPSBhcGkuTE1TQ29tbWl0KCIiKTsKICAgIGlmIChyZXN1bHQgIT0gInRydWUiKSB7CiAgICAgIHZhciBlcnIgPSBFcnJvckhhbmRsZXIoKTsKICAgIH0KICB9CgogIHJldHVybiByZXN1bHQudG9TdHJpbmcoKTsKfQoKLyoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioKICoqCiAqKiBGdW5jdGlvbiBkb0xNU0dldExhc3RFcnJvcigpCiAqKiBJbnB1dHM6ICBOb25lCiAqKiBSZXR1cm46ICBUaGUgZXJyb3IgY29kZSB0aGF0IHdhcyBzZXQgYnkgdGhlIGxhc3QgTE1TIGZ1bmN0aW9uIGNhbGwKICoqCiAqKiBEZXNjcmlwdGlvbjoKICoqIENhbGwgdGhlIExNU0dldExhc3RFcnJvciBmdW5jdGlvbgogKioKICoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKiovCmZ1bmN0aW9uIGRvTE1TR2V0TGFzdEVycm9yKCkgewogIHZhciBhcGkgPSBnZXRBUElIYW5kbGUoKTsKICBpZiAoYXBpID09IG51bGwpIHsKICAgIGNvbnNvbGUuZXJyb3IoIlVuYWJsZSB0byBsb2NhdGUgdGhlIExNUydzIEFQSSBJbXBsZW1lbnRhdGlvbi5cbkxNU0dldExhc3RFcnJvciB3YXMgbm90IHN1Y2Nlc3NmdWwuIik7CiAgICAvL3NpbmNlIHdlIGNhbid0IGdldCB0aGUgZXJyb3IgY29kZSBmcm9tIHRoZSBMTVMsIHJldHVybiBhIGdlbmVyYWwgZXJyb3IKICAgIHJldHVybiBfR2VuZXJhbEVycm9yOwogIH0KCiAgcmV0dXJuIGFwaS5MTVNHZXRMYXN0RXJyb3IoKS50b1N0cmluZygpOwp9CgovKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKgogKioKICoqIEZ1bmN0aW9uIGRvTE1TR2V0RXJyb3JTdHJpbmcoZXJyb3JDb2RlKQogKiogSW5wdXRzOiAgZXJyb3JDb2RlIC0gRXJyb3IgQ29kZQogKiogUmV0dXJuOiAgVGhlIHRleHR1YWwgZGVzY3JpcHRpb24gdGhhdCBjb3JyZXNwb25kcyB0byB0aGUgaW5wdXQgZXJyb3IgY29kZQogKioKICoqIERlc2NyaXB0aW9uOgogKiogQ2FsbCB0aGUgTE1TR2V0RXJyb3JTdHJpbmcgZnVuY3Rpb24KICoqCiAqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKi8KZnVuY3Rpb24gZG9MTVNHZXRFcnJvclN0cmluZyhlcnJvckNvZGUpIHsKICB2YXIgYXBpID0gZ2V0QVBJSGFuZGxlKCk7CiAgaWYgKGFwaSA9PSBudWxsKSB7CiAgICBjb25zb2xlLmVycm9yKCJVbmFibGUgdG8gbG9jYXRlIHRoZSBMTVMncyBBUEkgSW1wbGVtZW50YXRpb24uXG5MTVNHZXRFcnJvclN0cmluZyB3YXMgbm90IHN1Y2Nlc3NmdWwuIik7CiAgfQoKICByZXR1cm4gYXBpLkxNU0dldEVycm9yU3RyaW5nKGVycm9yQ29kZSkudG9TdHJpbmcoKTsKfQoKLyoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioKICoqCiAqKiBGdW5jdGlvbiBkb0xNU0dldERpYWdub3N0aWMoZXJyb3JDb2RlKQogKiogSW5wdXRzOiAgZXJyb3JDb2RlIC0gRXJyb3IgQ29kZShpbnRlZ2VyIGZvcm1hdCksIG9yIG51bGwKICoqIFJldHVybjogIFRoZSB2ZW5kb3Igc3BlY2lmaWMgdGV4dHVhbCBkZXNjcmlwdGlvbiB0aGF0IGNvcnJlc3BvbmRzIHRvIHRoZQogKiogICAgICAgICAgaW5wdXQgZXJyb3IgY29kZQogKioKICoqIERlc2NyaXB0aW9uOgogKiogQ2FsbCB0aGUgTE1TR2V0RGlhZ25vc3RpYyBmdW5jdGlvbgogKioKICoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKiovCmZ1bmN0aW9uIGRvTE1TR2V0RGlhZ25vc3RpYyhlcnJvckNvZGUpIHsKICB2YXIgYXBpID0gZ2V0QVBJSGFuZGxlKCk7CiAgaWYgKGFwaSA9PSBudWxsKSB7CiAgICBjb25zb2xlLmVycm9yKCJVbmFibGUgdG8gbG9jYXRlIHRoZSBMTVMncyBBUEkgSW1wbGVtZW50YXRpb24uXG5MTVNHZXREaWFnbm9zdGljIHdhcyBub3Qgc3VjY2Vzc2Z1bC4iKTsKICB9CgogIHJldHVybiBhcGkuTE1TR2V0RGlhZ25vc3RpYyhlcnJvckNvZGUpLnRvU3RyaW5nKCk7Cn0KCi8qKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqCiAqKgogKiogRnVuY3Rpb24gTE1TSXNJbml0aWFsaXplZCgpCiAqKiBJbnB1dHM6ICBub25lCiAqKiBSZXR1cm46ICB0cnVlIGlmIHRoZSBMTVMgQVBJIGlzIGN1cnJlbnRseSBpbml0aWFsaXplZCwgb3RoZXJ3aXNlIGZhbHNlCiAqKgogKiogRGVzY3JpcHRpb246CiAqKiBEZXRlcm1pbmVzIGlmIHRoZSBMTVMgQVBJIGlzIGN1cnJlbnRseSBpbml0aWFsaXplZCBvciBub3QuCiAqKgogKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKi8KZnVuY3Rpb24gTE1TSXNJbml0aWFsaXplZCgpIHsKICAvLyB0aGVyZSBpcyBubyBkaXJlY3QgbWV0aG9kIGZvciBkZXRlcm1pbmluZyBpZiB0aGUgTE1TIEFQSSBpcyBpbml0aWFsaXplZAogIC8vIGZvciBleGFtcGxlIGFuIExNU0lzSW5pdGlhbGl6ZWQgZnVuY3Rpb24gZGVmaW5lZCBvbiB0aGUgQVBJIHNvIHdlJ2xsIHRyeQogIC8vIGEgc2ltcGxlIExNU0dldFZhbHVlIGFuZCB0cmFwIGZvciB0aGUgTE1TIE5vdCBJbml0aWFsaXplZCBFcnJvcgoKICB2YXIgYXBpID0gZ2V0QVBJSGFuZGxlKCk7CiAgaWYgKGFwaSA9PSBudWxsKSB7CiAgICBjb25zb2xlLmVycm9yKCJVbmFibGUgdG8gbG9jYXRlIHRoZSBMTVMncyBBUEkgSW1wbGVtZW50YXRpb24uXG5MTVNJc0luaXRpYWxpemVkKCkgZmFpbGVkLiIpOwogICAgcmV0dXJuIGZhbHNlOwogIH0gZWxzZSB7CiAgICB2YXIgdmFsdWUgPSBhcGkuTE1TR2V0VmFsdWUoImNtaS5jb3JlLnN0dWRlbnRfbmFtZSIpOwogICAgdmFyIGVyckNvZGUgPSBhcGkuTE1TR2V0TGFzdEVycm9yKCkudG9TdHJpbmcoKTsKICAgIGlmIChlcnJDb2RlID09IF9Ob3RJbml0aWFsaXplZCkgewogICAgICByZXR1cm4gZmFsc2U7CiAgICB9IGVsc2UgewogICAgICByZXR1cm4gdHJ1ZTsKICAgIH0KICB9Cn0KCi8qKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqCiAqKgogKiogRnVuY3Rpb24gRXJyb3JIYW5kbGVyKCkKICoqIElucHV0czogIE5vbmUKICoqIFJldHVybjogIFRoZSBjdXJyZW50IHZhbHVlIG9mIHRoZSBMTVMgRXJyb3IgQ29kZQogKioKICoqIERlc2NyaXB0aW9uOgogKiogRGV0ZXJtaW5lcyBpZiBhbiBlcnJvciB3YXMgZW5jb3VudGVyZWQgYnkgdGhlIHByZXZpb3VzIEFQSSBjYWxsCiAqKiBhbmQgaWYgc28sIGRpc3BsYXlzIGEgbWVzc2FnZSB0byB0aGUgdXNlci4gIElmIHRoZSBlcnJvciBjb2RlCiAqKiBoYXMgYXNzb2NpYXRlZCB0ZXh0IGl0IGlzIGFsc28gZGlzcGxheWVkLgogKioKICoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKiovCmZ1bmN0aW9uIEVycm9ySGFuZGxlcigpIHsKICB2YXIgYXBpID0gZ2V0QVBJSGFuZGxlKCk7CiAgaWYgKGFwaSA9PSBudWxsKSB7CiAgICBjb25zb2xlLmVycm9yKCJVbmFibGUgdG8gbG9jYXRlIHRoZSBMTVMncyBBUEkgSW1wbGVtZW50YXRpb24uXG5DYW5ub3QgZGV0ZXJtaW5lIExNUyBlcnJvciBjb2RlLiIpOwogICAgcmV0dXJuOwogIH0KCiAgLy8gY2hlY2sgZm9yIGVycm9ycyBjYXVzZWQgYnkgb3IgZnJvbSB0aGUgTE1TCiAgdmFyIGVyckNvZGUgPSBhcGkuTE1TR2V0TGFzdEVycm9yKCkudG9TdHJpbmcoKTsKICBpZiAoZXJyQ29kZSAhPSBfTm9FcnJvcikgewogICAgLy8gYW4gZXJyb3Igd2FzIGVuY291bnRlcmVkIHNvIGRpc3BsYXkgdGhlIGVycm9yIGRlc2NyaXB0aW9uCiAgICB2YXIgZXJyRGVzY3JpcHRpb24gPSBhcGkuTE1TR2V0RXJyb3JTdHJpbmcoZXJyQ29kZSk7CgogICAgaWYgKF9EZWJ1ZyA9PSB0cnVlKSB7CiAgICAgIGVyckRlc2NyaXB0aW9uICs9ICJcbiI7CiAgICAgIGVyckRlc2NyaXB0aW9uICs9IGFwaS5MTVNHZXREaWFnbm9zdGljKG51bGwpOwogICAgICAvLyBieSBwYXNzaW5nIG51bGwgdG8gTE1TR2V0RGlhZ25vc3RpYywgd2UgZ2V0IGFueSBhdmFpbGFibGUgZGlhZ25vc3RpY3MKICAgICAgLy8gb24gdGhlIHByZXZpb3VzIGVycm9yLgogICAgfQoKICAgIGNvbnNvbGUuZXJyb3IoZXJyRGVzY3JpcHRpb24pOwogIH0KCiAgcmV0dXJuIGVyckNvZGU7Cn0KCi8qKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioKICoqCiAqKiBGdW5jdGlvbiBnZXRBUElIYW5kbGUoKQogKiogSW5wdXRzOiAgTm9uZQogKiogUmV0dXJuOiAgdmFsdWUgY29udGFpbmVkIGJ5IEFQSUhhbmRsZQogKioKICoqIERlc2NyaXB0aW9uOgogKiogUmV0dXJucyB0aGUgaGFuZGxlIHRvIEFQSSBvYmplY3QgaWYgaXQgd2FzIHByZXZpb3VzbHkgc2V0LAogKiogb3RoZXJ3aXNlIGl0IHJldHVybnMgbnVsbAogKioKICoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKiovCmZ1bmN0aW9uIGdldEFQSUhhbmRsZSgpIHsKICBpZiAoYXBpSGFuZGxlID09IG51bGwpIHsKICAgIGFwaUhhbmRsZSA9IGdldEFQSSgpOwogIH0KCiAgcmV0dXJuIGFwaUhhbmRsZTsKfQoKLyoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioKICoqCiAqKiBGdW5jdGlvbiBmaW5kQVBJKHdpbikKICoqIElucHV0czogIHdpbiAtIGEgV2luZG93IE9iamVjdAogKiogUmV0dXJuOiAgSWYgYW4gQVBJIG9iamVjdCBpcyBmb3VuZCwgaXQncyByZXR1cm5lZCwgb3RoZXJ3aXNlIG51bGwgaXMgcmV0dXJuZWQKICoqCiAqKiBEZXNjcmlwdGlvbjoKICoqIFRoaXMgZnVuY3Rpb24gbG9va3MgZm9yIGFuIG9iamVjdCBuYW1lZCBBUEkgaW4gcGFyZW50IGFuZCBvcGVuZXIgd2luZG93cwogKioKICoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKiovCmZ1bmN0aW9uIGZpbmRBUEkod2luKSB7CiAgd2hpbGUgKHdpbi5BUEkgPT0gbnVsbCAmJiB3aW4ucGFyZW50ICE9IG51bGwgJiYgd2luLnBhcmVudCAhPSB3aW4pIHsKICAgIGZpbmRBUElUcmllcysrOwogICAgLy8gTm90ZTogNyBpcyBhbiBhcmJpdHJhcnkgbnVtYmVyLCBidXQgc2hvdWxkIGJlIG1vcmUgdGhhbiBzdWZmaWNpZW50CiAgICBpZiAoZmluZEFQSVRyaWVzID4gNykgewogICAgICBjb25zb2xlLmVycm9yKCJFcnJvciBmaW5kaW5nIEFQSSAtLSB0b28gZGVlcGx5IG5lc3RlZC4iKTsKICAgICAgcmV0dXJuIG51bGw7CiAgICB9CgogICAgd2luID0gd2luLnBhcmVudDsKICB9CiAgcmV0dXJuIHdpbi5BUEk7Cn0KCi8qKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqCiAqKgogKiogRnVuY3Rpb24gZ2V0QVBJKCkKICoqIElucHV0czogIG5vbmUKICoqIFJldHVybjogIElmIGFuIEFQSSBvYmplY3QgaXMgZm91bmQsIGl0J3MgcmV0dXJuZWQsIG90aGVyd2lzZSBudWxsIGlzIHJldHVybmVkCiAqKgogKiogRGVzY3JpcHRpb246CiAqKiBUaGlzIGZ1bmN0aW9uIGxvb2tzIGZvciBhbiBvYmplY3QgbmFtZWQgQVBJLCBmaXJzdCBpbiB0aGUgY3VycmVudCB3aW5kb3cncwogKiogZnJhbWUgaGllcmFyY2h5IGFuZCB0aGVuLCBpZiBuZWNlc3NhcnksIGluIHRoZSBjdXJyZW50IHdpbmRvdydzIG9wZW5lciB3aW5kb3cKICoqIGhpZXJhcmNoeSAoaWYgdGhlcmUgaXMgYW4gb3BlbmVyIHdpbmRvdykuCiAqKgogKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKi8KZnVuY3Rpb24gZ2V0QVBJKCkgewogIHZhciB0aGVBUEkgPSBmaW5kQVBJKHdpbmRvdyk7CiAgaWYgKHRoZUFQSSA9PSBudWxsICYmIHdpbmRvdy5vcGVuZXIgIT0gbnVsbCAmJiB0eXBlb2Ygd2luZG93Lm9wZW5lciAhPSAidW5kZWZpbmVkIikgewogICAgdGhlQVBJID0gZmluZEFQSSh3aW5kb3cub3BlbmVyKTsKICB9CiAgaWYgKHRoZUFQSSA9PSBudWxsKSB7CiAgICBjb25zb2xlLmVycm9yKCJVbmFibGUgdG8gZmluZCBhbiBBUEkgYWRhcHRlciIpOwogIH0KICByZXR1cm4gdGhlQVBJOwp9Cg==';
@@ -1742,6 +1804,12 @@ async function autoComplete(){
   if(!scormRow||scormRow.status==='klar')return;
   scormRow.status='klar';
   if(supa)await supa.from('enrollments').update({status:'klar'}).eq('id',scormRow.id);
+  // meddela Nordic Agir att certifikatet ska skickas
+  try{
+    const {data:{session}}=await supa.auth.getSession();
+    fetch('/api/notify-completion',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({token:session?.access_token||'',rowId:scormRow.id})});
+  }catch(e){}
   showInfoModal('Grattis! 🎉',
     '<p><b>Du har slutfört kursen med godkänt resultat.</b></p>'
     +'<p>Ditt certifikat sammanställs nu och skickas till din e-post av Nordic Agir Academy. Det är giltigt i fem år från examensdatumet.</p>'
@@ -1897,6 +1965,8 @@ function route(){
   const isAdmin=h==='#admin';
   const isPortal=h==='#minasidor';
   const courseMatch=h.match(/^#kurs\/(.+)$/);
+  const verifyMatch=h.match(/^#verifiera\/(.+)$/);
+  if(verifyMatch){renderVerify(decodeURIComponent(verifyMatch[1]));return;}
   document.body.classList.toggle('admin-mode',isAdmin);
   document.body.classList.toggle('portal-mode',isPortal);
   document.body.classList.toggle('course-mode',!!courseMatch);
@@ -1907,6 +1977,151 @@ function route(){
 }
 window.addEventListener('hashchange',route);
 route();
+
+/* ================= CHATT ================= */
+let chatStarted=false;
+function toggleChat(){
+  const p=document.getElementById('chatPanel');
+  p.classList.toggle('open');
+  if(p.classList.contains('open')&&!chatStarted){
+    chatStarted=true;
+    chatAddBot('Hej! 👋 Jag svarar direkt på det vanligaste om våra kurser — priser, inloggning, certifikat och mer. Vad undrar du över?');
+    chatChips(['Priser & moms','Hur fungerar kurserna?','Inloggning','Certifikat','Företag & grupper','Kontakta oss']);
+    setTimeout(()=>document.getElementById('chatText').focus(),150);
+  }
+}
+function chatAdd(html,who){
+  const m=document.getElementById('chatMsgs');
+  const d=document.createElement('div');
+  d.className='chat-msg '+who;
+  d.innerHTML=html;
+  m.appendChild(d);
+  m.scrollTop=m.scrollHeight;
+}
+function chatAddBot(h){chatAdd(h,'bot');}
+function chatChips(list){
+  document.getElementById('chatChips').innerHTML=(list||[]).map(c=>`<span class="chat-chip" onclick="chatAsk('${c.replace(/'/g,"\\'")}')">${c}</span>`).join('');
+}
+function chatAsk(q){document.getElementById('chatText').value=q;chatSend();}
+function chatSend(){
+  const inp=document.getElementById('chatText');
+  const q=inp.value.trim();
+  if(!q)return;
+  chatAdd(q.replace(/</g,'&lt;'),'user');
+  inp.value='';
+  setTimeout(()=>chatBot(q),350);
+}
+function chatCourseLinks(list){
+  return list.slice(0,3).map(c=>`<a onclick="location.hash='kurs/${c.id}';toggleChat()">${c.title}</a> — ${fmt(c.price)} exkl. moms`).join('<br>');
+}
+function chatBot(qRaw){
+  const q=qRaw.toLowerCase();
+  const has=(...ws)=>ws.some(w=>q.includes(w));
+
+  // kurssök: matcha mot kursnamn och nyckelord
+  const hits=COURSES.filter(c=>{
+    const hay=(c.title+' '+c.kw+' '+c.abbr).toLowerCase();
+    return q.split(/[\s,?!.]+/).filter(w=>w.length>2).some(w=>hay.includes(w));
+  });
+
+  if(has('pris','kost','moms','rabatt','kampanj','betala','betaln','faktura','swish','klarna','kort')){
+    chatAddBot('Kurserna kostar <b>795–2 195 kr exkl. moms</b> per deltagare — just nu med nylanseringsrabatt på upp till 25 %. Momsen (25 %) läggs på i kassan så du ser exakt slutpris innan du betalar.<br><br>Du betalar tryggt med <b>kort</b> direkt på sidan, eller väljer <b>faktura 30 dagar</b> i kassan.<br><br><a onclick="toggleChat();setFilter(\'alla\');scrollToCourses()">Se alla kurser och priser →</a>');
+    chatChips(['Hur fungerar kurserna?','Företag & grupper','Kontakta oss']);
+  }
+  else if(has('logga','lösenord','inloggning','konto','kommer inte in')){
+    chatAddBot('Så funkar inloggningen:<br>1. När köpet är klart mejlas inloggningsuppgifter automatiskt till varje deltagare (kolla skräpposten första gången!)<br>2. Logga in via <a onclick="toggleChat();location.hash=\'minasidor\'">Mina sidor</a><br>3. Glömt lösenordet? Klicka <b>”Glömt lösenordet?”</b> på inloggningssidan så får du ett nytt via mejl.');
+    chatChips(['Certifikat','Kontakta oss']);
+  }
+  else if(has('certifikat','intyg','bevis','giltig')){
+    chatAddBot('Efter godkänt kunskapsprov skickar vi ditt <b>personliga certifikat per mejl</b> som PDF. Det är giltigt i <b>fem år</b> och har en QR-kod som arbetsgivare kan skanna för att verifiera äktheten direkt mot vårt register.');
+    chatChips(['Hur fungerar kurserna?','Priser & moms']);
+  }
+  else if(has('hur fungerar','hur funkar','distans','tid','prov','tenta','examen','takt','länge')){
+    chatAddBot('Alla kurser är <b>på distans i din egen takt</b> — börja när du vill, pausa när du vill, allt sparas. Kursen avslutas med ett kunskapsprov som du kan göra om <b>obegränsat antal gånger</b>. När du är godkänd registreras examen automatiskt och certifikatet skickas per mejl.');
+    chatChips(['Priser & moms','Certifikat','Företag & grupper']);
+  }
+  else if(has('företag','grupp','flera','anställda','personal','avtal','offert','paket')){
+    chatAddBot('Vi utbildar gärna hela arbetslag! I kassan lägger du enkelt till flera deltagare i samma köp, och företag kan välja <b>faktura 30 dagar</b>. För större grupper eller ramavtal ger vi paketpris — mejla <a href="mailto:academy@nordicagir.se?subject=Företagsutbildning">academy@nordicagir.se</a> så återkommer vi snabbt med en offert.');
+    chatChips(['Priser & moms','Kontakta oss']);
+  }
+  else if(has('kontakt','telefon','mejl','maila','ring','prata','människa','person')){
+    chatAddBot('Du når oss på <a href="mailto:academy@nordicagir.se">academy@nordicagir.se</a> eller <b>073-912 97 89</b> (vardagar). Vill du hellre skriva här går det lika bra:');
+    chatShowForm();
+  }
+  else if(hits.length&&has('kurs','utbildning','har ni','finns','vilka','apv','bas','äta','ama','lou','luf','abk','kma','lyft','entreprenad','kalkyl','tidsplan','projektled','projektering','anbud')){
+    chatAddBot('Det låter som någon av de här:<br><br>'+chatCourseLinks(hits)+'<br><br>Klicka på en kurs för mer info — eller fråga vidare!');
+    chatChips(['Priser & moms','Hur fungerar kurserna?']);
+  }
+  else{
+    chatAddBot('Bra fråga — den vill jag att en kollega svarar på personligen! Fyll i nedan så återkommer vi via mejl, oftast samma dag:');
+    chatShowForm(qRaw);
+  }
+}
+function chatShowForm(prefill){
+  chatChips([]);
+  const m=document.getElementById('chatMsgs');
+  const d=document.createElement('div');
+  d.className='chat-form';
+  d.innerHTML=`
+    <input id="cfName" placeholder="Ditt namn">
+    <input id="cfEmail" type="email" placeholder="Din e-post *">
+    <textarea id="cfMsg" rows="3" placeholder="Din fråga *">${(prefill||'').replace(/</g,'&lt;')}</textarea>
+    <input id="cfHp" style="display:none" tabindex="-1" autocomplete="off">
+    <button onclick="chatSubmitForm(this)">Skicka till Nordic Agir Academy</button>`;
+  m.appendChild(d);
+  m.scrollTop=m.scrollHeight;
+}
+async function chatSubmitForm(btn){
+  const email=(document.getElementById('cfEmail').value||'').trim();
+  const msg=(document.getElementById('cfMsg').value||'').trim();
+  if(!email.includes('@')||!msg){toast('Fyll i e-post och din fråga');return;}
+  btn.disabled=true;btn.textContent='Skickar …';
+  try{
+    const res=await fetch('/api/chat-message',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name:document.getElementById('cfName').value,email,message:msg,website:document.getElementById('cfHp').value})});
+    if(res.ok){
+      btn.closest('.chat-form').remove();
+      chatAddBot('Tack! 📬 Din fråga är skickad — vi svarar till <b>'+email.replace(/</g,'&lt;')+'</b> så snart vi kan, oftast samma dag.');
+    }else{
+      btn.disabled=false;btn.textContent='Skicka till Nordic Agir Academy';
+      toast('Kunde inte skicka — prova igen eller mejla academy@nordicagir.se');
+    }
+  }catch(e){
+    btn.disabled=false;btn.textContent='Skicka till Nordic Agir Academy';
+    toast('Kunde inte skicka — mejla academy@nordicagir.se');
+  }
+}
+
+/* ---- Certifikatverifiering ---- */
+async function renderVerify(certId){
+  document.body.classList.add('course-mode');
+  const el=document.getElementById('courseView');
+  el.innerHTML='<div style="max-width:640px;margin:120px auto 80px;padding:0 20px;text-align:center"><p style="font-family:var(--mono);font-size:12px;letter-spacing:.15em;color:var(--text-dim)">KONTROLLERAR CERTIFIKAT …</p></div>';
+  let d=null;
+  try{
+    const res=await fetch('/api/verify-cert?id='+encodeURIComponent(certId));
+    d=await res.json();
+  }catch(e){}
+  const box=(inner)=>'<div style="max-width:640px;margin:120px auto 80px;padding:0 20px"><div style="background:#fff;border:1px solid var(--line-light);box-shadow:0 20px 60px rgba(35,33,33,.08);padding:44px 38px;text-align:center">'+inner+'</div></div>';
+  if(d&&d.valid){
+    el.innerHTML=box(
+      '<div style="width:64px;height:64px;margin:0 auto 18px;background:#0f9d58;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:32px">✓</div>'
+      +'<h2 style="font-family:var(--display);font-weight:800;font-size:26px;color:var(--coal);margin-bottom:6px">Giltigt certifikat</h2>'
+      +'<p style="font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--text-dim);margin-bottom:26px">'+(d.certId||certId)+'</p>'
+      +'<div style="text-align:left;max-width:400px;margin:0 auto;font-size:15px;line-height:2">'
+      +'<b>Deltagare:</b> '+d.name+'<br>'
+      +'<b>Utbildning:</b> '+d.course+'<br>'
+      +'<b>Examensdatum:</b> '+d.certDate+'<br>'
+      +'<b>Giltigt till:</b> '+d.validTo+'<br>'
+      +'<b>Utbildare:</b> Nordic Agir Academy</div>'
+      +'<p style="margin-top:26px;font-size:12.5px;color:var(--text-dim)">Detta certifikat är utfärdat av Nordic Agir Academy och verifierat mot vårt register.</p>');
+  }else{
+    el.innerHTML=box(
+      '<div style="width:64px;height:64px;margin:0 auto 18px;background:#c0392b;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:30px">✕</div>'
+      +'<h2 style="font-family:var(--display);font-weight:800;font-size:26px;color:var(--coal);margin-bottom:10px">Certifikatet kunde inte verifieras</h2>'
+      +'<p style="font-size:14.5px;color:var(--text);max-width:420px;margin:0 auto">Certifikat-ID:t <b style="font-family:var(--mono)">'+certId+'</b> finns inte i vårt register. Kontrollera att koden skannats korrekt, eller kontakta <a href="mailto:academy@nordicagir.se" style="color:var(--cyan-deep)">academy@nordicagir.se</a>.</p>');
+  }
+}
 
 /* ================= UI ================= */
 function toast(msg){
