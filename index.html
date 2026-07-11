@@ -615,7 +615,7 @@ body.course-mode{overflow:hidden}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v4.7</span>
+    <span>Alla rättigheter förbehållna · v4.8</span>
   </div>
 </footer>
 
@@ -1581,7 +1581,6 @@ async function emailCert(btn){
 function paintCert(certId){
   const name=document.getElementById('certName').value||'Förnamn Efternamn';
   const pnr=(document.getElementById('certPnr')?.value||'').trim();
-  drawCertQr();
   document.getElementById('cPnr').textContent=pnr?('Personnummer: '+pnr):'';
   const course=document.getElementById('certCourse').value||'Kursens namn';
   const d=document.getElementById('certDate').value;
@@ -1596,7 +1595,12 @@ function paintCert(certId){
     document.getElementById('cDate').textContent='—';
     document.getElementById('cValid').textContent='—';
   }
-  document.getElementById('cId').textContent='Certifikat-ID: '+(certId||'NAA-2026-'+String(Math.floor(1000+Math.random()*9000)));
+  // Behåll befintligt certifikat-ID vid omritning — skapa bara nytt om inget finns
+  const shown=(document.getElementById('cId').textContent||'').replace('Certifikat-ID: ','').trim();
+  const id=certId||((shown&&shown!=='—')?shown:'NAA-2026-'+String(Math.floor(1000+Math.random()*9000)));
+  document.getElementById('cId').textContent='Certifikat-ID: '+id;
+  // QR-koden ritas SIST — när ID:t garanterat står på certifikatet
+  drawCertQr();
 }
 
 /* ================= SUPABASE-KOPPLING =================
