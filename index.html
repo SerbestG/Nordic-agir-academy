@@ -615,7 +615,7 @@ body.course-mode{overflow:hidden}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v4.6</span>
+    <span>Alla rättigheter förbehållna · v4.7</span>
   </div>
 </footer>
 
@@ -1485,6 +1485,11 @@ function fillCertFromPick(){
   document.getElementById('certDate').value=r.p.certDate||new Date().toISOString().slice(0,10);
   document.getElementById('certEmail').value=r.p.email||'';
   document.getElementById('certPnr').value=r.p.pnr||'';
+  if(!r.p.certId){
+    r.p.certId='NAA-2026-'+String(Math.floor(1000+Math.random()*9000));
+    r.p.certDate=r.p.certDate||new Date().toISOString().slice(0,10);
+    if(supa&&r.rowId)supa.from('enrollments').update({cert_id:r.p.certId,cert_date:r.p.certDate}).eq('id',r.rowId).then(()=>{});
+  }
   paintCert(r.p.certId);
 }
 function showInfoModal(title,bodyHtml){
@@ -1509,7 +1514,20 @@ function loadScript(src,globalName){
     document.head.appendChild(s);
   });
 }
+async function drawCertQr(){
+  try{
+    const qrEl=document.getElementById('cQr');
+    const idTxt=(document.getElementById('cId').textContent||'').replace('Certifikat-ID: ','').trim();
+    if(!qrEl)return;
+    qrEl.innerHTML='';
+    if(!idTxt||idTxt==='—')return;
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js','QRCode');
+    new QRCode(qrEl,{text:location.origin+'/#verifiera/'+encodeURIComponent(idTxt),width:84,height:84,correctLevel:QRCode.CorrectLevel.M});
+    await new Promise(r=>setTimeout(r,120));
+  }catch(e){}
+}
 async function buildCertPdf(){
+  await drawCertQr(); // QR-koden ska garanterat vara på plats innan PDF:en byggs
   await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js','html2canvas');
   await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js','jspdf');
   const el=document.getElementById('certEl');
@@ -1563,18 +1581,7 @@ async function emailCert(btn){
 function paintCert(certId){
   const name=document.getElementById('certName').value||'Förnamn Efternamn';
   const pnr=(document.getElementById('certPnr')?.value||'').trim();
-  // QR-kod som länkar till verifieringssidan
-  (async()=>{
-    try{
-      const qrEl=document.getElementById('cQr');
-      const idTxt=(document.getElementById('cId').textContent||'').replace('Certifikat-ID: ','').trim();
-      if(!qrEl)return;
-      qrEl.innerHTML='';
-      if(!idTxt||idTxt==='—')return;
-      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js','QRCode');
-      new QRCode(qrEl,{text:location.origin+'/#verifiera/'+encodeURIComponent(idTxt),width:84,height:84,correctLevel:QRCode.CorrectLevel.M});
-    }catch(e){}
-  })();
+  drawCertQr();
   document.getElementById('cPnr').textContent=pnr?('Personnummer: '+pnr):'';
   const course=document.getElementById('certCourse').value||'Kursens namn';
   const d=document.getElementById('certDate').value;
@@ -1803,7 +1810,11 @@ function stopScormBridge(){
 async function autoComplete(){
   if(!scormRow||scormRow.status==='klar')return;
   scormRow.status='klar';
-  if(supa)await supa.from('enrollments').update({status:'klar'}).eq('id',scormRow.id);
+  if(!scormRow.cert_id){
+    scormRow.cert_id='NAA-2026-'+String(Math.floor(1000+Math.random()*9000));
+    scormRow.cert_date=new Date().toISOString().slice(0,10);
+  }
+  if(supa)await supa.from('enrollments').update({status:'klar',cert_id:scormRow.cert_id,cert_date:scormRow.cert_date}).eq('id',scormRow.id);
   // meddela Nordic Agir att certifikatet ska skickas
   try{
     const {data:{session}}=await supa.auth.getSession();
