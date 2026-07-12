@@ -630,7 +630,7 @@ body.course-mode{overflow:hidden}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v5.0</span>
+    <span>Alla rättigheter förbehållna · v5.1</span>
   </div>
 </footer>
 
@@ -1794,11 +1794,11 @@ async function portalLogout(){
    SCORM-paketets APIWrapper letar efter ett objekt vid namn `API` i
    föräldrafönstret. Vi tillhandahåller det här: när kursen rapporterar
    lesson_status = completed/passed markeras kursen klar automatiskt. */
-let scormRow=null,scormData={};
+let scormRow=null,scormData={},scormScoreSet=false;
 
 function buildScormAPI(){
   return {
-    LMSInitialize(){scormData={};return 'true';},
+    LMSInitialize(){scormData={};scormScoreSet=false;return 'true';},
     LMSFinish(){return 'true';},
     LMSGetValue(name){
       if(name==='cmi.core.student_name')return scormRow?.name||portalUser?.email||'';
@@ -1809,7 +1809,10 @@ function buildScormAPI(){
     },
     LMSSetValue(name,value){
       scormData[name]=value;
-      if(name==='cmi.core.lesson_status'&&(value==='completed'||value==='passed'))autoComplete();
+      // Provresultat inlämnat? (kursen skriver poängen när provet lämnas in)
+      if(name.indexOf('score.raw')!==-1&&String(value).trim()!=='')scormScoreSet=true;
+      // Godkänn ENDAST efter inlämnat prov: 'passed', eller 'completed' när poäng redan satts
+      if(name==='cmi.core.lesson_status'&&(value==='passed'||(value==='completed'&&scormScoreSet)))autoComplete();
       return 'true';
     },
     LMSCommit(){return 'true';},
