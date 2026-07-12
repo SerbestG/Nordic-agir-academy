@@ -102,20 +102,24 @@ section{padding:clamp(64px,8vw,100px) clamp(20px,5vw,64px);position:relative}
 
 /* ---------- Kategorikort ---------- */
 #kategorier{background:var(--off)}
-.cat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
-.cat-card{position:relative;color:#fff;cursor:pointer;border:none;text-align:left;padding:clamp(22px,2.2vw,30px);min-height:190px;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;transition:transform .35s,box-shadow .35s;font-family:var(--body)}
-.cat-card:hover{transform:translateY(-6px);box-shadow:0 24px 60px rgba(35,33,33,.25)}
-.cat-card .cat-bars{position:absolute;right:-12px;top:-16px;display:flex;gap:8px;opacity:.3;transition:opacity .4s,transform .4s}
-.cat-card:hover .cat-bars{opacity:.6;transform:translateY(6px)}
-.cat-card .cat-bars i{display:block;width:20px;transform:skewX(-24deg);background:#fff}
-.cat-card .cat-bars i:nth-child(1){height:80px}
-.cat-card .cat-bars i:nth-child(2){height:54px}
-.cat-card .cat-bars i:nth-child(3){height:32px}
-.cat-card .cat-count{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;opacity:.8;margin-bottom:6px}
-.cat-card h3{font-family:var(--display);font-weight:800;font-size:clamp(17px,1.5vw,21px);line-height:1.15}
-.cat-card .cat-go{margin-top:10px;font-family:var(--display);font-weight:700;font-size:12px;letter-spacing:.12em;text-transform:uppercase;display:inline-flex;gap:8px;transition:gap .3s}
-.cat-card:hover .cat-go{gap:14px}
+.cat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.cat-card{position:relative;color:#fff;cursor:pointer;border:1px solid var(--line-light);text-align:left;padding:24px 24px 20px;min-height:200px;display:flex;flex-direction:column;overflow:hidden;transition:transform .25s,box-shadow .25s,border-color .25s;font-family:var(--body);isolation:isolate}
+.cat-card:hover{transform:translateY(-5px);box-shadow:0 24px 60px rgba(35,33,33,.22);border-color:rgba(35,33,33,.3)}
+.cat-card.wide{grid-column:1/-1;min-height:140px}
+.cat-card .cat-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;filter:grayscale(1) contrast(1.08);mix-blend-mode:multiply;opacity:.75;transition:opacity .3s}
+.cat-card:hover .cat-img{opacity:.9}
+.cat-card>*:not(.cat-img){position:relative;z-index:1}
+.cat-top{display:flex;justify-content:space-between;align-items:center}
+.cat-nr{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:rgba(255,255,255,.78);text-transform:uppercase}
+.cat-count{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;background:rgba(0,0,0,.38);padding:5px 11px;border-radius:100px;text-transform:uppercase}
+.cat-card h3{font-family:var(--display);font-weight:900;font-size:clamp(19px,2vw,24px);line-height:1.1;margin-top:13px;text-shadow:0 2px 14px rgba(0,0,0,.35)}
+.cat-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px;flex:1;align-content:flex-start}
+.cat-chip{font-family:var(--mono);font-size:10px;letter-spacing:.05em;background:rgba(0,0,0,.36);border:1px solid rgba(255,255,255,.28);padding:5px 10px;text-transform:uppercase}
+.cat-go{margin-top:16px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;display:flex;align-items:center;gap:8px;text-shadow:0 1px 8px rgba(0,0,0,.45);text-transform:uppercase}
+.cat-go i{font-style:normal;transition:transform .2s}
+.cat-card:hover .cat-go i{transform:translateX(5px)}
 .cat-card.active{outline:3px solid var(--cyan);outline-offset:3px}
+@media(max-width:760px){.cat-grid{grid-template-columns:1fr}}
 
 /* ---------- Kursgrid ---------- */
 #kurser{background:var(--off);padding-top:0;display:none}
@@ -630,7 +634,7 @@ body.course-mode{overflow:hidden}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v5.1</span>
+    <span>Alla rättigheter förbehållna · v5.3</span>
   </div>
 </footer>
 
@@ -952,13 +956,19 @@ const DETAILS={
 /* ================= BUTIK ================= */
 let activeFilter=null,query='';
 const catGrid=document.getElementById('catGrid');
+const CAT_IMG={alla:'bas',upphandling:'lou-praktik',juridik:'ejur',bygg:'ama-hus',projekt:'pl'};
 catGrid.innerHTML=Object.entries(CATS).map(([id,c],i)=>{
-  const n=id==='alla'?COURSES.length:COURSES.filter(x=>x.cat===id).length;
-  return `<button class="cat-card reveal d${i%4}" data-cat="${id}" style="background:${c.grad}">
-    <span class="cat-bars" aria-hidden="true"><i></i><i></i><i></i></span>
-    <span class="cat-count">${n} kurser</span>
+  const inCat=COURSES.filter(x=>x.cat===id);
+  const n=id==='alla'?COURSES.length:inCat.length;
+  const rep=COURSES.find(x=>x.id===CAT_IMG[id])||inCat[0]||COURSES[0];
+  const chips=id==='alla'?'':`<div class="cat-chips">${inCat.map(x=>`<span class="cat-chip">${x.abbr}</span>`).join('')}</div>`;
+  const nr=id==='alla'?'HELA KATALOGEN':'OMRÅDE 0'+i;
+  return `<button class="cat-card reveal d${i%4}${id==='alla'?' wide':''}" data-cat="${id}" style="background:${c.grad}">
+    <img class="cat-img" src="${rep.img}" alt="" loading="lazy" onerror="this.remove()">
+    <span class="cat-top"><span class="cat-nr">${nr}</span><span class="cat-count">${n} kurser</span></span>
     <h3>${c.name}</h3>
-    <span class="cat-go">Visa kurser →</span>
+    ${chips}
+    <span class="cat-go">${id==='alla'?'Se hela utbudet':'Till kurserna'} <i>→</i></span>
   </button>`;
 }).join('');
 catGrid.querySelectorAll('.cat-card').forEach(b=>b.addEventListener('click',()=>{
@@ -2178,6 +2188,7 @@ window.addEventListener('scroll',()=>{
   if(y<innerHeight*1.4)heroBars.style.transform=`translateY(${y*.12}px)`;
 },{passive:true});
 updateCartUI();
+
 </script>
 </body>
 </html>
