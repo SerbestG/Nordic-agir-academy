@@ -497,6 +497,24 @@ body.course-mode{overflow:hidden}
 .chat-form input,.chat-form textarea{border:1px solid var(--line-light);padding:9px 11px;font-size:13px;font-family:var(--body);outline:none;resize:vertical}
 .chat-form button{background:var(--coal);color:#fff;border:none;padding:10px;cursor:pointer;font-size:13px;font-family:var(--display);font-weight:700}
 @media print{.chat-fab,.chat-panel{display:none!important}}
+
+/* ================= MOBILSPELARE ================= */
+@media(max-width:820px){
+  .player-wrap{padding:0 0 20px}
+  .player-frame{height:calc(100dvh - 128px);min-height:430px;border-left:none;border-right:none;box-shadow:none}
+  .player-head{padding:10px 12px;gap:8px;flex-wrap:wrap}
+  .player-head h2{font-size:14.5px;line-height:1.25}
+  .player-actions{padding:12px 16px 0}
+}
+.mobile-tip{display:none}
+@media(max-width:820px){.mobile-tip{display:block;font-size:12px;color:var(--text-dim);padding:10px 16px 0;line-height:1.5}}
+/* ================= GRATISTILLDELNING (admin) ================= */
+.gift-box{background:#fff;border:1px solid var(--line-light);padding:20px;margin-bottom:22px}
+.gift-box h3{font-family:var(--display);font-weight:800;font-size:16px;color:var(--coal);margin-bottom:12px}
+.gift-courses{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:4px 14px;margin-top:12px;padding:12px;background:var(--off,#F5F3EF);max-height:220px;overflow-y:auto}
+.gift-courses label{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--text);cursor:pointer;padding:3px 0}
+.gift-courses input{margin-top:2px;accent-color:var(--cyan)}
+.gift-note{font-size:11.5px;color:var(--text-dim);margin-top:10px;line-height:1.5}
 </style>
 </head>
 <body>
@@ -643,7 +661,7 @@ body.course-mode{overflow:hidden}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v5.5</span>
+    <span>Alla rättigheter förbehållna · v5.6</span>
   </div>
 </footer>
 
@@ -1348,7 +1366,7 @@ function allEnrollments(){
     return adminRows.map(row=>({
       rowId:row.id,
       order:{
-        id:(row.order_ref||'').startsWith('cs_')?'ST-'+row.order_ref.slice(-6).toUpperCase():(row.order_ref||'—'),
+        id:(row.order_ref||'').startsWith('cs_')?'ST-'+row.order_ref.slice(-6).toUpperCase():((row.order_ref||'').startsWith('GRATIS')?'KOSTNADSFRI':(row.order_ref||'—')),
         refFull:row.order_ref||('rad-'+row.id),
         date:(row.created_at||'').slice(0,10),
         buyer:{name:row.buyer_name||'',company:row.buyer_company||'',email:row.buyer_email||''}
@@ -1406,7 +1424,21 @@ async function renderAdmin(){
   }
 
   if(adminTab==='students'){
-    body.innerHTML=stats+`<div class="atable-wrap"><table>
+    const giftBox=`<div class="gift-box">
+      <h3>➕ Ge kostnadsfri tillgång</h3>
+      <div class="form-row">
+        <div class="field" style="margin:0"><label>Deltagarens namn *</label><input id="giftName" placeholder="Förnamn Efternamn"></div>
+        <div class="field" style="margin:0"><label>E-post *</label><input id="giftEmail" type="email" placeholder="namn@foretag.se"></div>
+      </div>
+      <div class="form-row" style="margin-top:10px">
+        <div class="field" style="margin:0"><label>Personnummer (valfritt — skrivs på certifikatet)</label><input id="giftPnr" placeholder="ÅÅÅÅMMDD-XXXX"></div>
+        <div class="field" style="margin:0"></div>
+      </div>
+      <div class="gift-courses">${COURSES.map(c=>`<label><input type="checkbox" class="giftCourse" value="${c.id}"> ${c.title}</label>`).join('')}</div>
+      <button class="btn btn-blue" style="margin-top:14px" onclick="adminGift(this)">Skapa tillgång &amp; mejla inloggning</button>
+      <p class="gift-note">Konto skapas automatiskt (eller återanvänds om mejlen redan finns) och deltagaren får ett välkomstmejl från academy@nordicagir.se med inloggningsuppgifter och kurserna. Registreras som <b>KOSTNADSFRI</b> i beställningslistan.</p>
+    </div>`;
+    body.innerHTML=stats+giftBox+`<div class="atable-wrap"><table>
       <thead><tr><th>Deltagare</th><th>Kurs</th><th>Order</th><th>Inloggning</th><th>Status</th><th></th></tr></thead>
       <tbody>${enr.map((r,i)=>{
         const c=COURSES.find(x=>x.id===r.courseId)||{title:r.courseId};
@@ -1496,6 +1528,32 @@ function sendLogins(orderId){
   }));
   toast('Inloggningsuppgifter skickade till '+o.items.reduce((s,i)=>s+i.participants.length,0)+' deltagare');
   renderAdmin();
+}
+async function adminGift(btn){
+  const name=(document.getElementById('giftName').value||'').trim();
+  const email=(document.getElementById('giftEmail').value||'').trim().toLowerCase();
+  const pnr=(document.getElementById('giftPnr').value||'').trim();
+  const courses=[...document.querySelectorAll('.giftCourse:checked')].map(c=>c.value);
+  if(!name){toast('Fyll i deltagarens namn');return;}
+  if(!email.includes('@')){toast('Fyll i en giltig e-post');return;}
+  if(!courses.length){toast('Bocka i minst en kurs');return;}
+  const orig=btn.textContent;btn.disabled=true;btn.textContent='Skapar tillgång …';
+  try{
+    const {data:{session}}=await supa.auth.getSession();
+    const res=await fetch('/api/admin-enroll',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({token:session?.access_token||'',name,email,pnr,courses})});
+    const out=await res.json().catch(()=>({}));
+    if(res.ok){
+      toast('Klart! '+courses.length+' kurs(er) tilldelade — välkomstmejl skickat till '+email+' 🎁');
+      renderAdmin();
+    }else{
+      toast('Kunde inte skapa: '+(out.error||('fel '+res.status)));
+      btn.disabled=false;btn.textContent=orig;
+    }
+  }catch(e){
+    toast('Fel: '+e.message);
+    btn.disabled=false;btn.textContent=orig;
+  }
 }
 async function setProgress(i,val){
   const r=allEnrollments()[i];
@@ -1872,6 +1930,13 @@ async function autoComplete(){
   if(act)act.outerHTML='<span class="pill klar">Slutförd — certifikatet är på väg</span>';
 }
 
+function playerFullscreen(){
+  const f=document.getElementById('playerFrame');
+  if(!f)return;
+  const req=f.requestFullscreen||f.webkitRequestFullscreen||f.mozRequestFullScreen;
+  if(req)req.call(f);
+  else toast('Helskärm stöds inte i den här webbläsaren');
+}
 async function openPlayer(rowId){
   const r=myRows.find(x=>String(x.id)===String(rowId));
   if(!r)return;
@@ -1886,11 +1951,13 @@ async function openPlayer(rowId){
       <button class="cp-back" onclick="renderPortal()">← Mina kurser</button>
       <h2>${c.title}</h2>
       <span class="pill ${PVSTAT[r.status].cls}" id="playerPill">${PVSTAT[r.status].label}</span>
+      <button class="cp-back" style="margin-left:auto" onclick="playerFullscreen()">⛶ Helskärm</button>
     </div>
     <div class="player-wrap">
       ${url
         ?`<iframe class="player-frame" id="playerFrame" allowtransparency="true" allow="fullscreen; downloads; autoplay" allowfullscreen></iframe>`
         :`<div class="player-missing"><h3 style="font-family:var(--display);font-weight:800;color:var(--coal);margin-bottom:8px">Kursen kopplas inom kort</h3><p>Kursinnehållet läggs in av Nordic Agir Academy och dyker upp här automatiskt.</p></div>`}
+      <p class="mobile-tip">📱 Tips på mobil: tryck <b>⛶ Helskärm</b> och vänd gärna telefonen till liggande läge — då blir kursen som störst och lättast att använda.</p>
       <div class="player-actions">
         <p style="font-size:13px;color:var(--text-dim);max-width:520px">Kursen avslutas med ett kunskapsprov — gör om det så många gånger du behöver. När du klarat provet registreras din examen automatiskt.</p>
         ${r.status==='klar'
