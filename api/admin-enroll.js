@@ -12,7 +12,8 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { token, name, email, pnr, courses } = req.body || {};
+    const { token, name, email, pnr, courses, type, company } = req.body || {};
+    const isPaid = type === 'faktura';
     const to = (email || '').trim().toLowerCase();
 
     if (!token || !name || !to.includes('@') || !Array.isArray(courses) || !courses.length) {
@@ -62,11 +63,11 @@ export default async function handler(req, res) {
     if (!found.length) return res.status(400).json({ error: 'Inga giltiga kurser valda' });
 
     // 4) Registrera kurserna
-    const orderRef = 'GRATIS-' + Date.now().toString(36).toUpperCase();
+    const orderRef = (isPaid ? 'FAKT-' : 'GRATIS-') + Date.now().toString(36).toUpperCase();
     const rows = found.map((c) => ({
       order_ref: orderRef,
-      buyer_name: 'Nordic Agir Academy',
-      buyer_company: 'Kostnadsfri tilldelning',
+      buyer_name: (company || 'Nordic Agir Academy').slice(0, 120),
+      buyer_company: isPaid ? (company || 'Fakturaorder').slice(0, 120) : 'Kostnadsfri tilldelning',
       buyer_email: 'academy@nordicagir.se',
       course_id: c.id,
       name,
@@ -109,9 +110,13 @@ export default async function handler(req, res) {
           from: 'Nordic Agir Academy <academy@nordicagir.se>',
           to: [to],
           bcc: process.env.ADMIN_EMAIL ? [process.env.ADMIN_EMAIL] : undefined,
-          subject: `Du har fått tillgång till ${found.length > 1 ? found.length + ' kurser' : 'en kurs'} — Nordic Agir Academy 🎁`,
+          subject: isPaid
+            ? `Välkommen till din utbildning — Nordic Agir Academy 🎓`
+            : `Du har fått tillgång till ${found.length > 1 ? found.length + ' kurser' : 'en kurs'} — Nordic Agir Academy 🎁`,
           html: `<h2>Hej ${firstName}!</h2>
-            <p>Nordic Agir Academy har gett dig kostnadsfri tillgång till:</p>
+            <p>${isPaid
+              ? (company ? `<b>${company}</b> har beställt följande utbildning till dig:` : 'Här är din utbildning från Nordic Agir Academy:')
+              : 'Nordic Agir Academy har gett dig kostnadsfri tillgång till:'}</p>
             <ul>${list}</ul>
             ${loginBlock}
             <p><a href="${SITE}/#minasidor" style="display:inline-block;background:#00ADEF;color:#fff;padding:12px 22px;text-decoration:none;font-weight:bold">Logga in och börja plugga →</a></p>
@@ -121,7 +126,7 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log('GRATIS tilldelning:', to, found.map((c) => c.id).join(','), isNew ? '(nytt konto)' : '(befintligt konto)');
+    console.log((isPaid ? 'FAKTURA' : 'GRATIS') + ' tilldelning:', to, found.map((c) => c.id).join(','), isNew ? '(nytt konto)' : '(befintligt konto)');
     return res.status(200).json({ ok: true, created: isNew, courses: found.length });
   } catch (err) {
     console.error('admin-enroll:', err.message);
