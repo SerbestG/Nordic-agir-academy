@@ -672,7 +672,7 @@ body.fs-mode .player-actions,body.fs-mode .mobile-tip{display:none}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v5.8</span>
+    <span>Alla rättigheter förbehållna · v6.2</span>
   </div>
 </footer>
 
@@ -1052,7 +1052,8 @@ function render(){
   document.getElementById('resultsText').innerHTML=hits.length+' kurser'+label+qlabel;
   catGrid.querySelectorAll('.cat-card').forEach(b=>b.classList.toggle('active',b.dataset.cat===f));
 }
-function setFilter(f){activeFilter=f;render();}
+function track(ev,params){try{if(typeof gtag==='function')gtag('event',ev,params||{});}catch(e){}}
+function setFilter(f){activeFilter=f;render();track('select_category',{category:f});}
 function resetAll(){activeFilter=null;query='';document.getElementById('searchInput').value='';render();}
 function scrollToCourses(){
   if(!activeFilter&&!query.trim())setFilter('alla');
@@ -1068,7 +1069,7 @@ document.getElementById('searchInput').addEventListener('input',e=>{
 /* ================= KUNDVAGN ================= */
 let cart=[]; // {id,qty}
 function cartTotal(){return cart.reduce((s,i)=>s+COURSES.find(c=>c.id===i.id).price*i.qty,0)}
-function addToCart(id,btn){
+function addToCart(id,btn){track('add_to_cart',{item_id:id});
   const ex=cart.find(i=>i.id===id);
   if(ex)ex.qty++;else cart.push({id,qty:1});
   updateCartUI();
@@ -1120,7 +1121,7 @@ function closeCart(){document.getElementById('cartDrawer').classList.remove('ope
 const ORDERS=[]; // {id,date,buyer,items:[{courseId,participants:[{name,email,login,progress,certDate,certId}]}],total}
 let orderSeq=1024;
 
-function openCheckout(){
+function openCheckout(){track('begin_checkout',{items:cart.length});
   if(!cart.length)return;
   closeCart();
   const body=document.getElementById('checkoutBody');
@@ -1282,7 +1283,7 @@ function finishOrder(data,method){
 /* Retur från Stripe Checkout */
 (function handleStripeReturn(){
   const p=new URLSearchParams(location.search);
-  if(p.get('betalning')==='klar'){
+  if(p.get('betalning')==='klar'){track('purchase_complete',{});
     document.getElementById('checkoutTitle').textContent='Tack för ditt köp! 🎉';
     document.getElementById('checkoutBody').innerHTML=`
       <div class="confirm-box">
@@ -1377,7 +1378,7 @@ function allEnrollments(){
     return adminRows.map(row=>({
       rowId:row.id,
       order:{
-        id:(row.order_ref||'').startsWith('cs_')?'ST-'+row.order_ref.slice(-6).toUpperCase():((row.order_ref||'').startsWith('GRATIS')?'KOSTNADSFRI':(row.order_ref||'—')),
+        id:(row.order_ref||'').startsWith('cs_')?'ST-'+row.order_ref.slice(-6).toUpperCase():((row.order_ref||'').startsWith('GRATIS')?'KOSTNADSFRI':((row.order_ref||'').startsWith('FAKT')?'FAKTURA · '+row.order_ref:(row.order_ref||'—'))),
         refFull:row.order_ref||('rad-'+row.id),
         date:(row.created_at||'').slice(0,10),
         buyer:{name:row.buyer_name||'',company:row.buyer_company||'',email:row.buyer_email||''}
@@ -1397,7 +1398,7 @@ function adminOrders(){
   const map={};
   allEnrollments().forEach(r=>{
     const k=r.order.refFull;
-    if(!map[k])map[k]={id:r.order.id,date:r.order.date,buyer:r.order.buyer,items:[],total:0,_c:{}};
+    if(!map[k])map[k]={id:r.order.id,ref:k,date:r.order.date,buyer:r.order.buyer,items:[],total:0,_c:{}};
     const o=map[k];
     if(!o._c[r.courseId]){o._c[r.courseId]={courseId:r.courseId,participants:[]};o.items.push(o._c[r.courseId]);}
     o._c[r.courseId].participants.push(r.p);
@@ -1428,7 +1429,9 @@ async function renderAdmin(){
           <td><b>${o.buyer.name}</b><br><span style="font-size:12px;color:var(--text-dim)">${o.buyer.company||''} · ${o.buyer.email}</span></td>
           <td>${o.items.map(i=>(COURSES.find(c=>c.id===i.courseId)||{title:i.courseId}).title).join('<br>')}<br><span style="font-size:12px;color:var(--text-dim)">${n} deltagare</span></td>
           <td style="white-space:nowrap">${fmt(o.total)}</td>
-          <td>${sent?'<span class="pill skickad">Skickad</span>':`<button class="mini-btn" onclick="sendLogins('${o.id}')">Skicka inloggning</button>`}</td>
+          <td>${o.items.some(it=>it.participants.some(p=>p.progress==='vantar'))
+            ?`<button class="mini-btn green" onclick="approveInvoice('${o.ref}')">🧾 Godkänn order</button>`
+            :(sent?'<span class="pill skickad">Skickad</span>':`<button class="mini-btn" onclick="sendLogins('${o.id}')">Skicka inloggning</button>`)}</td>
         </tr>`;
       }).join('')}</tbody></table></div>
     <p class="admin-note">// Demo: ”Skicka inloggning” genererar konton och markerar dem som utskickade. I skarp drift kopplas knappen till ert e-postsystem så att varje deltagare automatiskt får sina uppgifter.</p>`;
@@ -1436,8 +1439,17 @@ async function renderAdmin(){
 
   if(adminTab==='students'){
     const giftBox=`<div class="gift-box">
-      <h3>➕ Ge kostnadsfri tillgång</h3>
+      <h3>➕ Tilldela kurser manuellt</h3>
       <div class="form-row">
+        <div class="field" style="margin:0"><label>Typ av tilldelning *</label>
+          <select id="giftType">
+            <option value="faktura">Betald order — faktura skickas separat</option>
+            <option value="gratis">Kostnadsfri — gåva/partner</option>
+          </select>
+        </div>
+        <div class="field" style="margin:0"><label>Köparens företag (visas i deltagarens mejl)</label><input id="giftCompany" placeholder="t.ex. Consyd AB"></div>
+      </div>
+      <div class="form-row" style="margin-top:10px">
         <div class="field" style="margin:0"><label>Deltagarens namn *</label><input id="giftName" placeholder="Förnamn Efternamn"></div>
         <div class="field" style="margin:0"><label>E-post *</label><input id="giftEmail" type="email" placeholder="namn@foretag.se"></div>
       </div>
@@ -1447,20 +1459,22 @@ async function renderAdmin(){
       </div>
       <div class="gift-courses">${COURSES.map(c=>`<label><input type="checkbox" class="giftCourse" value="${c.id}"> ${c.title}</label>`).join('')}</div>
       <button class="btn btn-blue" style="margin-top:14px" onclick="adminGift(this)">Skapa tillgång &amp; mejla inloggning</button>
-      <p class="gift-note">Konto skapas automatiskt (eller återanvänds om mejlen redan finns) och deltagaren får ett välkomstmejl från academy@nordicagir.se med inloggningsuppgifter och kurserna. Registreras som <b>KOSTNADSFRI</b> i beställningslistan.</p>
+      <p class="gift-note">Konto skapas automatiskt (befintlig mejl återanvänds — lösenordet rörs inte) och deltagaren får välkomstmejl med inloggning. <b>Betald order</b> märks FAKTURA (ni skickar fakturan separat) och mejlet nämner aldrig något om kostnadsfritt · <b>Kostnadsfri</b> märks KOSTNADSFRI.</p>
     </div>`;
     body.innerHTML=stats+giftBox+`<div class="atable-wrap"><table>
       <thead><tr><th>Deltagare</th><th>Kurs</th><th>Order</th><th>Inloggning</th><th>Status</th><th></th></tr></thead>
       <tbody>${enr.map((r,i)=>{
         const c=COURSES.find(x=>x.id===r.courseId)||{title:r.courseId};
         return `<tr>
-          <td><b>${r.p.name}</b><br><span style="font-size:12px;color:var(--text-dim)">${r.p.email}${r.p.pnr?' · '+r.p.pnr:''}</span></td>
+          <td><b>${r.p.name}</b><br><span style="font-size:12px;color:var(--text-dim)">${r.p.email} · ${r.p.pnr?r.p.pnr:'<i style="color:var(--amber,#F59E0B)">pnr saknas</i>'} <a href="#" onclick="editPnr(${i});return false" title="Ändra personnummer" style="text-decoration:none">✎</a></span></td>
           <td>${c.title}</td>
           <td style="font-family:var(--mono);font-size:12px">${r.order.id}</td>
           <td>${r.p.login?`<span class="pill skickad">${r.p.login}</span>`:'<span class="pill ny">Ej skickad</span>'}</td>
-          <td><select class="status-sel" onchange="setProgress(${i},this.value)">
+          <td>${r.p.progress==='vantar'
+            ?'<span class="pill ej">Väntar godkännande</span>'
+            :`<select class="status-sel" onchange="setProgress(${i},this.value)">
             ${Object.entries(PROG).map(([k,v])=>`<option value="${k}"${r.p.progress===k?' selected':''}>${v}</option>`).join('')}
-          </select></td>
+          </select>`}</td>
           <td>${r.p.progress==='klar'
             ?`<button class="mini-btn green" onclick="goCert(${i})">Skapa certifikat</button>`
             :`<span class="pill ${r.p.progress}">${PROG[r.p.progress]}</span>`}</td>
@@ -1544,6 +1558,8 @@ async function adminGift(btn){
   const name=(document.getElementById('giftName').value||'').trim();
   const email=(document.getElementById('giftEmail').value||'').trim().toLowerCase();
   const pnr=(document.getElementById('giftPnr').value||'').trim();
+  const gtype=document.getElementById('giftType').value;
+  const company=(document.getElementById('giftCompany').value||'').trim();
   const courses=[...document.querySelectorAll('.giftCourse:checked')].map(c=>c.value);
   if(!name){toast('Fyll i deltagarens namn');return;}
   if(!email.includes('@')){toast('Fyll i en giltig e-post');return;}
@@ -1552,10 +1568,10 @@ async function adminGift(btn){
   try{
     const {data:{session}}=await supa.auth.getSession();
     const res=await fetch('/api/admin-enroll',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({token:session?.access_token||'',name,email,pnr,courses})});
+      body:JSON.stringify({token:session?.access_token||'',name,email,pnr,courses,type:gtype,company})});
     const out=await res.json().catch(()=>({}));
     if(res.ok){
-      toast('Klart! '+courses.length+' kurs(er) tilldelade — välkomstmejl skickat till '+email+' 🎁');
+      toast('Klart! '+courses.length+' kurs(er) tilldelade ('+(gtype==='faktura'?'FAKTURA':'kostnadsfritt')+') — välkomstmejl skickat till '+email+(gtype==='faktura'?' 🧾':' 🎁'));
       renderAdmin();
     }else{
       toast('Kunde inte skapa: '+(out.error||('fel '+res.status)));
@@ -1565,6 +1581,29 @@ async function adminGift(btn){
     toast('Fel: '+e.message);
     btn.disabled=false;btn.textContent=orig;
   }
+}
+async function approveInvoice(orderRef){
+  if(!confirm('Godkänna fakturaorder '+orderRef+'?\n\nDå skapas konton, deltagarna får sina inloggningar per mejl och köparen får orderbekräftelse med fakturabesked.'))return;
+  try{
+    const {data:{session}}=await supa.auth.getSession();
+    const res=await fetch('/api/approve-invoice',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({token:session?.access_token||'',orderRef})});
+    const out=await res.json().catch(()=>({}));
+    if(res.ok){toast('Order godkänd — '+(out.participants||'')+' inloggning(ar) mejlas nu 🧾');renderAdmin();}
+    else toast('Kunde inte godkänna: '+(out.error||('fel '+res.status)));
+  }catch(e){toast('Fel: '+e.message);}
+}
+async function editPnr(i){
+  const r=allEnrollments()[i];
+  const nytt=prompt('Personnummer för '+r.p.name+' (skrivs på certifikatet):',r.p.pnr||'');
+  if(nytt===null)return;
+  const v=nytt.trim().slice(0,20);
+  if(supa&&r.rowId){
+    const {error}=await supa.from('enrollments').update({personnummer:v}).eq('id',r.rowId);
+    if(error){toast('Kunde inte spara: '+error.message);return;}
+  }else{r.p.pnr=v;}
+  toast(v?'Personnummer sparat för '+r.p.name:'Personnummer borttaget');
+  renderAdmin();
 }
 async function setProgress(i,val){
   const r=allEnrollments()[i];
@@ -1759,6 +1798,7 @@ function scormWrapperDoc(url){
 /* ================= MINA SIDOR (deltagarportal) ================= */
 let portalUser=null,myRows=[],courseUrls={...COURSE_URLS};
 const PVSTAT={
+  vantar:{label:'Väntar godkännande',cls:'ej',pct:0},
   ej:{label:'Ej påbörjad',cls:'ej',pct:0},
   pagar:{label:'Pågår',cls:'pagar',pct:50},
   klar:{label:'Klar',cls:'klar',pct:100}
@@ -1811,7 +1851,7 @@ async function renderPortal(){
   if(supa){
     const {data,error}=await supa.from('enrollments').select('*').eq('email',portalUser.email).order('created_at');
     if(error)portalErr=error.message+(error.code?' (kod '+error.code+')':'');
-    myRows=data||[];
+    myRows=(data||[]).filter(r=>r.status!=='vantar'); // fakturaordrar syns först efter ert godkännande
     await loadCourseUrls();
   }else myRows=DEMO_ROWS;
 
@@ -1928,9 +1968,10 @@ async function autoComplete(){
   // meddela Nordic Agir att certifikatet ska skickas
   try{
     const {data:{session}}=await supa.auth.getSession();
-    fetch('/api/notify-completion',{method:'POST',headers:{'Content-Type':'application/json'},
+    const nres=await fetch('/api/notify-completion',{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({token:session?.access_token||'',rowId:scormRow.id})});
-  }catch(e){}
+    if(!nres.ok)console.warn('Klarnotisen misslyckades:',nres.status,await nres.text().catch(()=>''));
+  }catch(e){console.warn('Klarnotisen misslyckades:',e.message);}
   showInfoModal('Grattis! 🎉',
     '<p><b>Du har slutfört kursen med godkänt resultat.</b></p>'
     +'<p>Ditt certifikat sammanställs nu och skickas till din e-post av Nordic Agir Academy. Det är giltigt i fem år från examensdatumet.</p>'
@@ -2004,7 +2045,7 @@ if(supa){
 
 /* ================= KURSSIDA ================= */
 let cpQty=1;
-function openCoursePage(id){location.hash='kurs/'+id;}
+function openCoursePage(id){location.hash='kurs/'+id;track('view_item',{item_id:id});}
 function closeCoursePage(){location.hash='';}
 function cpChQty(d){cpQty=Math.max(1,cpQty+d);document.getElementById('cpQty').textContent=cpQty;}
 function cpAdd(id){
