@@ -672,7 +672,7 @@ body.fs-mode .player-actions,body.fs-mode .mobile-tip{display:none}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v6.4</span>
+    <span>Alla rättigheter förbehållna · v6.6</span>
   </div>
 </footer>
 
@@ -1454,7 +1454,7 @@ function allEnrollments(){
         buyer:{name:row.buyer_name||'',company:row.buyer_company||'',email:row.buyer_email||''}
       },
       courseId:row.course_id,
-      p:{name:row.name||row.email,email:row.email,pnr:row.personnummer||'',login:'Automatisk',progress:row.status||'ej',certDate:row.cert_date||'',certId:row.cert_id||''}
+      p:{name:row.name||row.email,email:row.email,pnr:row.personnummer||'',login:'Automatisk',progress:row.status||'ej',certDate:row.cert_date||'',certId:row.cert_id||'',certSent:row.cert_sent||null}
     }));
   }
   const rows=[];
@@ -1546,7 +1546,9 @@ async function renderAdmin(){
             ${Object.entries(PROG).map(([k,v])=>`<option value="${k}"${r.p.progress===k?' selected':''}>${v}</option>`).join('')}
           </select>`}</td>
           <td>${r.p.progress==='klar'
-            ?`<button class="mini-btn green" onclick="goCert(${i})">Skapa certifikat</button>`
+            ?(r.p.certSent
+              ?`<span class="pill skickad" title="Skickat ${String(r.p.certSent).slice(0,10)}">🎓 Intyg skickat</span> <a href="#" onclick="goCert(${i});return false" title="Öppna certifikatet igen" style="text-decoration:none">↺</a>`
+              :`<button class="mini-btn green" onclick="goCert(${i})">Skapa certifikat</button>`)
             :`<span class="pill ${r.p.progress}">${PROG[r.p.progress]}</span>`}</td>
         </tr>`;
       }).join('')}</tbody></table></div>
@@ -1687,7 +1689,8 @@ async function setProgress(i,val){
   }
   renderAdmin();
 }
-function goCert(i){pendingCert=i;setTab('cert');}
+let certRowId=null;
+function goCert(i){pendingCert=i;certRowId=(allEnrollments()[i]||{}).rowId||null;setTab('cert');}
 function fillCertFromPick(){
   const v=document.getElementById('certPick').value;
   if(v===''){paintCert();return;}
@@ -1722,7 +1725,9 @@ function loadScript(src,globalName){
   return new Promise((ok,fail)=>{
     if(globalName&&window[globalName])return ok();
     const s=document.createElement('script');s.src=src;
-    s.onload=ok;s.onerror=()=>fail(new Error('Kunde inte ladda hjälpbiblioteket'));
+    const t=setTimeout(()=>fail(new Error('Biblioteket svarade inte (nätverk/annonsblockerare?)')),15000);
+    s.onload=()=>{clearTimeout(t);ok();};
+    s.onerror=()=>{clearTimeout(t);fail(new Error('Kunde inte ladda hjälpbiblioteket (blockerat?)'));};
     document.head.appendChild(s);
   });
 }
@@ -1738,16 +1743,27 @@ async function drawCertQr(){
     await new Promise(r=>setTimeout(r,120));
   }catch(e){}
 }
-async function buildCertPdf(){
-  await drawCertQr(); // QR-koden ska garanterat vara på plats innan PDF:en byggs
-  await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js','html2canvas');
-  await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js','jspdf');
-  const el=document.getElementById('certEl');
-  const canvas=await html2canvas(el,{scale:2,useCORS:true,backgroundColor:'#ffffff'});
-  const img=canvas.toDataURL('image/jpeg',0.92);
-  const pdf=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
-  pdf.addImage(img,'JPEG',0,0,297,210);
-  return pdf;
+async function buildCertPdf(status){
+  const säg=t=>{try{if(status)status(t);}catch(e){}};
+  let steg='QR-koden';
+  try{
+    säg('Ritar QR-kod …');await drawCertQr();
+    steg='ritbiblioteket';säg('Laddar ritbibliotek …');
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js','html2canvas');
+    steg='PDF-biblioteket';säg('Laddar PDF-bibliotek …');
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js','jspdf');
+    steg='certifikatritningen';säg('Ritar certifikatet …');
+    const el=document.getElementById('certEl');
+    const canvas=await html2canvas(el,{scale:2,useCORS:true,backgroundColor:'#ffffff',imageTimeout:8000,logging:false});
+    steg='PDF-sammansättningen';säg('Bygger PDF …');
+    const img=canvas.toDataURL('image/jpeg',0.92);
+    const pdf=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+    pdf.addImage(img,'JPEG',0,0,297,210);
+    return pdf;
+  }catch(e){
+    console.error('buildCertPdf stannade vid',steg,e);
+    throw new Error('stannade vid '+steg+': '+e.message);
+  }
 }
 function certFileName(){
   const id=(document.getElementById('cId').textContent||'').replace('Certifikat-ID: ','').replace(/[^A-Za-z0-9-]/g,'')||'NAA';
@@ -1757,7 +1773,7 @@ function certFileName(){
 async function downloadCert(btn){
   const orig=btn.textContent;btn.disabled=true;btn.textContent='Skapar PDF …';
   try{
-    const pdf=await buildCertPdf();
+    const pdf=await buildCertPdf(t=>{btn.textContent=t;});
     pdf.save(certFileName());
     toast('PDF nedladdad ✓');
   }catch(e){toast('Fel: '+e.message);}
@@ -1769,9 +1785,9 @@ async function emailCert(btn){
   if(!supa){toast('Mejlutskick kräver skarp drift');return;}
   const orig=btn.textContent;btn.disabled=true;btn.textContent='Skapar PDF …';
   try{
-    const pdf=await buildCertPdf();
+    const pdf=await buildCertPdf(t=>{btn.textContent=t;});
     const b64=pdf.output('datauristring').split(',')[1];
-    btn.textContent='Skickar …';
+    btn.textContent='Skickar mejlet …';
     const {data:{session}}=await supa.auth.getSession();
     const res=await fetch('/api/send-certificate',{
       method:'POST',headers:{'Content-Type':'application/json'},
@@ -1781,12 +1797,18 @@ async function emailCert(btn){
         name:document.getElementById('certName').value,
         course:document.getElementById('certCourse').value,
         certId:(document.getElementById('cId').textContent||'').replace('Certifikat-ID: ',''),
-        pdf:b64
+        pdf:b64,
+        rowId:certRowId
       })
     });
     const out=await res.json().catch(()=>({}));
-    if(res.ok)toast('Certifikatet är mejlat till '+email+' 🎉');
-    else toast('Kunde inte skicka: '+(out.error||('fel '+res.status)));
+    if(res.ok){
+      toast('Certifikatet är mejlat till '+email+' ✓ — kopia till er inkorg 🎉');
+      btn.disabled=false;btn.textContent='✓ Skickat';
+      if(certRowId){const r=adminRows.find(x=>x.id===certRowId);if(r)r.cert_sent=new Date().toISOString();}
+      return;
+    }
+    toast('Kunde inte skicka: '+(out.error||('fel '+res.status)));
   }catch(e){toast('Fel: '+e.message);}
   btn.disabled=false;btn.textContent=orig;
 }
