@@ -672,7 +672,7 @@ body.fs-mode .player-actions,body.fs-mode .mobile-tip{display:none}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v7.3</span>
+    <span>Alla rättigheter förbehållna · v7.4</span>
   </div>
 </footer>
 
@@ -1202,19 +1202,32 @@ function openCheckout(){track('begin_checkout',{items:cart.length});
     <form id="checkoutForm" onsubmit="return placeOrder(event)">
       <div class="checkout-section">
         <h4>Beställare</h4>
+        <div class="form-row" style="margin-bottom:16px">
+          <label class="paybox" style="margin:0"><input type="radio" name="buyerType" value="foretag" checked onchange="setBuyerType('foretag')"> <b>Företag</b><span style="display:block;font-size:13px;color:var(--text-dim);margin-top:2px">Faktureras med organisationsnummer</span></label>
+          <label class="paybox" style="margin:0"><input type="radio" name="buyerType" value="privat" onchange="setBuyerType('privat')"> <b>Privatperson</b><span style="display:block;font-size:13px;color:var(--text-dim);margin-top:2px">Faktureras till din hemadress</span></label>
+        </div>
         <div class="form-row">
           <div class="field"><label>Ditt namn *</label><input required id="bName"></div>
-          <div class="field"><label>Företag</label><input id="bCompany"></div>
+          <div class="field"><label>E-post *</label><input required type="email" id="bEmail"></div>
         </div>
         <div class="form-row">
-          <div class="field"><label>Organisationsnummer</label><input id="bOrgnr" placeholder="XXXXXX-XXXX"></div>
+          <div class="field"><label>Telefon</label><input type="tel" id="bPhone"></div>
           <div class="field"></div>
         </div>
-        <div class="form-row">
-          <div class="field"><label>E-post *</label><input required type="email" id="bEmail"></div>
-          <div class="field"><label>Telefon</label><input type="tel" id="bPhone"></div>
+        <div id="foretagFields">
+          <div class="form-row">
+            <div class="field"><label>Företag *</label><input id="bCompany"></div>
+            <div class="field"><label>Organisationsnummer *</label><input id="bOrgnr" placeholder="XXXXXX-XXXX"></div>
+          </div>
+          <div class="field"><label>Fakturaadress / referens</label><input id="bInvoice" placeholder="T.ex. faktura@företag.se eller kostnadsställe"></div>
         </div>
-        <div class="field"><label>Fakturaadress / referens</label><input id="bInvoice" placeholder="T.ex. faktura@företag.se eller kostnadsställe"></div>
+        <div id="privatFields" style="display:none">
+          <div class="field"><label>Gatuadress *</label><input id="bAdress" placeholder="Gatan 1"></div>
+          <div class="form-row">
+            <div class="field"><label>Postnummer *</label><input id="bPostnr" placeholder="123 45"></div>
+            <div class="field"><label>Ort *</label><input id="bOrt"></div>
+          </div>
+        </div>
       </div>
       <div class="checkout-section">
         <h4>Vem ska gå kursen?</h4>
@@ -1251,7 +1264,7 @@ function openCheckout(){track('begin_checkout',{items:cart.length});
           <input type="radio" name="payMethod" value="faktura">
           <div>
             <b>Faktura — 30 dagar</b>
-            <span>För företag. Fakturan skickas till e-postadressen eller referensen du angett ovan.</span>
+            <span>Fakturan skickas med 30 dagars betalningsvillkor till uppgifterna du angett ovan.</span>
           </div>
         </label>
       </div>
@@ -1265,6 +1278,12 @@ function closeCheckout(){document.getElementById('checkoutVeil').classList.remov
 /* Backend-adress: tom sträng = samma domän (Vercel). Ändra vid behov. */
 const API_BASE='';
 
+let buyerType='foretag';
+function setBuyerType(t){
+  buyerType=t;
+  document.getElementById('foretagFields').style.display=t==='foretag'?'':'none';
+  document.getElementById('privatFields').style.display=t==='privat'?'':'none';
+}
 function collectOrder(){
   const fnames=[...document.querySelectorAll('.pFname')];
   const lnames=[...document.querySelectorAll('.pLname')];
@@ -1279,7 +1298,13 @@ function collectOrder(){
     });
   });
   return {
-    buyer:{name:bName.value,company:bCompany.value,orgnr:bOrgnr.value,email:bEmail.value,phone:bPhone.value,invoice:bInvoice.value},
+    buyer:{type:buyerType,name:bName.value,email:bEmail.value,phone:bPhone.value,
+      company:buyerType==='foretag'?bCompany.value:'',
+      orgnr:buyerType==='foretag'?bOrgnr.value:'',
+      invoice:buyerType==='foretag'?bInvoice.value:'',
+      address:buyerType==='privat'?bAdress.value:'',
+      zip:buyerType==='privat'?bPostnr.value:'',
+      city:buyerType==='privat'?bOrt.value:''},
     items,total:cartTotal()
   };
 }
@@ -1309,10 +1334,14 @@ async function placeOrder(e){
   }
 
   // Faktura: skicka ordern till backend (mejlas till er) — fungerar även lokalt som demo
-  if(!(data.buyer.orgnr||'').trim()){
-    toast('Ange organisationsnummer — det krävs för fakturaköp');
-    const f=document.getElementById('bOrgnr');if(f){f.focus();f.style.outline='2px solid #E8A33D';setTimeout(()=>f.style.outline='',4000);}
-    return false;
+  const markera=id=>{const f=document.getElementById(id);if(f){f.focus();f.style.outline='2px solid #E8A33D';setTimeout(()=>f.style.outline='',4000);}};
+  if(data.buyer.type==='foretag'){
+    if(!(data.buyer.company||'').trim()){toast('Ange företagsnamn — krävs för företagsfaktura');markera('bCompany');return false;}
+    if(!(data.buyer.orgnr||'').trim()){toast('Ange organisationsnummer — krävs för företagsfaktura');markera('bOrgnr');return false;}
+  }else{
+    if(!(data.buyer.address||'').trim()){toast('Ange gatuadress — krävs för att fakturera dig som privatperson');markera('bAdress');return false;}
+    if(!(data.buyer.zip||'').trim()){toast('Ange postnummer');markera('bPostnr');return false;}
+    if(!(data.buyer.city||'').trim()){toast('Ange ort');markera('bOrt');return false;}
   }
   btn.disabled=true;btn.innerHTML='Skickar beställningen…';
   try{
@@ -1456,7 +1485,7 @@ function allEnrollments(){
         id:(row.order_ref||'').startsWith('cs_')?'ST-'+row.order_ref.slice(-6).toUpperCase():((row.order_ref||'').startsWith('GRATIS')?'KOSTNADSFRI':((row.order_ref||'').startsWith('FAKT')?'FAKTURA · '+row.order_ref:(row.order_ref||'—'))),
         refFull:row.order_ref||('rad-'+row.id),
         date:(row.created_at||'').slice(0,10),
-        buyer:{name:row.buyer_name||'',company:row.buyer_company||'',email:row.buyer_email||'',orgnr:row.buyer_orgnr||'',phone:row.buyer_phone||'',invoice:row.buyer_invoice||''}
+        buyer:{name:row.buyer_name||'',company:row.buyer_company||'',email:row.buyer_email||'',orgnr:row.buyer_orgnr||'',phone:row.buyer_phone||'',invoice:row.buyer_invoice||'',type:row.buyer_type||'',address:row.buyer_address||'',zip:row.buyer_zip||'',city:row.buyer_city||''}
       },
       courseId:row.course_id,
       p:{name:row.name||row.email,email:row.email,pnr:row.personnummer||'',login:'Automatisk',progress:row.status||'ej',certDate:row.cert_date||'',certId:row.cert_id||'',certSent:row.cert_sent||null}
@@ -1728,10 +1757,9 @@ function openOrder(ref){
   const inkl=Math.round(o.total*1.25*100)/100;
   const underlag=`FAKTURAUNDERLAG — Nordic Agir Academy (Nordic Agir AB, org.nr 559516-5373)
 Order: ${o.ref} · Datum: ${o.date}
-Kund: ${b.company||b.name||'—'}
-Org.nr: ${b.orgnr||'—'}
-Kontakt: ${b.name||'—'} · ${b.email||'—'} · ${b.phone||'—'}
-Fakturaadress/märkning: ${b.invoice||'—'}
+Kund: ${b.type==='privat'?(b.name||'—')+' (privatperson)':(b.company||b.name||'—')}
+${b.type==='privat'?('Fakturaadress: '+(b.address||'—')+', '+(b.zip||'')+' '+(b.city||'')):('Org.nr: '+(b.orgnr||'—'))}
+Kontakt: ${b.name||'—'} · ${b.email||'—'} · ${b.phone||'—'}${b.type==='privat'?'':'\nFakturaadress/märkning: '+(b.invoice||'—')}
 ${o.items.map(i=>{const t=(COURSES.find(c=>c.id===i.courseId)||{title:i.courseId}).title;return i.participants.map(p=>`1 st ${t} — deltagare ${p.name}`).join('\n');}).join('\n')}
 Summa: ${o.total} kr exkl. moms · Moms 25%: ${Math.round(o.total*0.25*100)/100} kr · ATT BETALA: ${inkl} kr
 Betalningsvillkor: 30 dagar`;
@@ -1740,8 +1768,10 @@ Betalningsvillkor: 30 dagar`;
       <table style="width:100%;border-collapse:collapse;font-size:14px">
         ${rad('Ordertyp',o.id)}
         ${rad('Datum',o.date)}
-        ${rad('Företag',b.company)}
-        ${rad('Org.nr',b.orgnr,true)}
+        ${rad('Kundtyp',b.type==='privat'?'Privatperson':(b.type==='foretag'?'Företag':''))}
+        ${b.type==='privat'
+          ?rad('Fakturaadress',(b.address?b.address+', ':'')+(b.zip||'')+' '+(b.city||''),true)
+          :rad('Företag',b.company)+rad('Org.nr',b.orgnr,true)}
         ${rad('Beställare',b.name)}
         ${rad('E-post',b.email)}
         ${rad('Telefon',b.phone)}
