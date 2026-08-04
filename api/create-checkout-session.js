@@ -12,23 +12,23 @@ const MOMS = 1.25;
 // Kurskatalog: id -> { titel, pris i kr exkl. moms }
 // OBS: håll denna i synk med kurslistan i index.html när priser ändras.
 const COURSES = {
-  'anbud':       { title: 'Analysera och kvalitetssäkra offentliga anbud', price: 795 },
-  'lou-praktik': { title: 'LOU i praktiken — offentlig upphandling', price: 1495 },
-  'luf-praktik': { title: 'LUF i praktiken — upphandling inom försörjningssektorerna', price: 1395 },
+  'anbud':       { title: 'Anbudsarbete i offentlig upphandling — analys och kvalitetssäkring', price: 795 },
+  'lou-praktik': { title: 'LOU — Lagen om offentlig upphandling', price: 1495 },
+  'luf-praktik': { title: 'LUF — Lagen om upphandling inom försörjningssektorerna', price: 1395 },
   'ejur':        { title: 'Entreprenadjuridik — AB 04, ABT 06 och ABK 09', price: 2195 },
-  'ab-abt':      { title: 'AB 04 och ABT 06 — standardavtalen i bygg', price: 1495 },
-  'abk':         { title: 'ABK 09 — avtal och ansvar i konsultuppdrag', price: 995 },
-  'ata':         { title: 'ÄTA-hantering — från teori till praktik', price: 995 },
-  'lyft':        { title: 'Säkra lyft — riskbedömning och utrustning', price: 795 },
-  'bas':         { title: 'BAS-P och BAS-U — säkert byggprojekt från start', price: 1495 },
+  'ab-abt':      { title: 'AB 04 och ABT 06 — standardavtal för entreprenader', price: 1495 },
+  'abk':         { title: 'ABK 09 — Allmänna bestämmelser för konsultuppdrag', price: 995 },
+  'ata':         { title: 'ÄTA-arbeten — ändrings-, tilläggs- och avgående arbeten', price: 995 },
+  'lyft':        { title: 'Säkra lyft — lastkoppling, signalering och riskbedömning', price: 795 },
+  'bas':         { title: 'BAS-P och BAS-U — byggarbetsmiljösamordning', price: 1495 },
   'apv':         { title: 'Arbete på väg — APV Steg 1 (1.1, 1.2, 1.3)', price: 995 },
-  'ama-hus':     { title: 'AMA Hus — från kod till kvalitet', price: 1495 },
-  'ama-anl':     { title: 'AMA Anläggning — kvalitet på bygget', price: 1495 },
-  'kma':         { title: 'KMA i praktiken — bygg och anläggning', price: 1495 },
-  'pl':          { title: 'Projektledning — från start till mål', price: 995 },
+  'ama-hus':     { title: 'AMA Hus — allmän material- och arbetsbeskrivning för husbyggnad', price: 1495 },
+  'ama-anl':     { title: 'AMA Anläggning — allmän material- och arbetsbeskrivning för anläggning', price: 1495 },
+  'kma':         { title: 'KMA — kvalitet, miljö och arbetsmiljö i bygg och anläggning', price: 1495 },
+  'pl':          { title: 'Projektledning i bygg- och anläggningsprojekt', price: 995 },
   'prl':         { title: 'Projekteringsledning i bygg- och anläggningsprojekt', price: 995 },
-  'tid':         { title: 'Tidsplanering i byggprojekt — från plan till produktion', price: 995 },
-  'kalk':        { title: 'Kalkylering för entreprenader — från anbud till vinst', price: 995 },
+  'tid':         { title: 'Tidsplanering i byggprojekt', price: 995 },
+  'kalk':        { title: 'Kalkylering för entreprenader — anbuds- och produktionskalkyl', price: 995 },
 };
 
 export default async function handler(req, res) {
