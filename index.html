@@ -12,7 +12,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nordic Agir Academy — Utbildningar för dig som bygger Sverige</title>
-<meta name="description" content="Nordic Agir Academy — 17 distanskurser inom bygg & anläggning. Entreprenadjuridik, BAS-P/U, Arbete på väg, LOU, ÄTA m.m. I din egen takt, certifikat giltigt i 5 år.">
+<meta name="description" content="Nordic Agir Academy — 25 distanskurser inom bygg & anläggning. Entreprenadjuridik, BAS-P/U, Arbete på väg, LOU, ÄTA m.m. I din egen takt, certifikat giltigt i 5 år.">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/png" href="/favicon.png" sizes="96x96">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -20,7 +20,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Nordic Agir Academy">
 <meta property="og:title" content="Nordic Agir Academy — Distanskurser inom bygg & anläggning">
-<meta property="og:description" content="17 kurser i din egen takt: entreprenadjuridik, BAS-P/U, Arbete på väg, LOU, ÄTA m.m. Certifikat direkt i mejlen — giltigt i 5 år.">
+<meta property="og:description" content="25 kurser i din egen takt: entreprenadjuridik, BAS-P/U, Arbete på väg, LOU, ÄTA m.m. Certifikat direkt i mejlen — giltigt i 5 år.">
 <meta property="og:url" content="https://nordicagiracademy.se">
 <meta property="og:image" content="https://nordicagiracademy.se/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -672,7 +672,7 @@ body.fs-mode .player-actions,body.fs-mode .mobile-tip{display:none}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v7.4</span>
+    <span>Alla rättigheter förbehållna · v7.6</span>
   </div>
 </footer>
 
@@ -790,11 +790,15 @@ const COURSES=[
  {id:'bas',cat:'bygg',abbr:'BAS-P och BAS-U',sub:'Byggarbetsmiljösamordning',title:'BAS-P och BAS-U — byggarbetsmiljösamordning',desc:'Bli trygg som byggarbetsmiljösamordnare: ansvaret, arbetsmiljöplanen och samordningen som håller från planering till utförande.',dur:'ca 4 tim',price:1495,orig:1995,img:IMG('1541888946425-d81bb19240f5'),kw:'bas-p bas-u byggarbetsmiljösamordnare arbetsmiljö arbetsmiljöplan'},
  {id:'apv',cat:'bygg',abbr:'Arbete på väg',sub:'APV Steg 1 · 1.1 · 1.2 · 1.3',title:'Arbete på väg — APV Steg 1 (1.1, 1.2 och 1.3)',desc:'Grundkompetensen för alla som arbetar på eller vid väg, enligt Trafikverkets krav — hela steg 1 med kompetenserna 1.1, 1.2 och 1.3.',dur:'ca 2 tim',price:995,orig:1295,img:IMG('1724204408341-adb2e4538a73'),kw:'apv arbete på väg trafikverket steg 1 1.1 1.2 1.3 vägarbetsplats väghållningsfordon'},
 
- {id:'mer',cat:'bygg',soon:true,abbr:'MER Anläggning',sub:'Mät- och ersättningsregler',title:'MER Anläggning — mät- och ersättningsregler för anläggningsarbeten',desc:'Mängdförteckningen bestämmer vad du får betalt — MER bestämmer hur den läses. Teoretisk mängd, reglerbara mängder och gränsdragningen mot ÄTA.',dur:'ca 4–5 tim',price:1495,orig:1995,img:IMG('1581094794329-c8112a89af12'),kw:'mer anläggning mängdförteckning mätregler ersättning teoretisk mängd ama'},
- {id:'schakt',cat:'bygg',soon:true,abbr:'Säker schakt',sub:'Schaktansvarig',title:'Säker schakt — schaktarbete och schaktansvar',desc:'Ett schakt rasar på två sekunder — planeringen tar två timmar. Jordarter, slänt eller stöd, dagliga kontroller och räddningsplanen som skrivs innan.',dur:'ca 3–4 tim',price:995,orig:1295,img:IMG('1581092160562-40aa08e78837'),kw:'schakt schaktning rasrisk slänt spont schaktslåde grävlåda schaktansvarig'},
- {id:'inst',cat:'projekt',soon:true,abbr:'Installations-samordnare',sub:'Rör, luft, el & styr i samma hus',title:'Installationssamordning i byggprojekt',desc:'Huset byggs en gång — installationerna krockar tre gånger om ingen samordnar. Gränsdragningslistor, montageordning och samordnad provning.',dur:'ca 4 tim',price:1495,orig:1995,img:IMG('1521791136064-7986c2920216'),kw:'installationssamordnare installationer samordning vvs el ventilation gränsdragning'},
- {id:'fall',cat:'bygg',soon:true,abbr:'Fallskydd',sub:'Arbete på höjd',title:'Fallskydd — arbete på höjd',desc:'Fem meter tar en sekund, kunskapen tar två timmar. Skyddens rangordning, selens fysik, förankringar och räddningen ur hängtraumat.',dur:'ca 2–3 tim',price:795,orig:999,img:IMG('1503387762-592deb58ef4e'),kw:'fallskydd fall höjd sele fallstopp förankring hängtrauma tak'},
- {id:'bim',cat:'projekt',soon:true,abbr:'BIM',sub:'För produktionen',title:'BIM — byggnadsinformationsmodellering i produktionen',desc:'Modellen finns redan — frågan är om du kan läsa den. Granska, mängda och döda krockarna på skärmen, med gratis verktyg och kontraktet i ryggen.',dur:'ca 3–4 tim',price:995,orig:1295,img:IMG('1460925895917-afdab827c52f'),kw:'bim ifc modell kollisionskontroll mängdavtagning digital produktion'},
+ {id:'ama-af',cat:'bygg',abbr:'AMA AF',sub:'Administrativa föreskrifter',title:'AMA AF — administrativa föreskrifter för entreprenader',desc:'AF-delen sätter spelreglerna: anbudskrav, tider, ansvar, viten och möten. Lär dig läsa och använda de administrativa föreskrifterna — innan de används mot dig.',dur:'ca 3–4 tim',price:1495,orig:1995,img:IMG('1581094794329-c8112a89af12'),kw:'ama af administrativa föreskrifter afc afd entreprenadföreskrifter upphandlingsföreskrifter'},
+ {id:'ramavtal',cat:'upphandling',abbr:'Ramavtal & avrop',sub:'Strategi för leverantörer',title:'Ramavtal och avrop i offentlig upphandling',desc:'Att vinna ramavtalet är halva matchen — avropen är den andra. Rangordning, förnyad konkurrensutsättning och strategin som gör ramavtalet lönsamt.',dur:'ca 3 tim',price:1395,orig:1795,img:IMG('1521791136064-7986c2920216'),kw:'ramavtal avrop förnyad konkurrensutsättning rangordning offentlig upphandling leverantör'},
+ {id:'ritning',cat:'bygg',abbr:'Ritningsläsning',sub:'Planer, sektioner & detaljer',title:'Ritningsläsning i byggprojekt',desc:'Ritningen är byggets språk. Skalor, beteckningar, planer, sektioner, detaljer och revisioner — läs dem rätt och led därefter.',dur:'ca 2–3 tim',price:995,orig:1295,img:IMG('1503387762-592deb58ef4e'),kw:'ritningsläsning ritning skala sektion detalj plan bygghandling relationshandling revision'},
+
+ {id:'mer',cat:'bygg',abbr:'MER Anläggning',sub:'Mät- och ersättningsregler',title:'MER Anläggning — mät- och ersättningsregler för anläggningsarbeten',desc:'Mängdförteckningen bestämmer vad du får betalt — MER bestämmer hur den läses. Teoretisk mängd, reglerbara mängder och gränsdragningen mot ÄTA.',dur:'ca 4–5 tim',price:1495,orig:1995,img:IMG('1581094794329-c8112a89af12'),kw:'mer anläggning mängdförteckning mätregler ersättning teoretisk mängd ama'},
+ {id:'schakt',cat:'bygg',abbr:'Säker schakt',sub:'Schaktansvarig',title:'Säker schakt — schaktarbete och schaktansvar',desc:'Ett schakt rasar på två sekunder — planeringen tar två timmar. Jordarter, slänt eller stöd, dagliga kontroller och räddningsplanen som skrivs innan.',dur:'ca 3–4 tim',price:995,orig:1295,img:IMG('1581092160562-40aa08e78837'),kw:'schakt schaktning rasrisk slänt spont schaktslåde grävlåda schaktansvarig'},
+ {id:'inst',cat:'projekt',abbr:'Installations-samordnare',sub:'Rör, luft, el & styr i samma hus',title:'Installationssamordning i byggprojekt',desc:'Huset byggs en gång — installationerna krockar tre gånger om ingen samordnar. Gränsdragningslistor, montageordning och samordnad provning.',dur:'ca 4 tim',price:1495,orig:1995,img:IMG('1521791136064-7986c2920216'),kw:'installationssamordnare installationer samordning vvs el ventilation gränsdragning'},
+ {id:'fall',cat:'bygg',abbr:'Fallskydd',sub:'Arbete på höjd',title:'Fallskydd — arbete på höjd',desc:'Fem meter tar en sekund, kunskapen tar två timmar. Skyddens rangordning, selens fysik, förankringar och räddningen ur hängtraumat.',dur:'ca 2–3 tim',price:795,orig:999,img:IMG('1503387762-592deb58ef4e'),kw:'fallskydd fall höjd sele fallstopp förankring hängtrauma tak'},
+ {id:'bim',cat:'projekt',abbr:'BIM',sub:'För produktionen',title:'BIM — byggnadsinformationsmodellering i produktionen',desc:'Modellen finns redan — frågan är om du kan läsa den. Granska, mängda och döda krockarna på skärmen, med gratis verktyg och kontraktet i ryggen.',dur:'ca 3–4 tim',price:995,orig:1295,img:IMG('1460925895917-afdab827c52f'),kw:'bim ifc modell kollisionskontroll mängdavtagning digital produktion'},
  {id:'ama-hus',cat:'bygg',abbr:'AMA Hus',sub:'Material- och arbetsbeskrivning',title:'AMA Hus — allmän material- och arbetsbeskrivning för husbyggnad',desc:'Lär dig läsa och skriva tekniska beskrivningar för husbyggnad: koder, rubriker och pyramidregeln — utan huvudvärk.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1503387762-592deb58ef4e'),kw:'ama hus beskrivning kod rubrik husbyggnad'},
  {id:'ama-anl',cat:'bygg',abbr:'AMA Anläggning',sub:'Material- och arbetsbeskrivning',title:'AMA Anläggning — allmän material- och arbetsbeskrivning för anläggning',desc:'AMA och MER för mark- och anläggningsjobb: struktur, mätregler och kopplingen som gör att kalkylen stämmer med verkligheten.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1581094794329-c8112a89af12'),kw:'ama anläggning mark mängdförteckning mer mätregler'},
  {id:'kma',cat:'bygg',abbr:'KMA i praktiken',sub:'Kvalitet, miljö och arbetsmiljö',title:'KMA — kvalitet, miljö och arbetsmiljö i bygg och anläggning',desc:'Kvalitet, miljö och arbetsmiljö som fungerar ute i produktionen: egenkontroller, KMA-planer och dokumentation som håller.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1705579612477-20866d78deeb'),kw:'kma kvalitet miljö arbetsmiljö egenkontroll'},
@@ -813,6 +817,40 @@ const saleOff=c=>Math.round((1-c.price/origOf(c))*100);
 
 /* ============ KURSDETALJER ============ */
 const DETAILS={
+ 'ama-af':{
+  audience:'För entreprenadingenjörer, kalkylatorer, platschefer och anbudsansvariga — alla som möter AF-delen i förfrågningsunderlag och kontrakt.',
+  goals:['Förstå AF-delens roll i AMA-familjen och dokumentrangordningen','Läsa och tolka föreskrifterna om anbud, tider, ansvar och ekonomi','Känna igen viten, försäkringskrav och säkerheter innan de kostar','Använda AF-delen aktivt i anbudsräkning och projektstyrning'],
+  modules:[
+   {t:'AF-delens plats i systemet',d:'AMA AF, rangordningen mot AB/ABT och varför AF-delen läses FÖRE mängderna.'},
+   {t:'Anbudsföreskrifterna',d:'Formkrav, tider, referenser och uteslutningsgrunder — det som fäller anbud i onödan.'},
+   {t:'Entreprenadföreskrifterna',d:'Tider, viten, försäkringar, säkerheter och besiktningar — ekonomin mellan raderna.'},
+   {t:'Möten, organisation och kommunikation',d:'Byggmöten, underrättelsevägar och dagbokskrav som AF-delen styr.'},
+   {t:'AF i vardagen',d:'Från anbudsgenomgång till avslut — checklistorna som gör AF-delen till ett verktyg.'},
+   {t:'Examen',d:'Kunskapsprov online med obegränsade försök.'}
+  ]},
+ 'ramavtal':{
+  audience:'För leverantörer till offentlig sektor: anbudsansvariga, säljare och företagsledare som vill vinna ramavtal — och tjäna pengar på avropen.',
+  goals:['Förstå ramavtalens logik: rangordning, fördelningsnycklar och förnyad konkurrensutsättning','Räkna och positionera anbudet strategiskt för avropsvinster','Bevaka avrop, svara rätt och i tid — och undvika passivitetsfällan','Hantera avvikelser, prisjusteringar och förlängningar under avtalstiden'],
+  modules:[
+   {t:'Ramavtalets anatomi',d:'En eller flera leverantörer, rangordning, fördelningsnyckel eller förnyad konkurrensutsättning — spelplanerna.'},
+   {t:'Att vinna platsen',d:'Utvärderingsmodeller, taktisk men ärlig prissättning och referenserna som avgör.'},
+   {t:'Avropen — där pengarna finns',d:'Bevakning, svarstider, minikonkurrenser och konsten att prioritera rätt avrop.'},
+   {t:'Under avtalstiden',d:'Prisjusteringar, volymer utan garantier, avvikelser och relationen med beställaren.'},
+   {t:'Fällorna och fallgroparna',d:'Passivitet, felräknade takpriser och ramavtal som blir olönsamma — och hur du undviker dem.'},
+   {t:'Examen',d:'Kunskapsprov online med obegränsade försök.'}
+  ]},
+ 'ritning':{
+  audience:'För platschefer, arbetsledare, yrkesarbetare och beställare — alla som ska förstå vad ritningen faktiskt säger innan det byggs.',
+  goals:['Läsa planer, sektioner, fasader och detaljer med rätt skalförståelse','Tolka beteckningar, linjetyper, måttsättning och hänvisningar','Hålla ordning på ritningsnummer, revisioner och gällande handling','Koppla ritningen till beskrivning och mängder — helheten som styr bygget'],
+  modules:[
+   {t:'Ritningens språk',d:'Skalor, linjetyper, symboler och måttsättning — grammatiken som allt bygger på.'},
+   {t:'Ritningstyperna',d:'Situationsplan, planer, sektioner, fasader, detaljer och uppställningar — vad varje typ svarar på.'},
+   {t:'Discipliner och samordning',d:'A-, K- och installationsritningar — och hur de läses ihop.'},
+   {t:'Revisioner och gällande handling',d:'Ritningsnummer, ändringsmoln, PM och konsten att aldrig bygga efter fel version.'},
+   {t:'Från ritning till produktion',d:'Mängda, bereda och sätta ut från ritningen — med kopplingen till beskrivning och kontrakt.'},
+   {t:'Examen',d:'Kunskapsprov online med obegränsade försök.'}
+  ]},
+
  'mer':{
   audience:'För kalkylatorer, platschefer, entreprenadingenjörer och arbetschefer i mark- och anläggningsföretag som räknar och reglerar jobb med mängdförteckning.',
   goals:['Läsa mängdförteckningen: koder, enheter, fasta och reglerbara mängder','Tillämpa principen om teoretisk mängd vid schakt, fyllning och ledningsgrav','Skilja mängdreglering från ÄTA — och dokumentera för att få betalt','Räkna anbud på mängdförteckning med medveten riskvärdering'],
@@ -1115,6 +1153,15 @@ function render(){
   catGrid.querySelectorAll('.cat-card').forEach(b=>b.classList.toggle('active',b.dataset.cat===f));
 }
 function track(ev,params){try{if(typeof gtag==='function')gtag('event',ev,params||{});}catch(e){}}
+/* Google Ads-konvertering: klistra in etiketten från Ads (Mål → Konverteringar → er köp-åtgärd),
+   formatet är 'AW-18318666112/XXXXXXXXXXX'. Tom sträng = inget skickas (säkert läge). */
+const ADS_KONVERTERING='';
+function trackKop(varde,ordernr){
+  try{
+    if(typeof gtag!=='function'||!ADS_KONVERTERING)return;
+    gtag('event','conversion',{send_to:ADS_KONVERTERING,value:Number(varde)||0,currency:'SEK',transaction_id:ordernr||''});
+  }catch(e){}
+}
 function setFilter(f){activeFilter=f;render();track('select_category',{category:f});}
 function resetAll(){activeFilter=null;query='';document.getElementById('searchInput').value='';render();}
 function scrollToCourses(){
@@ -1360,6 +1407,7 @@ async function placeOrder(e){
 }
 
 function finishOrder(data,method,serverRef){
+  if(method==='faktura')trackKop(Math.round(data.total*1.25*100)/100,serverRef||'');
   const order={
     id:'NA-'+(orderSeq++),
     date:new Date().toLocaleDateString('sv-SE'),
@@ -1387,7 +1435,7 @@ function finishOrder(data,method,serverRef){
 /* Retur från Stripe Checkout */
 (function handleStripeReturn(){
   const p=new URLSearchParams(location.search);
-  if(p.get('betalning')==='klar'){track('purchase_complete',{});
+  if(p.get('betalning')==='klar'){track('purchase_complete',{value:Number(p.get('summa'))||0,currency:'SEK'});trackKop(p.get('summa'),p.get('session_id'));
     document.getElementById('checkoutTitle').textContent='Tack för ditt köp! 🎉';
     document.getElementById('checkoutBody').innerHTML=`
       <div class="confirm-box">
@@ -2050,6 +2098,15 @@ if(supa){supa.auth.onAuthStateChange((ev,session)=>{
    Spelaren bygger själv in Courseaus SCORM-omslag runt länken — inga extra
    filer behöver laddas upp. Kan även läsas från tabellen `courses` i Supabase. */
 const COURSE_URLS={
+  'mer':'https://app.courseau.co/projects/8749c54b-6c61-4177-abda-112e63311591/preview?scorm=true&token=sct_OlAvtIP3Oyb3g9hbL2EgtBe4YGltHavqyrzmq7rN3rQ',
+  'schakt':'https://app.courseau.co/projects/60284660-5bd3-4832-95b0-adfa420abeb5/preview?scorm=true&token=sct_9GB1hvSfK8wpZnEPpHiHVSsgcY5N5C4RLeNsOaNoKX0',
+  'inst':'https://app.courseau.co/projects/9eb93bbb-5a17-4ac6-9366-49a44958f2f3/preview?scorm=true&token=sct_4XI_-cAUGZM2j0CV8xE2vrXEOTXDl5g6z658YbrendE',
+  'fall':'https://app.courseau.co/projects/fc2dcd97-a1fd-4387-b5ef-5575cfe56c28/preview?scorm=true&token=sct_RV0cVXGS1h9vktR2QxYeDlkYF3FPLaV62hgi8L5C1aM',
+  'bim':'https://app.courseau.co/projects/74db794a-e4ef-44b7-9be3-9cd94c03796c/preview?scorm=true&token=sct_GMjzQJsFffJAQWfx5T0HsnKVsDGG9qS8b1CmUTUmJGI',
+  'ama-af':'https://app.courseau.co/projects/65fe1413-1da1-4a99-a905-7c5918a8bde9/preview?scorm=true&token=sct_6_jLJFwNQvgnMkzI0Mc-2n-k59_O2tjAhDshIrJG0Qo',
+  'ramavtal':'https://app.courseau.co/projects/0774c1fb-97ee-479f-94fa-57ae99001530/preview?scorm=true&token=sct_3gcGuNZhfTyJqvgdn4_11Y_xj6T78EpySbeoXxkGRTw',
+  'ritning':'https://app.courseau.co/projects/8a1f66e1-e6f3-45e3-b957-ac85deb80aa5/preview?scorm=true&token=sct_CQcjM0H5V9IH7oB9I8Ju0BdA5_rd-pE7iyRp5HdFyyk',
+
   'anbud':'https://app.courseau.co/projects/2c993c0b-9ae3-46cf-a640-3f8f89af809f/preview?scorm=true&token=sct_JQf9aQNePZFm_gMZk9Rmwxmc6ENVJbHz0Vsc-4rvJy4',
   'lou-praktik':'https://app.courseau.co/projects/98c7bf30-3b21-4872-a60d-90160eafbdce/preview?scorm=true&token=sct_Qsl_xKRrPkBVa02njjVHPcc-Z0sjWcs2fUgYIVYFHkI',
   'luf-praktik':'https://app.courseau.co/projects/404916b7-436f-4645-8163-50a19cef985e/preview?scorm=true&token=sct_TPz4wUNyhzPArejJfB1m0LGpygzIUilmH3jIOXiY2-g',
@@ -2058,12 +2115,12 @@ const COURSE_URLS={
   'abk':'https://app.courseau.co/projects/e0af61c2-98ee-4865-a316-d2702898b870/preview?scorm=true&token=sct_ZDhV28xVzXiUjRXqbTlqdP5BewSw0JAflZK4CeWTon4',
   'ata':'https://app.courseau.co/projects/5ef7b500-19c2-4a26-9d02-92fce9c95e71/preview?scorm=true&token=sct_8B--l2NuWJ4Q-hyHdpgT2FcVReIgtpjWjE1-B5BczW0',
   'lyft':'https://app.courseau.co/projects/19ef11da-6e72-46ab-b037-ec5a4b3c70d7/preview?scorm=true&token=sct_WJOGj9zPOm0YxItfX7_dOpAfrsacicB5fPCjwQk-Gi0',
-  'bas':'https://app.courseau.co/projects/0061b3ff-dabf-41a2-99fd-4b9943632092/preview?scorm=true&token=sct_fV9wCNky200TuMvsjuRKTGYkeNXrK-twCGnkO9bcelc',
+  'bas':'https://app.courseau.co/projects/dd7d378a-1766-4390-b290-b3daeee957a3/preview?scorm=true&token=sct_eSIUbXtrIUPsqbxzXBoCEAY9-4uurlbgPBw6iMAHHPE',
   'apv':'https://app.courseau.co/projects/787f8262-6f01-4b70-9c2a-0afd32b75073/preview?scorm=true&token=sct_V9wNIdVi-gdu8CU1nUX4qMSOhIWlRn8Tt5VPDWv4UZY',
   'ama-hus':'https://app.courseau.co/projects/33eddf11-6394-48c0-96be-2525955ade16/preview?scorm=true&token=sct_ygmNP_AQ6UvKr4FYyYo69fFMVLQt35BQVcQ8SocheUU',
   'ama-anl':'https://app.courseau.co/projects/8b9d55dd-2bd4-463d-ab7f-97a65c77244f/preview?scorm=true&token=sct_F2t5QOZvH2fc-COuKypB-fsxsCopNkBFeZsf666azXc',
   'kma':'https://app.courseau.co/projects/34ef0cd9-5cac-48d3-9e7c-ec4a9940e280/preview?scorm=true&token=sct_D9aE7CA7SJbZ9hm3uYP-aWOGBjaP6TUvs61SjRHFcVI',
-  'pl':'https://app.courseau.co/projects/69e08267-91e3-4bdd-989c-0372515ed45d/preview?scorm=true&token=sct_yTtfV8tBPqvVT3Ooj6l8sWe0KZGF-Wn0KEBAhk7h094',
+  'pl':'https://app.courseau.co/projects/d599c718-f7fd-470b-94f9-ee01b13a16b8/preview?scorm=true&token=sct_ofWgIh2I8EYhZlfM_1tNFhhmwyu5-wAmf12WKZ7oh6c',
   'prl':'https://app.courseau.co/projects/d78a5cbb-7b4e-408f-bdc0-19b9f7a3a56e/preview?scorm=true&token=sct_JZdYeOcAKaXWeUCWb4KuI75AgQtyPZECNYtz6dKg5Ps',
   'tid':'https://app.courseau.co/projects/30ea7004-fa78-4cbf-8a1b-66912c85409e/preview?scorm=true&token=sct_bIFfbIo_w1sxefByNznErK3H6avwXR8IVWNgwaYGG54',
   'kalk':'https://app.courseau.co/projects/b2f18b9b-47b1-45ab-be8a-fb97a6c33ded/preview?scorm=true&token=sct_-AdwO_-l7_I7e6IkJd8Hs7JlE3DRKtY8Lbx27l_bGSo'
