@@ -672,7 +672,7 @@ body.fs-mode .player-actions,body.fs-mode .mobile-tip{display:none}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v6.9</span>
+    <span>Alla rättigheter förbehållna · v7.0</span>
   </div>
 </footer>
 
@@ -1801,14 +1801,21 @@ async function buildCertPdf(status){
     }
 
     const center=(txt,y,opt)=>pdf.text(txt,CX,y,Object.assign({align:'center'},opt||{}));
+    // Glesad text: PDF-motorn räknar inte in bokstavsmellanrum vid justering — vi mäter själva
+    const spaced=(txt,x,y,cs,align)=>{
+      const w=pdf.getTextWidth(txt)+cs*Math.max(0,txt.length-1);
+      const sx=align==='center'?x-w/2:align==='right'?x-w:x;
+      pdf.text(txt,sx,y,{charSpace:cs});
+      return w;
+    };
 
     // CERTIFIKAT-etiketten
     pdf.setFont('courier','normal');pdf.setFontSize(11);pdf.setTextColor(...CYAND);
-    center('CERTIFIKAT',54,{charSpace:1.9});
+    spaced('CERTIFIKAT',CX,54,1.9,'center');
 
     // GODKÄND EXAMEN
     pdf.setFont('helvetica','bold');pdf.setFontSize(44);pdf.setTextColor(...COAL);
-    center('GODKÄND EXAMEN',68,{charSpace:0.6});
+    spaced('GODKÄND EXAMEN',CX,68,0.6,'center');
 
     pdf.setFont('helvetica','normal');pdf.setFontSize(12.5);pdf.setTextColor(...DIM);
     center('Detta certifikat intygar att',78);
@@ -1825,7 +1832,7 @@ async function buildCertPdf(status){
     let y=104;
     if(pnrLine){
       pdf.setFont('courier','normal');pdf.setFontSize(11);pdf.setTextColor(107,104,104);
-      center(pnrLine,y,{charSpace:0.31});y+=8;
+      spaced(pnrLine,CX,y,0.31,'center');y+=8;
     }
 
     pdf.setFont('helvetica','normal');pdf.setFontSize(12.5);pdf.setTextColor(...DIM);
@@ -1850,14 +1857,14 @@ async function buildCertPdf(status){
     pdf.setDrawColor(...COAL);pdf.setLineWidth(0.35);
     pdf.line(23.8,182,89.1,182);
     pdf.setFont('courier','normal');pdf.setFontSize(9);pdf.setTextColor(...DIM);
-    pdf.text('NORDIC AGIR ACADEMY · STOCKHOLM',56.4,187,{align:'center',charSpace:0.4});
+    spaced('NORDIC AGIR ACADEMY · STOCKHOLM',56.4,187,0.4,'center');
 
     // Sidfot höger: ID + verifieringstext + QR
     const qrSize=25,qrX=W-23.8-qrSize,qrY=158;
     pdf.setFont('courier','normal');pdf.setFontSize(9.5);pdf.setTextColor(...DIM);
-    pdf.text(idLine,qrX-5,176,{align:'right',charSpace:0.25});
+    spaced(idLine,qrX-6,176,0.25,'right');
     pdf.setFontSize(7.5);pdf.setTextColor(...GREY);
-    pdf.text('SKANNA FÖR ATT VERIFIERA ÄKTHET',qrX-5,181,{align:'right',charSpace:0.25});
+    spaced('SKANNA FÖR ATT VERIFIERA ÄKTHET',qrX-6,181,0.25,'right');
     if(qrData)pdf.addImage(qrData,'PNG',qrX,qrY,qrSize,qrSize);
 
     return pdf;
