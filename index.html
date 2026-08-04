@@ -672,7 +672,7 @@ body.fs-mode .player-actions,body.fs-mode .mobile-tip{display:none}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v7.2</span>
+    <span>Alla rättigheter förbehållna · v7.3</span>
   </div>
 </footer>
 
@@ -1309,6 +1309,11 @@ async function placeOrder(e){
   }
 
   // Faktura: skicka ordern till backend (mejlas till er) — fungerar även lokalt som demo
+  if(!(data.buyer.orgnr||'').trim()){
+    toast('Ange organisationsnummer — det krävs för fakturaköp');
+    const f=document.getElementById('bOrgnr');if(f){f.focus();f.style.outline='2px solid #E8A33D';setTimeout(()=>f.style.outline='',4000);}
+    return false;
+  }
   btn.disabled=true;btn.innerHTML='Skickar beställningen…';
   try{
     const res=await fetch(API_BASE+'/api/order-invoice',{
@@ -1451,7 +1456,7 @@ function allEnrollments(){
         id:(row.order_ref||'').startsWith('cs_')?'ST-'+row.order_ref.slice(-6).toUpperCase():((row.order_ref||'').startsWith('GRATIS')?'KOSTNADSFRI':((row.order_ref||'').startsWith('FAKT')?'FAKTURA · '+row.order_ref:(row.order_ref||'—'))),
         refFull:row.order_ref||('rad-'+row.id),
         date:(row.created_at||'').slice(0,10),
-        buyer:{name:row.buyer_name||'',company:row.buyer_company||'',email:row.buyer_email||''}
+        buyer:{name:row.buyer_name||'',company:row.buyer_company||'',email:row.buyer_email||'',orgnr:row.buyer_orgnr||'',phone:row.buyer_phone||'',invoice:row.buyer_invoice||''}
       },
       courseId:row.course_id,
       p:{name:row.name||row.email,email:row.email,pnr:row.personnummer||'',login:'Automatisk',progress:row.status||'ej',certDate:row.cert_date||'',certId:row.cert_id||'',certSent:row.cert_sent||null}
@@ -1493,15 +1498,15 @@ async function renderAdmin(){
       <tbody>${adminOrders().map(o=>{
         const n=o.items.reduce((s,i)=>s+i.participants.length,0);
         const sent=o.items.every(i=>i.participants.every(p=>p.login));
-        return `<tr>
+        return `<tr onclick="openOrder('${o.ref}')" style="cursor:pointer" title="Klicka för fullständiga orderuppgifter">
           <td style="font-family:var(--mono);font-size:12px">${o.id}</td>
           <td>${o.date}</td>
           <td><b>${o.buyer.name}</b><br><span style="font-size:12px;color:var(--text-dim)">${o.buyer.company||''} · ${o.buyer.email}</span></td>
           <td>${o.items.map(i=>(COURSES.find(c=>c.id===i.courseId)||{title:i.courseId}).title).join('<br>')}<br><span style="font-size:12px;color:var(--text-dim)">${n} deltagare</span></td>
           <td style="white-space:nowrap">${fmt(o.total)}</td>
           <td>${o.items.some(it=>it.participants.some(p=>p.progress==='vantar'))
-            ?`<button class="mini-btn green" onclick="approveInvoice('${o.ref}')">🧾 Godkänn order</button>`
-            :(sent?'<span class="pill skickad">Skickad</span>':`<button class="mini-btn" onclick="sendLogins('${o.id}')">Skicka inloggning</button>`)}</td>
+            ?`<button class="mini-btn green" onclick="event.stopPropagation();approveInvoice('${o.ref}')">🧾 Godkänn order</button>`
+            :(sent?'<span class="pill skickad">Skickad</span>':`<button class="mini-btn" onclick="event.stopPropagation();sendLogins('${o.id}')">Skicka inloggning</button>`)}</td>
         </tr>`;
       }).join('')}</tbody></table></div>
     <p class="admin-note">// Demo: ”Skicka inloggning” genererar konton och markerar dem som utskickade. I skarp drift kopplas knappen till ert e-postsystem så att varje deltagare automatiskt får sina uppgifter.</p>`;
@@ -1707,6 +1712,47 @@ function fillCertFromPick(){
     if(supa&&r.rowId)supa.from('enrollments').update({cert_id:r.p.certId,cert_date:r.p.certDate}).eq('id',r.rowId).then(()=>{});
   }
   paintCert(r.p.certId);
+}
+function openOrder(ref){
+  const o=adminOrders().find(x=>x.ref===ref);
+  if(!o){toast('Hittade inte ordern');return;}
+  const b=o.buyer||{};
+  const isFakt=(o.id||'').startsWith('FAKTURA');
+  const rad=(etikett,v,varna)=>`<tr><td style="padding:4px 12px 4px 0;color:var(--text-dim);white-space:nowrap;vertical-align:top">${etikett}</td><td style="padding:4px 0"><b>${v||(varna?'<span style="color:#E8A33D">— saknas'+(isFakt?' (behövs för fakturan)':'')+'</span>':'—')}</b></td></tr>`;
+  const kurser=o.items.map(i=>{
+    const t=(COURSES.find(c=>c.id===i.courseId)||{title:i.courseId}).title;
+    const dl=i.participants.map(p=>`&nbsp;&nbsp;• ${p.name} · ${p.pnr||'pnr saknas'} · ${p.email} · ${(PROG[p.progress]||p.progress)}`).join('<br>');
+    return `<b>${t}</b><br>${dl}`;
+  }).join('<br><br>');
+  const antal=o.items.reduce((s,i)=>s+i.participants.length,0);
+  const inkl=Math.round(o.total*1.25*100)/100;
+  const underlag=`FAKTURAUNDERLAG — Nordic Agir Academy (Nordic Agir AB, org.nr 559516-5373)
+Order: ${o.ref} · Datum: ${o.date}
+Kund: ${b.company||b.name||'—'}
+Org.nr: ${b.orgnr||'—'}
+Kontakt: ${b.name||'—'} · ${b.email||'—'} · ${b.phone||'—'}
+Fakturaadress/märkning: ${b.invoice||'—'}
+${o.items.map(i=>{const t=(COURSES.find(c=>c.id===i.courseId)||{title:i.courseId}).title;return i.participants.map(p=>`1 st ${t} — deltagare ${p.name}`).join('\n');}).join('\n')}
+Summa: ${o.total} kr exkl. moms · Moms 25%: ${Math.round(o.total*0.25*100)/100} kr · ATT BETALA: ${inkl} kr
+Betalningsvillkor: 30 dagar`;
+  showInfoModal('Order '+o.ref,
+    `<div style="text-align:left;max-height:60vh;overflow-y:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:14px">
+        ${rad('Ordertyp',o.id)}
+        ${rad('Datum',o.date)}
+        ${rad('Företag',b.company)}
+        ${rad('Org.nr',b.orgnr,true)}
+        ${rad('Beställare',b.name)}
+        ${rad('E-post',b.email)}
+        ${rad('Telefon',b.phone)}
+        ${rad('Fakturaadress/märkning',b.invoice)}
+      </table>
+      <hr style="border:none;border-top:1px solid var(--line-light);margin:14px 0">
+      <div style="font-size:14px">${kurser}</div>
+      <hr style="border:none;border-top:1px solid var(--line-light);margin:14px 0">
+      <div style="font-size:14px"><b>${antal} deltagarplats(er)</b> · ${fmt(o.total)} exkl. moms · <b>${inkl.toLocaleString('sv-SE')} kr inkl. moms</b></div>
+      <button class="btn btn-blue" style="margin-top:16px;width:100%" onclick="navigator.clipboard.writeText(this.dataset.u).then(()=>toast('Fakturaunderlaget kopierat — klistra in i ert faktureringsprogram 📋'))" data-u="${underlag.replace(/"/g,'&quot;')}">📋 Kopiera fakturaunderlag</button>
+    </div>`);
 }
 function showInfoModal(title,bodyHtml){
   const prev=document.getElementById('infoModal');if(prev)prev.remove();
