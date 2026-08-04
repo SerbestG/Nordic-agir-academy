@@ -14,7 +14,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { token, to, name, course, certId, pdf } = req.body || {};
+    const { token, to, name, course, certId, pdf, rowId } = req.body || {};
 
     if (!token || !to || !pdf) return res.status(400).json({ error: 'Ofullständig begäran' });
     if (!SUPA || !SUPA_KEY) return res.status(500).json({ error: 'Supabase är inte konfigurerat' });
@@ -65,8 +65,18 @@ export default async function handler(req, res) {
       return res.status(502).json({ error: 'Mejlet kunde inte skickas' });
     }
 
+    // 4) Stämpla raden som skickad — kvittot som syns i adminportalen
+    if (rowId) {
+      const stamp = await fetch(`${SUPA}/rest/v1/enrollments?id=eq.${encodeURIComponent(rowId)}`, {
+        method: 'PATCH',
+        headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        body: JSON.stringify({ cert_sent: new Date().toISOString() }),
+      });
+      if (!stamp.ok) console.error('CERT_SENT-stämpel misslyckades', stamp.status, await stamp.text().catch(() => ''));
+    }
+
     console.log('CERTIFIKAT mejlat till', to, fileName);
-    return res.status(200).json({ ok: true });
+    return res.status(200).json({ ok: true, sentAt: new Date().toISOString() });
   } catch (err) {
     console.error('send-certificate:', err.message);
     return res.status(500).json({ error: 'Något gick fel' });
