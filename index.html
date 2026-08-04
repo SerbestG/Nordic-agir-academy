@@ -672,7 +672,7 @@ body.fs-mode .player-actions,body.fs-mode .mobile-tip{display:none}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v6.6</span>
+    <span>Alla rättigheter förbehållna · v6.7</span>
   </div>
 </footer>
 
@@ -1754,7 +1754,22 @@ async function buildCertPdf(status){
     await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js','jspdf');
     steg='certifikatritningen';säg('Ritar certifikatet …');
     const el=document.getElementById('certEl');
-    const canvas=await html2canvas(el,{scale:2,useCORS:true,backgroundColor:'#ffffff',imageTimeout:8000,logging:false});
+    // Ritbiblioteket klonar HELA sidan och väntar på alla dess bilder.
+    // Skydd 1: pausa bilder som inte laddat klart (utanför certifikatet) så de inte kan blockera.
+    const pausade=[];
+    document.querySelectorAll('img').forEach(im=>{
+      if(!el.contains(im)&&!im.complete){pausade.push([im,im.src]);im.src='data:image/gif;base64,R0lGODlhAQABAAAAACw=';}
+    });
+    let canvas;
+    try{
+      // Skydd 2: hård tidsgräns — hellre tydligt fel än evig väntan
+      canvas=await Promise.race([
+        html2canvas(el,{scale:2,useCORS:true,backgroundColor:'#ffffff',imageTimeout:8000}),
+        new Promise((_,rej)=>setTimeout(()=>rej(new Error('ritningen tog över 25 sekunder — ladda om sidan (Cmd+Shift+R) och försök igen, gärna i inkognitofönster')),25000))
+      ]);
+    }finally{
+      pausade.forEach(([im,src])=>{im.src=src;});
+    }
     steg='PDF-sammansättningen';säg('Bygger PDF …');
     const img=canvas.toDataURL('image/jpeg',0.92);
     const pdf=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
