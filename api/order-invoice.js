@@ -11,6 +11,28 @@ const SUPA = (process.env.SUPABASE_URL || '')
 const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const MOMS = 1.25;
 
+// Kurskatalog: id -> { titel, pris exkl. moms } — håll i synk med create-checkout-session.js
+const KURSER = {
+  'anbud':       { title: 'Analysera och kvalitetssäkra offentliga anbud', price: 795 },
+  'lou-praktik': { title: 'LOU i praktiken — offentlig upphandling', price: 1495 },
+  'luf-praktik': { title: 'LUF i praktiken — upphandling inom försörjningssektorerna', price: 1395 },
+  'ejur':        { title: 'Entreprenadjuridik — AB 04, ABT 06 och ABK 09', price: 2195 },
+  'ab-abt':      { title: 'AB 04 och ABT 06 — standardavtalen i bygg', price: 1495 },
+  'abk':         { title: 'ABK 09 — avtal och ansvar i konsultuppdrag', price: 995 },
+  'ata':         { title: 'ÄTA-hantering — från teori till praktik', price: 995 },
+  'lyft':        { title: 'Säkra lyft — riskbedömning och utrustning', price: 795 },
+  'bas':         { title: 'BAS-P och BAS-U — säkert byggprojekt från start', price: 1495 },
+  'apv':         { title: 'Arbete på väg — APV Steg 1 (1.1, 1.2, 1.3)', price: 995 },
+  'ama-hus':     { title: 'AMA Hus — från kod till kvalitet', price: 1495 },
+  'ama-anl':     { title: 'AMA Anläggning — kvalitet på bygget', price: 1495 },
+  'kma':         { title: 'KMA i praktiken — bygg och anläggning', price: 1495 },
+  'pl':          { title: 'Projektledning — från start till mål', price: 995 },
+  'prl':         { title: 'Projekteringsledning i bygg- och anläggningsprojekt', price: 995 },
+  'tid':         { title: 'Tidsplanering i byggprojekt — från plan till produktion', price: 995 },
+  'kalk':        { title: 'Kalkylering för entreprenader — från anbud till vinst', price: 995 },
+};
+
+
 async function sendMail(payload) {
   if (!process.env.RESEND_API_KEY) return;
   await fetch('https://api.resend.com/emails', {
@@ -35,14 +57,10 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Inga deltagare i beställningen' });
     }
 
-    // Kurstitlar + priser ur databasen (databasen är sanningen)
-    const ids = [...new Set(participants.map((p) => p.courseId))]
-      .map((c) => encodeURIComponent(c)).join(',');
-    const cRes = await fetch(`${SUPA}/rest/v1/courses?id=in.(${ids})&select=id,title,price`, {
-      headers: { apikey: KEY, Authorization: `Bearer ${KEY}` },
-    });
-    const courses = cRes.ok ? await cRes.json() : [];
-    const courseOf = Object.fromEntries(courses.map((c) => [c.id, c]));
+    // Kurstitlar + priser ur serverns priskatalog (samma källa som kortkassan)
+    const courseOf = KURSER;
+    const okand = [...new Set(participants.map((p) => p.courseId))].filter((c) => !courseOf[c]);
+    if (okand.length) return res.status(400).json({ error: 'Okänd kurs: ' + okand.join(', ') });
 
     const orderRef = 'FAKT-' + Date.now().toString(36).toUpperCase();
     const rows = participants
