@@ -672,7 +672,7 @@ body.fs-mode .player-actions,body.fs-mode .mobile-tip{display:none}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v6.2</span>
+    <span>Alla rättigheter förbehållna · v6.4</span>
   </div>
 </footer>
 
@@ -789,6 +789,12 @@ const COURSES=[
  {id:'lyft',cat:'bygg',abbr:'Säkra lyft',sub:'Riskbedömning och utrustning',title:'Säkra lyft — riskbedömning och utrustning',desc:'För dig som kopplar last eller dirigerar lyft: rätt redskap, rätt riskbedömning och rutiner som gör att alla går hem hela.',dur:'ca 2 tim',price:795,orig:999,img:IMG('1504307651254-35680f356dfd'),kw:'säkra lyft kran lastkoppling signalman afs riskbedömning'},
  {id:'bas',cat:'bygg',abbr:'BAS-P och BAS-U',sub:'Säkert byggprojekt från start',title:'BAS-P och BAS-U — säkert byggprojekt från start',desc:'Bli trygg som byggarbetsmiljösamordnare: ansvaret, arbetsmiljöplanen och samordningen som håller från planering till utförande.',dur:'ca 4 tim',price:1495,orig:1995,img:IMG('1541888946425-d81bb19240f5'),kw:'bas-p bas-u byggarbetsmiljösamordnare arbetsmiljö arbetsmiljöplan'},
  {id:'apv',cat:'bygg',abbr:'Arbete på väg',sub:'APV Steg 1 · 1.1 · 1.2 · 1.3',title:'Arbete på väg — APV Steg 1 (1.1, 1.2 och 1.3)',desc:'Grundkompetensen för alla som arbetar på eller vid väg, enligt Trafikverkets krav — hela steg 1 med kompetenserna 1.1, 1.2 och 1.3.',dur:'ca 2 tim',price:995,orig:1295,img:IMG('1724204408341-adb2e4538a73'),kw:'apv arbete på väg trafikverket steg 1 1.1 1.2 1.3 vägarbetsplats väghållningsfordon'},
+
+ {id:'mer',cat:'bygg',soon:true,abbr:'MER Anläggning',sub:'Mät- och ersättningsregler',title:'MER Anläggning i praktiken',desc:'Mängdförteckningen bestämmer vad du får betalt — MER bestämmer hur den läses. Teoretisk mängd, reglerbara mängder och gränsdragningen mot ÄTA.',dur:'ca 4–5 tim',price:1495,orig:1995,img:IMG('1581094794329-c8112a89af12'),kw:'mer anläggning mängdförteckning mätregler ersättning teoretisk mängd ama'},
+ {id:'schakt',cat:'bygg',soon:true,abbr:'Säker schakt',sub:'Schaktansvarig',title:'Säker schakt & schaktansvarig',desc:'Ett schakt rasar på två sekunder — planeringen tar två timmar. Jordarter, slänt eller stöd, dagliga kontroller och räddningsplanen som skrivs innan.',dur:'ca 3–4 tim',price:995,orig:1295,img:IMG('1581092160562-40aa08e78837'),kw:'schakt schaktning rasrisk slänt spont schaktslåde grävlåda schaktansvarig'},
+ {id:'inst',cat:'projekt',soon:true,abbr:'Installations-samordnare',sub:'Rör, luft, el & styr i samma hus',title:'Installationssamordnare',desc:'Huset byggs en gång — installationerna krockar tre gånger om ingen samordnar. Gränsdragningslistor, montageordning och samordnad provning.',dur:'ca 4 tim',price:1495,orig:1995,img:IMG('1521791136064-7986c2920216'),kw:'installationssamordnare installationer samordning vvs el ventilation gränsdragning'},
+ {id:'fall',cat:'bygg',soon:true,abbr:'Fallskydd',sub:'Arbete på höjd',title:'Fallskydd — arbete på höjd',desc:'Fem meter tar en sekund, kunskapen tar två timmar. Skyddens rangordning, selens fysik, förankringar och räddningen ur hängtraumat.',dur:'ca 2–3 tim',price:795,orig:999,img:IMG('1503387762-592deb58ef4e'),kw:'fallskydd fall höjd sele fallstopp förankring hängtrauma tak'},
+ {id:'bim',cat:'projekt',soon:true,abbr:'BIM',sub:'För produktionen',title:'BIM för produktionen',desc:'Modellen finns redan — frågan är om du kan läsa den. Granska, mängda och döda krockarna på skärmen, med gratis verktyg och kontraktet i ryggen.',dur:'ca 3–4 tim',price:995,orig:1295,img:IMG('1460925895917-afdab827c52f'),kw:'bim ifc modell kollisionskontroll mängdavtagning digital produktion'},
  {id:'ama-hus',cat:'bygg',abbr:'AMA Hus',sub:'Från kod till kvalitet',title:'AMA Hus — från kod till kvalitet',desc:'Lär dig läsa och skriva tekniska beskrivningar för husbyggnad: koder, rubriker och pyramidregeln — utan huvudvärk.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1503387762-592deb58ef4e'),kw:'ama hus beskrivning kod rubrik husbyggnad'},
  {id:'ama-anl',cat:'bygg',abbr:'AMA Anläggning',sub:'Kvalitet på bygget',title:'AMA Anläggning — kvalitet på bygget',desc:'AMA och MER för mark- och anläggningsjobb: struktur, mätregler och kopplingen som gör att kalkylen stämmer med verkligheten.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1581094794329-c8112a89af12'),kw:'ama anläggning mark mängdförteckning mer mätregler'},
  {id:'kma',cat:'bygg',abbr:'KMA i praktiken',sub:'Bygg och anläggning',title:'KMA i praktiken — bygg och anläggning',desc:'Kvalitet, miljö och arbetsmiljö som fungerar ute i produktionen: egenkontroller, KMA-planer och dokumentation som håller.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1705579612477-20866d78deeb'),kw:'kma kvalitet miljö arbetsmiljö egenkontroll'},
@@ -807,6 +813,62 @@ const saleOff=c=>Math.round((1-c.price/origOf(c))*100);
 
 /* ============ KURSDETALJER ============ */
 const DETAILS={
+ 'mer':{
+  audience:'För kalkylatorer, platschefer, entreprenadingenjörer och arbetschefer i mark- och anläggningsföretag som räknar och reglerar jobb med mängdförteckning.',
+  goals:['Läsa mängdförteckningen: koder, enheter, fasta och reglerbara mängder','Tillämpa principen om teoretisk mängd vid schakt, fyllning och ledningsgrav','Skilja mängdreglering från ÄTA — och dokumentera för att få betalt','Räkna anbud på mängdförteckning med medveten riskvärdering'],
+  modules:[
+   {t:'Vad är MER — och varför avgör det din ersättning?',d:'AMA-familjen, mängdkontraktets logik och kopplingen till AB 04 kap 6.'},
+   {t:'Avtalskedjan och mängdförteckningens anatomi',d:'Dokumentrangordning, objektspecifika regler som slår boken, och kolumnen som avgör allt: reglerbar eller fast.'},
+   {t:'Mätreglerna i praktiken',d:'Teoretisk mängd, berggränser, ledningsgravens skikt — och räkneexemplen som visar var pengarna tar vägen.'},
+   {t:'Ersättning och väsentlig avvikelse',d:'À-prisets innehåll, mängdreglering och när à-priset kan omförhandlas.'},
+   {t:'Gränsdragningen mot ÄTA och tvistetoppen',d:'Lackmustestet, de fem klassiska fällorna och dokumentationen som vinner regleringen.'},
+   {t:'Examen',d:'Kunskapsprov online med obegränsade försök.'}
+  ]},
+ 'schakt':{
+  audience:'För yrkesarbetare, maskinförare, arbetsledare och platschefer — och den som ska utses till schaktansvarig på arbetsplatsen.',
+  goals:['Förstå jordarternas beteende och varför schaktras dödar','Planera schaktarbetet: underlag, ledningar, laster, slänt eller stöd','Genomföra schaktansvarigs dagliga kontroller och kunna stoppkriterierna','Skriva räddningsplanen som räddar liv — innan någon går ner'],
+  modules:[
+   {t:'Varför schaktras dödar',d:'En kubik jord väger som en personbil — matematiken, tidsförloppen och situationerna där det händer.'},
+   {t:'Jorden: materialet som bestämmer reglerna',d:'Friktionsjord, lera, silt och morän — och vattnet som är stabilitetens huvudfiende.'},
+   {t:'Roller, ansvar och schaktansvarigs uppdrag',d:'Byggherre, BAS-P/U, arbetsgivare — och rollbeskrivningen som ger stoppmandat på riktigt.'},
+   {t:'Planeringen och metodvalet',d:'Geoteknik, Ledningskollen, säkerhetsavstånd — slänt när utrymmet finns, släde och spont när det inte gör det.'},
+   {t:'Daglig drift och räddning',d:'Kontrollrundan, stoppsignalerna och räddningsplanen — varför impulsräddning skapar fler offer.'},
+   {t:'Examen',d:'Kunskapsprov online med obegränsade försök.'}
+  ]},
+ 'inst':{
+  audience:'För arbetsledare, platschefer, entreprenadingenjörer och installatörernas ledande montörer i husbyggnadsprojekt.',
+  goals:['Förstå disciplinernas logik: luft, självfall, tryckrör, el, sprinkler och styr','Använda gränsdragningslistan och håltagningsrutinen mot gjutkalendern','Takta installationerna i tidplanen och leda samordningsmötet med beslutslogg','Styra slutfasen: injustering, samordnad provning och överlämning'],
+  modules:[
+   {t:'Varför rollen finns',d:'Installationernas dyra tredjedel, vad en krock faktiskt kostar och mandatet som måste uttalas.'},
+   {t:'Disciplinerna och deras logik',d:'Kanalerna först, självfallets lutningslavar, elens zoner — samordnarens allmänbildning.'},
+   {t:'Verktygslådan',d:'Gränsdragningslistans åtta frågor, samordningsritningar, ursparingar före gjutning och undertakets trängsel.'},
+   {t:'Ordning, taktning och mötet',d:'Grundsekvensen, zonerna, 60-minutersagendan — och skillnaden mellan samordning och ÄTA.'},
+   {t:'Kvalitet och slutfas',d:'Foto före stängning, provning före inbyggnad, injustering, samordnad provning och överlämningen.'},
+   {t:'Examen',d:'Kunskapsprov online med obegränsade försök.'}
+  ]},
+ 'fall':{
+  audience:'För alla som arbetar eller leder arbete på höjd: tak, montage, fasad, ställningsbruk, arbete från lift, service och besiktning.',
+  goals:['Tillämpa skyddens rangordning: kollektivt skydd före personligt','Skilja fallhindrande, positionerande och fallstoppande system','Räkna fallfaktor och erforderlig fri höjd — kursens livräddande matematik','Kontrollera och kassera utrustning, och förstå hängtraumats minuträkning'],
+  modules:[
+   {t:'Varför fall dödar',d:'Branschens dödligaste olyckstyp — och riskkatalogen: tak, svaga ytor, öppningar och de låga höjderna.'},
+   {t:'Reglerna och rangordningen',d:'Eliminera höjdarbetet, kollektiva skydd, sele sist — och gränsen mot ställnings- och liftutbildningarnas egna krav.'},
+   {t:'Personliga systemet',d:'Helsele, falldämpare, block och karbiner — tre uppdrag som aldrig får blandas ihop.'},
+   {t:'Fysiken och förankringen',d:'Fallfaktor 0–2, erforderlig fri höjd, pendelfall — och förankringspunkterna som duger (och de förbjudna).'},
+   {t:'Kontroll, kassation och räddning',d:'60-sekunderskontrollen, järnregeln efter fall och räddningsplanen mot hängtraumat.'},
+   {t:'Examen',d:'Kunskapsprov online med obegränsade försök.'}
+  ]},
+ 'bim':{
+  audience:'För produktionens folk: arbetsledare, platschefer, entreprenadingenjörer, kalkylatorer och ledande montörer. Ingen CAD-vana krävs.',
+  goals:['Öppna, navigera, sektionera och mäta i modeller med kostnadsfria verktyg','Hitta objektens information och filtrera på egenskaper','Delta i samgranskning, driva BCF-ärenden och prioritera kollisioner','Ta ut kontrollmängder — och veta när modellen går att lita på (och när inte)'],
+  modules:[
+   {t:'Vad BIM är — och inte är',d:'Informationen är poängen, geometrin är skyltfönstret. Tre myter avlivas.'},
+   {t:'Nyttan i produktionen',d:'Krockar som dör på skärmen, mängder på minuter och arbetsberedningar i 3D.'},
+   {t:'Filer, verktyg och grundgreppen',d:'IFC, BCF och gratis granskare — navigera, sektionera, filtrera, mäta, läsa egenskaper.'},
+   {t:'Samgranskning och mängder',d:'Hårda och mjuka kollisioner, ärendevägen — och varför MF och MER styr ersättningen medan modellen larmar.'},
+   {t:'Vardagen och juridiken',d:'Versionsdisciplinen, utsättningsdata, modellens status i handlingarna och företagets 30-dagarsplan.'},
+   {t:'Examen',d:'Kunskapsprov online med obegränsade försök.'}
+  ]},
+
  'anbud':{
   audience:'För dig som skriver eller granskar anbud i offentliga upphandlingar — anbudsansvariga, kalkylatorer och företagsledare som vill höja träffsäkerheten och slippa onödiga förkastanden.',
   goals:['Läsa förfrågningsunderlaget systematiskt och hitta varje skall-krav','Bygga en kravmatris som säkrar att inget missas','Skriva svar som utvärderaren förstår och kan ge poäng för','Slutgranska anbudet före inlämning — formalia, bilagor och bevis'],
@@ -1029,7 +1091,7 @@ function cardHTML(c){
       <p>${c.desc}</p>
       <div class="kcard-foot">
         <div><span class="price"><s class="oldp">${fmt(origOf(c))}</s>${fmt(c.price)}</span><br><span class="meta">Distans · ${c.dur}</span></div>
-        <button class="add-btn${inCart?' added':''}" onclick="event.stopPropagation();addToCart('${c.id}',this)">${inCart?'✓ Tillagd':'Lägg i kundvagn'}</button>
+        ${c.soon?'<span class="pill ny" style="white-space:nowrap">Lanseras inom kort</span>':`<button class="add-btn${inCart?' added':''}" onclick="event.stopPropagation();addToCart('${c.id}',this)">${inCart?'✓ Tillagd':'Lägg i kundvagn'}</button>`}
       </div>
     </div>
   </article>`;
@@ -1069,7 +1131,10 @@ document.getElementById('searchInput').addEventListener('input',e=>{
 /* ================= KUNDVAGN ================= */
 let cart=[]; // {id,qty}
 function cartTotal(){return cart.reduce((s,i)=>s+COURSES.find(c=>c.id===i.id).price*i.qty,0)}
-function addToCart(id,btn){track('add_to_cart',{item_id:id});
+function addToCart(id,btn){
+  const _c=COURSES.find(x=>x.id===id);
+  if(_c&&_c.soon){toast('Kursen lanseras inom kort — mejla oss för förtur! 🔜');return;}
+  track('add_to_cart',{item_id:id});
   const ex=cart.find(i=>i.id===id);
   if(ex)ex.qty++;else cart.push({id,qty:1});
   updateCartUI();
@@ -1246,16 +1311,21 @@ async function placeOrder(e){
   // Faktura: skicka ordern till backend (mejlas till er) — fungerar även lokalt som demo
   btn.disabled=true;btn.innerHTML='Skickar beställningen…';
   try{
-    await fetch(API_BASE+'/api/order-invoice',{
+    const res=await fetch(API_BASE+'/api/order-invoice',{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify(data)
     });
-  }catch(err){/* demo utan backend: fortsätt ändå */}
-  finishOrder(data,'faktura');
+    const out=await res.json().catch(()=>({}));
+    if(!res.ok)throw new Error(out.error||('serverfel '+res.status));
+    finishOrder(data,'faktura',out.orderRef||'');
+  }catch(err){
+    btn.disabled=false;btn.innerHTML='Slutför beställning <span class="arrow">→</span>';
+    toast('Beställningen kunde INTE skickas ('+err.message+'). Försök igen om en stund — eller ring 073-912 97 89 så registrerar vi den åt dig direkt.');
+  }
   return false;
 }
 
-function finishOrder(data,method){
+function finishOrder(data,method,serverRef){
   const order={
     id:'NA-'+(orderSeq++),
     date:new Date().toLocaleDateString('sv-SE'),
@@ -1270,9 +1340,9 @@ function finishOrder(data,method){
     <div class="confirm-box">
       <div class="check">✓</div>
       <h3>Tack för din beställning!</h3>
-      <p class="order-id">Ordernummer: ${order.id}</p>
+      <p class="order-id">Ordernummer: ${serverRef||order.id}</p>
       <p>${method==='faktura'
-        ?`Fakturan skickas till <b>${order.buyer.email}</b> med 30 dagars betalvillkor, och varje deltagare får sina inloggningsuppgifter via e-post inom kort.`
+        ?`En bekräftelse har skickats till <b>${order.buyer.email}</b>. Vi behandlar nu beställningen — inom kort får varje deltagare sina inloggningsuppgifter via e-post, och fakturan skickas separat med 30 dagars betalvillkor.`
         :`En orderbekräftelse skickas till <b>${order.buyer.email}</b>, och varje deltagare får sina inloggningsuppgifter via e-post inom kort.`}</p>
       <p>Har du frågor under tiden? Hör av dig till <a href="mailto:info@nordicagir.se" style="color:var(--cyan-deep)">info@nordicagir.se</a> så hjälper vi dig.</p>
       <button class="btn btn-blue" onclick="closeCheckout()" style="margin-top:10px">Fortsätt utforska kurser</button>
@@ -2129,7 +2199,7 @@ function renderCoursePage(id){
             <button onclick="cpChQty(1)">+</button>
             <span class="ql">deltagare</span>
           </div>
-          <button class="btn btn-blue" onclick="cpAdd('${c.id}')">Lägg i kundvagn <span class="arrow">→</span></button>
+          ${c.soon?'<span class="pill ny" style="font-size:14px;padding:10px 18px">🔜 Lanseras inom kort — mejla academy@nordicagir.se för förtur</span>':`<button class="btn btn-blue" onclick="cpAdd('${c.id}')">Lägg i kundvagn <span class="arrow">→</span></button>`}
           <p class="fact-help">Bokar du för fler än 10? <a href="mailto:info@nordicagir.se">Hör av dig</a> så ger vi ett bra paketpris.</p>
         </div>
       </aside>
