@@ -12,6 +12,14 @@ const MOMS = 1.25;
 // Kurskatalog: id -> { titel, pris i kr exkl. moms }
 // OBS: håll denna i synk med kurslistan i index.html när priser ändras.
 const COURSES = {
+  'mer':         { title: 'MER Anläggning — mät- och ersättningsregler för anläggningsarbeten', price: 1495 },
+  'schakt':      { title: 'Säker schakt — schaktarbete och schaktansvar', price: 995 },
+  'inst':        { title: 'Installationssamordning i byggprojekt', price: 1495 },
+  'fall':        { title: 'Fallskydd — arbete på höjd', price: 795 },
+  'bim':         { title: 'BIM — byggnadsinformationsmodellering i produktionen', price: 995 },
+  'ama-af':      { title: 'AMA AF — administrativa föreskrifter för entreprenader', price: 1495 },
+  'ramavtal':    { title: 'Ramavtal och avrop i offentlig upphandling', price: 1395 },
+  'ritning':     { title: 'Ritningsläsning i byggprojekt', price: 995 },
   'anbud':       { title: 'Anbudsarbete i offentlig upphandling — analys och kvalitetssäkring', price: 795 },
   'lou-praktik': { title: 'LOU — Lagen om offentlig upphandling', price: 1495 },
   'luf-praktik': { title: 'LUF — Lagen om upphandling inom försörjningssektorerna', price: 1395 },
@@ -80,7 +88,7 @@ export default async function handler(req, res) {
       line_items,
       customer_email: buyer.email,
       metadata,
-      success_url: `${siteUrl}/?betalning=klar&session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${siteUrl}/?betalning=klar&session_id={CHECKOUT_SESSION_ID}&summa=${line_items.reduce((s, li) => s + (li.price_data.unit_amount * li.quantity), 0) / 100}`,
       cancel_url: `${siteUrl}/?betalning=avbruten`,
       locale: 'sv',
       billing_address_collection: 'auto',
