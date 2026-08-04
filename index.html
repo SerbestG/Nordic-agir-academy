@@ -672,7 +672,7 @@ body.fs-mode .player-actions,body.fs-mode .mobile-tip{display:none}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v7.0</span>
+    <span>Alla rättigheter förbehållna · v7.2</span>
   </div>
 </footer>
 
@@ -779,35 +779,35 @@ const CATS={
 };
 const IMG=q=>'https://images.unsplash.com/photo-'+q+'?auto=format&fit=crop&w=800&q=60';
 const COURSES=[
- {id:'anbud',cat:'upphandling',abbr:'Analysera anbud',sub:'Kvalitetssäkra offentliga anbud',title:'Analysera och kvalitetssäkra offentliga anbud',desc:'Lär dig granska anbudet som en upphandlare — hitta varje skall-krav, täpp till luckorna och lämna in med trygghet.',dur:'ca 2 tim',price:795,orig:999,img:IMG('1454165804606-c3d57bc86b40'),kw:'anbud analysera kvalitetssäkra skall-krav offentlig upphandling granska'},
- {id:'lou-praktik',cat:'upphandling',abbr:'LOU i praktiken',sub:'Offentlig upphandling',title:'LOU i praktiken — offentlig upphandling',desc:'Så fungerar offentlig upphandling på riktigt: processen, utvärderingsmodellerna och strategin som vinner kontrakt.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1589829545856-d10d557cf95f'),kw:'lou praktik anbud överprövning utvärdering offentlig upphandling'},
- {id:'luf-praktik',cat:'upphandling',abbr:'LUF i praktiken',sub:'Upphandling inom försörjningssektorerna',title:'LUF i praktiken — upphandling inom försörjningssektorerna',desc:'Vatten, energi och transport spelar efter egna regler. Lär dig skillnaderna mot LOU — och hur du drar nytta av dem.',dur:'ca 3 tim',price:1395,orig:1795,img:IMG('1466611653911-95081537e5b7'),kw:'luf försörjningssektor upphandling energi vatten transport'},
+ {id:'anbud',cat:'upphandling',abbr:'Analysera anbud',sub:'Analys och kvalitetssäkring',title:'Anbudsarbete i offentlig upphandling — analys och kvalitetssäkring',desc:'Lär dig granska anbudet som en upphandlare — hitta varje skall-krav, täpp till luckorna och lämna in med trygghet.',dur:'ca 2 tim',price:795,orig:999,img:IMG('1454165804606-c3d57bc86b40'),kw:'anbud analysera kvalitetssäkra skall-krav offentlig upphandling granska'},
+ {id:'lou-praktik',cat:'upphandling',abbr:'LOU i praktiken',sub:'Lagen om offentlig upphandling',title:'LOU — Lagen om offentlig upphandling',desc:'Så fungerar offentlig upphandling på riktigt: processen, utvärderingsmodellerna och strategin som vinner kontrakt.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1589829545856-d10d557cf95f'),kw:'lou praktik anbud överprövning utvärdering offentlig upphandling'},
+ {id:'luf-praktik',cat:'upphandling',abbr:'LUF i praktiken',sub:'Upphandling inom försörjningssektorerna',title:'LUF — Lagen om upphandling inom försörjningssektorerna',desc:'Vatten, energi och transport spelar efter egna regler. Lär dig skillnaderna mot LOU — och hur du drar nytta av dem.',dur:'ca 3 tim',price:1395,orig:1795,img:IMG('1466611653911-95081537e5b7'),kw:'luf försörjningssektor upphandling energi vatten transport'},
  {id:'ejur',cat:'juridik',abbr:'Entreprenadjuridik',sub:'AB 04, ABT 06 och ABK 09',title:'Entreprenadjuridik — AB 04, ABT 06 och ABK 09',desc:'Hela entreprenadjuridiken i en kurs. Efter den här läser du standardavtalen med nya ögon — och vet var fallgroparna finns.',dur:'ca 4 tim',price:2195,orig:2795,img:IMG('1505664194779-8beaceb93744'),kw:'entreprenadjuridik ab04 abt06 abk09 avtal standardavtal'},
- {id:'ab-abt',cat:'juridik',abbr:'AB 04 och ABT 06',sub:'Standardavtalen i bygg',title:'AB 04 och ABT 06 — standardavtalen i bygg',desc:'Utförande- och totalentreprenad på djupet: vem ansvarar för vad, hur ekonomin regleras och vad som gäller när något går snett.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1450101499163-c8848c66ca85'),kw:'ab04 abt06 utförandeentreprenad totalentreprenad standardavtal'},
- {id:'abk',cat:'juridik',abbr:'ABK 09',sub:'Avtal och ansvar i konsultuppdrag',title:'ABK 09 — avtal och ansvar i konsultuppdrag',desc:'Konsultuppdragets spelregler: omfattning, ansvar, försäkring och vem som äger resultatet. För dig som köper eller säljer konsulttjänster.',dur:'ca 2 tim',price:995,orig:1295,img:IMG('1521791136064-7986c2920216'),kw:'abk09 konsult konsulträtt uppdrag ansvar'},
- {id:'ata',cat:'juridik',abbr:'ÄTA-hantering',sub:'Från teori till praktik',title:'ÄTA-hantering — från teori till praktik',desc:'Det arbete du utför ska du få betalt för. Underrätta i rätt tid, dokumentera rätt och stå stadigt om det blir diskussion.',dur:'ca 3 tim',price:995,orig:1295,img:IMG('1554224155-6726b3ff858f'),kw:'äta ändring tillägg avgående underrättelse'},
- {id:'lyft',cat:'bygg',abbr:'Säkra lyft',sub:'Riskbedömning och utrustning',title:'Säkra lyft — riskbedömning och utrustning',desc:'För dig som kopplar last eller dirigerar lyft: rätt redskap, rätt riskbedömning och rutiner som gör att alla går hem hela.',dur:'ca 2 tim',price:795,orig:999,img:IMG('1504307651254-35680f356dfd'),kw:'säkra lyft kran lastkoppling signalman afs riskbedömning'},
- {id:'bas',cat:'bygg',abbr:'BAS-P och BAS-U',sub:'Säkert byggprojekt från start',title:'BAS-P och BAS-U — säkert byggprojekt från start',desc:'Bli trygg som byggarbetsmiljösamordnare: ansvaret, arbetsmiljöplanen och samordningen som håller från planering till utförande.',dur:'ca 4 tim',price:1495,orig:1995,img:IMG('1541888946425-d81bb19240f5'),kw:'bas-p bas-u byggarbetsmiljösamordnare arbetsmiljö arbetsmiljöplan'},
+ {id:'ab-abt',cat:'juridik',abbr:'AB 04 och ABT 06',sub:'Standardavtal för entreprenader',title:'AB 04 och ABT 06 — standardavtal för entreprenader',desc:'Utförande- och totalentreprenad på djupet: vem ansvarar för vad, hur ekonomin regleras och vad som gäller när något går snett.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1450101499163-c8848c66ca85'),kw:'ab04 abt06 utförandeentreprenad totalentreprenad standardavtal'},
+ {id:'abk',cat:'juridik',abbr:'ABK 09',sub:'Allmänna bestämmelser för konsultuppdrag',title:'ABK 09 — Allmänna bestämmelser för konsultuppdrag',desc:'Konsultuppdragets spelregler: omfattning, ansvar, försäkring och vem som äger resultatet. För dig som köper eller säljer konsulttjänster.',dur:'ca 2 tim',price:995,orig:1295,img:IMG('1521791136064-7986c2920216'),kw:'abk09 konsult konsulträtt uppdrag ansvar'},
+ {id:'ata',cat:'juridik',abbr:'ÄTA-hantering',sub:'Ändrings-, tilläggs- och avgående',title:'ÄTA-arbeten — ändrings-, tilläggs- och avgående arbeten',desc:'Det arbete du utför ska du få betalt för. Underrätta i rätt tid, dokumentera rätt och stå stadigt om det blir diskussion.',dur:'ca 3 tim',price:995,orig:1295,img:IMG('1554224155-6726b3ff858f'),kw:'äta ändring tillägg avgående underrättelse'},
+ {id:'lyft',cat:'bygg',abbr:'Säkra lyft',sub:'Lastkoppling och signalering',title:'Säkra lyft — lastkoppling, signalering och riskbedömning',desc:'För dig som kopplar last eller dirigerar lyft: rätt redskap, rätt riskbedömning och rutiner som gör att alla går hem hela.',dur:'ca 2 tim',price:795,orig:999,img:IMG('1504307651254-35680f356dfd'),kw:'säkra lyft kran lastkoppling signalman afs riskbedömning'},
+ {id:'bas',cat:'bygg',abbr:'BAS-P och BAS-U',sub:'Byggarbetsmiljösamordning',title:'BAS-P och BAS-U — byggarbetsmiljösamordning',desc:'Bli trygg som byggarbetsmiljösamordnare: ansvaret, arbetsmiljöplanen och samordningen som håller från planering till utförande.',dur:'ca 4 tim',price:1495,orig:1995,img:IMG('1541888946425-d81bb19240f5'),kw:'bas-p bas-u byggarbetsmiljösamordnare arbetsmiljö arbetsmiljöplan'},
  {id:'apv',cat:'bygg',abbr:'Arbete på väg',sub:'APV Steg 1 · 1.1 · 1.2 · 1.3',title:'Arbete på väg — APV Steg 1 (1.1, 1.2 och 1.3)',desc:'Grundkompetensen för alla som arbetar på eller vid väg, enligt Trafikverkets krav — hela steg 1 med kompetenserna 1.1, 1.2 och 1.3.',dur:'ca 2 tim',price:995,orig:1295,img:IMG('1724204408341-adb2e4538a73'),kw:'apv arbete på väg trafikverket steg 1 1.1 1.2 1.3 vägarbetsplats väghållningsfordon'},
 
- {id:'mer',cat:'bygg',soon:true,abbr:'MER Anläggning',sub:'Mät- och ersättningsregler',title:'MER Anläggning i praktiken',desc:'Mängdförteckningen bestämmer vad du får betalt — MER bestämmer hur den läses. Teoretisk mängd, reglerbara mängder och gränsdragningen mot ÄTA.',dur:'ca 4–5 tim',price:1495,orig:1995,img:IMG('1581094794329-c8112a89af12'),kw:'mer anläggning mängdförteckning mätregler ersättning teoretisk mängd ama'},
- {id:'schakt',cat:'bygg',soon:true,abbr:'Säker schakt',sub:'Schaktansvarig',title:'Säker schakt & schaktansvarig',desc:'Ett schakt rasar på två sekunder — planeringen tar två timmar. Jordarter, slänt eller stöd, dagliga kontroller och räddningsplanen som skrivs innan.',dur:'ca 3–4 tim',price:995,orig:1295,img:IMG('1581092160562-40aa08e78837'),kw:'schakt schaktning rasrisk slänt spont schaktslåde grävlåda schaktansvarig'},
- {id:'inst',cat:'projekt',soon:true,abbr:'Installations-samordnare',sub:'Rör, luft, el & styr i samma hus',title:'Installationssamordnare',desc:'Huset byggs en gång — installationerna krockar tre gånger om ingen samordnar. Gränsdragningslistor, montageordning och samordnad provning.',dur:'ca 4 tim',price:1495,orig:1995,img:IMG('1521791136064-7986c2920216'),kw:'installationssamordnare installationer samordning vvs el ventilation gränsdragning'},
+ {id:'mer',cat:'bygg',soon:true,abbr:'MER Anläggning',sub:'Mät- och ersättningsregler',title:'MER Anläggning — mät- och ersättningsregler för anläggningsarbeten',desc:'Mängdförteckningen bestämmer vad du får betalt — MER bestämmer hur den läses. Teoretisk mängd, reglerbara mängder och gränsdragningen mot ÄTA.',dur:'ca 4–5 tim',price:1495,orig:1995,img:IMG('1581094794329-c8112a89af12'),kw:'mer anläggning mängdförteckning mätregler ersättning teoretisk mängd ama'},
+ {id:'schakt',cat:'bygg',soon:true,abbr:'Säker schakt',sub:'Schaktansvarig',title:'Säker schakt — schaktarbete och schaktansvar',desc:'Ett schakt rasar på två sekunder — planeringen tar två timmar. Jordarter, slänt eller stöd, dagliga kontroller och räddningsplanen som skrivs innan.',dur:'ca 3–4 tim',price:995,orig:1295,img:IMG('1581092160562-40aa08e78837'),kw:'schakt schaktning rasrisk slänt spont schaktslåde grävlåda schaktansvarig'},
+ {id:'inst',cat:'projekt',soon:true,abbr:'Installations-samordnare',sub:'Rör, luft, el & styr i samma hus',title:'Installationssamordning i byggprojekt',desc:'Huset byggs en gång — installationerna krockar tre gånger om ingen samordnar. Gränsdragningslistor, montageordning och samordnad provning.',dur:'ca 4 tim',price:1495,orig:1995,img:IMG('1521791136064-7986c2920216'),kw:'installationssamordnare installationer samordning vvs el ventilation gränsdragning'},
  {id:'fall',cat:'bygg',soon:true,abbr:'Fallskydd',sub:'Arbete på höjd',title:'Fallskydd — arbete på höjd',desc:'Fem meter tar en sekund, kunskapen tar två timmar. Skyddens rangordning, selens fysik, förankringar och räddningen ur hängtraumat.',dur:'ca 2–3 tim',price:795,orig:999,img:IMG('1503387762-592deb58ef4e'),kw:'fallskydd fall höjd sele fallstopp förankring hängtrauma tak'},
- {id:'bim',cat:'projekt',soon:true,abbr:'BIM',sub:'För produktionen',title:'BIM för produktionen',desc:'Modellen finns redan — frågan är om du kan läsa den. Granska, mängda och döda krockarna på skärmen, med gratis verktyg och kontraktet i ryggen.',dur:'ca 3–4 tim',price:995,orig:1295,img:IMG('1460925895917-afdab827c52f'),kw:'bim ifc modell kollisionskontroll mängdavtagning digital produktion'},
- {id:'ama-hus',cat:'bygg',abbr:'AMA Hus',sub:'Från kod till kvalitet',title:'AMA Hus — från kod till kvalitet',desc:'Lär dig läsa och skriva tekniska beskrivningar för husbyggnad: koder, rubriker och pyramidregeln — utan huvudvärk.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1503387762-592deb58ef4e'),kw:'ama hus beskrivning kod rubrik husbyggnad'},
- {id:'ama-anl',cat:'bygg',abbr:'AMA Anläggning',sub:'Kvalitet på bygget',title:'AMA Anläggning — kvalitet på bygget',desc:'AMA och MER för mark- och anläggningsjobb: struktur, mätregler och kopplingen som gör att kalkylen stämmer med verkligheten.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1581094794329-c8112a89af12'),kw:'ama anläggning mark mängdförteckning mer mätregler'},
- {id:'kma',cat:'bygg',abbr:'KMA i praktiken',sub:'Bygg och anläggning',title:'KMA i praktiken — bygg och anläggning',desc:'Kvalitet, miljö och arbetsmiljö som fungerar ute i produktionen: egenkontroller, KMA-planer och dokumentation som håller.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1705579612477-20866d78deeb'),kw:'kma kvalitet miljö arbetsmiljö egenkontroll'},
- {id:'pl',cat:'projekt',abbr:'Projektledning',sub:'Från start till mål',title:'Projektledning — från start till mål',desc:'Att leda byggprojekt handlar om människor lika mycket som planer. Här får du verktygen för båda — från startmöte till överlämning.',dur:'ca 4 tim',price:995,orig:1295,img:IMG('1552664730-d307ca884978'),kw:'projektledning projektledare styrning ledarskap'},
+ {id:'bim',cat:'projekt',soon:true,abbr:'BIM',sub:'För produktionen',title:'BIM — byggnadsinformationsmodellering i produktionen',desc:'Modellen finns redan — frågan är om du kan läsa den. Granska, mängda och döda krockarna på skärmen, med gratis verktyg och kontraktet i ryggen.',dur:'ca 3–4 tim',price:995,orig:1295,img:IMG('1460925895917-afdab827c52f'),kw:'bim ifc modell kollisionskontroll mängdavtagning digital produktion'},
+ {id:'ama-hus',cat:'bygg',abbr:'AMA Hus',sub:'Material- och arbetsbeskrivning',title:'AMA Hus — allmän material- och arbetsbeskrivning för husbyggnad',desc:'Lär dig läsa och skriva tekniska beskrivningar för husbyggnad: koder, rubriker och pyramidregeln — utan huvudvärk.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1503387762-592deb58ef4e'),kw:'ama hus beskrivning kod rubrik husbyggnad'},
+ {id:'ama-anl',cat:'bygg',abbr:'AMA Anläggning',sub:'Material- och arbetsbeskrivning',title:'AMA Anläggning — allmän material- och arbetsbeskrivning för anläggning',desc:'AMA och MER för mark- och anläggningsjobb: struktur, mätregler och kopplingen som gör att kalkylen stämmer med verkligheten.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1581094794329-c8112a89af12'),kw:'ama anläggning mark mängdförteckning mer mätregler'},
+ {id:'kma',cat:'bygg',abbr:'KMA i praktiken',sub:'Kvalitet, miljö och arbetsmiljö',title:'KMA — kvalitet, miljö och arbetsmiljö i bygg och anläggning',desc:'Kvalitet, miljö och arbetsmiljö som fungerar ute i produktionen: egenkontroller, KMA-planer och dokumentation som håller.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1705579612477-20866d78deeb'),kw:'kma kvalitet miljö arbetsmiljö egenkontroll'},
+ {id:'pl',cat:'projekt',abbr:'Projektledning',sub:'Ledning av byggprojekt',title:'Projektledning i bygg- och anläggningsprojekt',desc:'Att leda byggprojekt handlar om människor lika mycket som planer. Här får du verktygen för båda — från startmöte till överlämning.',dur:'ca 4 tim',price:995,orig:1295,img:IMG('1552664730-d307ca884978'),kw:'projektledning projektledare styrning ledarskap'},
  {id:'prl',cat:'projekt',abbr:'Projekteringsledning',sub:'I bygg- och anläggningsprojekt',title:'Projekteringsledning i bygg- och anläggningsprojekt',desc:'Håll ihop projekteringen: styr konsultgruppen, hantera gränssnitten och se till att handlingarna håller måttet — i tid.',dur:'ca 3 tim',price:995,orig:1295,img:IMG('1581092160562-40aa08e78837'),kw:'projekteringsledning projektering konsultgrupp handlingar'},
- {id:'tid',cat:'projekt',abbr:'Tidsplanering',sub:'Från plan till produktion',title:'Tidsplanering i byggprojekt — från plan till produktion',desc:'Tidplaner som håller även när verkligheten stökar: kritiska linjen, resurssättning och uppföljning som fångar avvikelser i tid.',dur:'ca 2 tim',price:995,orig:1295,img:IMG('1506784983877-45594efa4cbe'),kw:'tidplan tidsplanering kritiska linjen gantt produktion'},
- {id:'kalk',cat:'projekt',abbr:'Kalkylering',sub:'Från anbud till vinst',title:'Kalkylering för entreprenader — från anbud till vinst',desc:'Från mängdförteckning till anbudssumma: metoder, påslag och risktänk som vinner jobben utan att du förlorar pengar på dem.',dur:'ca 3 tim',price:995,orig:1295,img:IMG('1460925895917-afdab827c52f'),kw:'kalkyl kalkylering anbud mängd prissättning vinst'}
+ {id:'tid',cat:'projekt',abbr:'Tidsplanering',sub:'I byggprojekt',title:'Tidsplanering i byggprojekt',desc:'Tidplaner som håller även när verkligheten stökar: kritiska linjen, resurssättning och uppföljning som fångar avvikelser i tid.',dur:'ca 2 tim',price:995,orig:1295,img:IMG('1506784983877-45594efa4cbe'),kw:'tidplan tidsplanering kritiska linjen gantt produktion'},
+ {id:'kalk',cat:'projekt',abbr:'Kalkylering',sub:'Anbuds- och produktionskalkyl',title:'Kalkylering för entreprenader — anbuds- och produktionskalkyl',desc:'Från mängdförteckning till anbudssumma: metoder, påslag och risktänk som vinner jobben utan att du förlorar pengar på dem.',dur:'ca 3 tim',price:995,orig:1295,img:IMG('1460925895917-afdab827c52f'),kw:'kalkyl kalkylering anbud mängd prissättning vinst'}
 ];
 const fmt=n=>n.toLocaleString('sv-SE')+' kr';
 /* Nylanseringskampanj: ordinarie pris (genomstruket) per kampanjpris */
 /* Certifikatets kursnamn: huvudnamnet utan tilläggstext (allt före tankstrecket).
    APV behåller sin officiella beteckning. */
-const certTitleOf=c=>c.id==='apv'?'Arbete på väg — APV Steg 1':((c.title||'').split(' — ')[0]);
+const certTitleOf=c=>(c.title||''); // fulla formella kursnamnet på certifikatet
 const origOf=c=>c.orig||c.price;
 const saleOff=c=>Math.round((1-c.price/origOf(c))*100);
 
@@ -1547,7 +1547,7 @@ async function renderAdmin(){
           </select>`}</td>
           <td>${r.p.progress==='klar'
             ?(r.p.certSent
-              ?`<span class="pill skickad" title="Skickat ${String(r.p.certSent).slice(0,10)}">🎓 Intyg skickat</span> <a href="#" onclick="goCert(${i});return false" title="Öppna certifikatet igen" style="text-decoration:none">↺</a>`
+              ?`<span class="pill klar" title="Skickat ${String(r.p.certSent).slice(0,10)}">🎓 SKICKAD ${String(r.p.certSent).slice(0,10)}</span><br><button class="mini-btn" style="margin-top:6px" onclick="goCert(${i})" title="Öppnar certifikatet med mejladressen ifylld — behåll den eller skriv en annan">↺ Skicka igen</button>`
               :`<button class="mini-btn green" onclick="goCert(${i})">Skapa certifikat</button>`)
             :`<span class="pill ${r.p.progress}">${PROG[r.p.progress]}</span>`}</td>
         </tr>`;
@@ -1588,6 +1588,7 @@ async function renderAdmin(){
             <div id="cPnr" style="font-family:var(--mono);font-size:13px;letter-spacing:.08em;color:#6b6868;margin-top:6px"></div>
             <p class="cert-course-label">med godkänt resultat har genomfört utbildningen</p>
             <div class="cert-course" id="cCourse">Kursens namn</div>
+            <div class="cert-course-label" id="cExtra" style="margin-top:6px;font-style:italic"></div>
             <div class="cert-meta">
               <div>Examensdatum<b id="cDate">—</b></div>
               <div>Giltigt till<b id="cValid">—</b></div>
@@ -1811,7 +1812,7 @@ async function buildCertPdf(status){
 
     // CERTIFIKAT-etiketten
     pdf.setFont('courier','normal');pdf.setFontSize(11);pdf.setTextColor(...CYAND);
-    spaced('CERTIFIKAT',CX,54,1.9,'center');
+    spaced('CERTIFIKAT',CX,50.5,1.9,'center');
 
     // GODKÄND EXAMEN
     pdf.setFont('helvetica','bold');pdf.setFontSize(44);pdf.setTextColor(...COAL);
@@ -1842,7 +1843,12 @@ async function buildCertPdf(status){
     pdf.setFont('helvetica','bold');pdf.setFontSize(22);pdf.setTextColor(...CYAND);
     const rows=pdf.splitTextToSize(course,215);
     rows.forEach((r,k)=>center(r,y+13+k*9));
-    const metaY=y+13+rows.length*9+13;
+    const extra=T('cExtra');let extraH=0;
+    if(extra){
+      pdf.setFont('helvetica','italic');pdf.setFontSize(11.5);pdf.setTextColor(...DIM);
+      center(extra,y+13+rows.length*9+7);extraH=9;
+    }
+    const metaY=y+13+rows.length*9+13+extraH;
 
     // Metakolumnerna
     const cols=[[CX-45,'Examensdatum',cDate],[CX,'Giltigt till',cValid],[CX+45,'Utbildare','Nordic Agir Academy']];
@@ -1914,6 +1920,7 @@ async function emailCert(btn){
       toast('Certifikatet är mejlat till '+email+' ✓ — kopia till er inkorg 🎉');
       btn.disabled=false;btn.textContent='✓ Skickat';
       if(certRowId){const r=adminRows.find(x=>x.id===certRowId);if(r)r.cert_sent=new Date().toISOString();}
+      try{if(typeof renderAdmin==='function'&&adminLoggedIn)renderAdmin();}catch(e){}
       return;
     }
     toast('Kunde inte skicka: '+(out.error||('fel '+res.status)));
@@ -1928,6 +1935,8 @@ function paintCert(certId){
   const d=document.getElementById('certDate').value;
   document.getElementById('cName').textContent=name;
   document.getElementById('cCourse').textContent=course;
+  const cx=document.getElementById('cExtra');
+  if(cx)cx.textContent=/^LOU\b/.test(course)?'Utbildningen avser upphandlingsjuridik (LOU)':'';
   if(d){
     const dd=new Date(d);
     document.getElementById('cDate').textContent=dd.toLocaleDateString('sv-SE');
