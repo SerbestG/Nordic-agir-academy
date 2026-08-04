@@ -672,7 +672,7 @@ body.fs-mode .player-actions,body.fs-mode .mobile-tip{display:none}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v6.8</span>
+    <span>Alla rättigheter förbehållna · v6.9</span>
   </div>
 </footer>
 
@@ -1748,39 +1748,118 @@ async function buildCertPdf(status){
   let steg='QR-koden';
   try{
     säg('Ritar QR-kod …');await drawCertQr();
-    const el=document.getElementById('certEl');
     steg='PDF-biblioteket';säg('Laddar PDF-bibliotek …');
     await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js','jspdf');
-    let img=null;
-    // Metod 1: html-to-image — fotograferar BARA certifikatet, klonar aldrig resten av sidan
-    try{
-      steg='ritbiblioteket';säg('Laddar ritbibliotek …');
-      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js','htmlToImage');
-      steg='certifikatritningen';säg('Ritar certifikatet …');
-      img=await Promise.race([
-        htmlToImage.toJpeg(el,{pixelRatio:2,quality:0.92,backgroundColor:'#ffffff',cacheBust:true}),
-        new Promise((_,rej)=>setTimeout(()=>rej(new Error('tidsgräns 20 s')),20000))
-      ]);
-    }catch(e1){
-      console.warn('Ritmetod 1 föll ('+e1.message+') — provar reservmetoden');
-      steg='reservbiblioteket';säg('Laddar reservbibliotek …');
-      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js','html2canvas');
-      steg='reservritningen';säg('Ritar (reservmetod) …');
-      const pausade=[];
-      document.querySelectorAll('img').forEach(im=>{
-        if(!el.contains(im)&&!im.complete){pausade.push([im,im.src]);im.src='data:image/gif;base64,R0lGODlhAQABAAAAACw=';}
-      });
-      try{
-        const canvas=await Promise.race([
-          html2canvas(el,{scale:2,useCORS:true,backgroundColor:'#ffffff',imageTimeout:8000}),
-          new Promise((_,rej)=>setTimeout(()=>rej(new Error('reservritningen tog över 25 sekunder — ladda om sidan (Cmd+Shift+R) och försök igen')),25000))
-        ]);
-        img=canvas.toDataURL('image/jpeg',0.92);
-      }finally{pausade.forEach(([im,src])=>{im.src=src;});}
-    }
-    steg='PDF-sammansättningen';säg('Bygger PDF …');
+    steg='certifikatbygget';säg('Bygger certifikatet …');
+
+    // ---- Läs EXAKT det som står i förhandsvisningen ----
+    const T=id=>((document.getElementById(id)||{}).textContent||'').trim();
+    const name=T('cName')||'Förnamn Efternamn';
+    const pnrLine=T('cPnr');                      // "Personnummer: …" eller tomt
+    const course=T('cCourse')||'Kursens namn';
+    const cDate=T('cDate')||'—', cValid=T('cValid')||'—';
+    const idLine=T('cId')||'Certifikat-ID: —';
+    const logoEl=document.querySelector('#certEl img.cert-logo');
+    const qrImg=document.querySelector('#cQr img')||document.querySelector('#cQr canvas');
+    const qrData=qrImg?(qrImg.tagName==='IMG'?qrImg.src:qrImg.toDataURL('image/png')):null;
+
+    // ---- Rita PDF:en (A4 liggande, mm) med certifikatets designvärden ----
     const pdf=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
-    pdf.addImage(img,'JPEG',0,0,297,210);
+    const W=297,H=210,CX=W/2;
+    const CYAN=[0,173,239],CYAND=[0,144,201],COAL=[79,76,76],DIM=[122,119,118],GREY=[154,151,151];
+
+    // Topp- och bottenband: toning cyan -> cyan-deep
+    for(let i=0;i<60;i++){
+      const t=i/59,r=Math.round(0+(0-0)*t),g=Math.round(173+(144-173)*t),b=Math.round(239+(201-239)*t);
+      pdf.setFillColor(r,g,b);
+      pdf.rect(i*(W/60),0,W/60+0.3,4.2,'F');
+      pdf.rect(i*(W/60),H-4.2,W/60+0.3,4.2,'F');
+    }
+
+    // Snedställda dekorstaplar (skewX -24°) med genomskinlighet
+    const poly=(pts,rgb,op)=>{
+      pdf.saveGraphicsState();pdf.setGState(new pdf.GState({opacity:op}));
+      pdf.setFillColor(rgb[0],rgb[1],rgb[2]);
+      const segs=[];for(let k=1;k<pts.length;k++)segs.push([pts[k][0]-pts[k-1][0],pts[k][1]-pts[k-1][1]]);
+      pdf.lines(segs,pts[0][0],pts[0][1],[1,1],'F',true);
+      pdf.restoreGraphicsState();
+    };
+    const skew=h=>0.445*h;
+    // Vänster-nedre: cyan, höjder 26.7/44.6/62.4, bredd 10.7, lutar vänster
+    [[-7,26.7],[7.3,44.6],[21.6,62.4]].forEach(([x,h])=>{
+      poly([[x,H],[x+10.7,H],[x+10.7-skew(h),H-h],[x-skew(h),H-h]],CYAN,0.10);
+    });
+    // Höger-övre: kol, höjder 56.4/38.6/23.8, lutar åt samma håll
+    [[261,56.4],[275.3,38.6],[289.6,23.8]].forEach(([x,h])=>{
+      poly([[x,0],[x+10.7,0],[x+10.7-skew(h),h],[x-skew(h),h]],COAL,0.08);
+    });
+
+    // Logga (behåller proportionerna)
+    if(logoEl&&logoEl.src){
+      const lw=54.3,lh=19;
+      pdf.addImage(logoEl.src,'PNG',CX-lw/2,25,lw,lh);
+    }
+
+    const center=(txt,y,opt)=>pdf.text(txt,CX,y,Object.assign({align:'center'},opt||{}));
+
+    // CERTIFIKAT-etiketten
+    pdf.setFont('courier','normal');pdf.setFontSize(11);pdf.setTextColor(...CYAND);
+    center('CERTIFIKAT',54,{charSpace:1.9});
+
+    // GODKÄND EXAMEN
+    pdf.setFont('helvetica','bold');pdf.setFontSize(44);pdf.setTextColor(...COAL);
+    center('GODKÄND EXAMEN',68,{charSpace:0.6});
+
+    pdf.setFont('helvetica','normal');pdf.setFontSize(12.5);pdf.setTextColor(...DIM);
+    center('Detta certifikat intygar att',78);
+
+    // Namnet + cyanlinjen
+    let nSize=34;pdf.setFont('helvetica','bold');pdf.setFontSize(nSize);
+    while(pdf.getTextWidth(name)>230&&nSize>16){nSize-=2;pdf.setFontSize(nSize);}
+    pdf.setTextColor(...COAL);center(name,93);
+    const nw=pdf.getTextWidth(name);
+    pdf.setDrawColor(...CYAN);pdf.setLineWidth(0.7);
+    pdf.line(CX-nw/2-8.9,96.5,CX+nw/2+8.9,96.5);
+
+    // Personnummer
+    let y=104;
+    if(pnrLine){
+      pdf.setFont('courier','normal');pdf.setFontSize(11);pdf.setTextColor(107,104,104);
+      center(pnrLine,y,{charSpace:0.31});y+=8;
+    }
+
+    pdf.setFont('helvetica','normal');pdf.setFontSize(12.5);pdf.setTextColor(...DIM);
+    center('med godkänt resultat har genomfört utbildningen',y+2);
+
+    // Kursens namn (radbryts vid behov)
+    pdf.setFont('helvetica','bold');pdf.setFontSize(22);pdf.setTextColor(...CYAND);
+    const rows=pdf.splitTextToSize(course,215);
+    rows.forEach((r,k)=>center(r,y+13+k*9));
+    const metaY=y+13+rows.length*9+13;
+
+    // Metakolumnerna
+    const cols=[[CX-45,'Examensdatum',cDate],[CX,'Giltigt till',cValid],[CX+45,'Utbildare','Nordic Agir Academy']];
+    cols.forEach(([x,lab,val])=>{
+      pdf.setFont('helvetica','normal');pdf.setFontSize(11);pdf.setTextColor(...DIM);
+      pdf.text(lab,x,metaY,{align:'center'});
+      pdf.setFont('helvetica','bold');pdf.setFontSize(12.5);pdf.setTextColor(...COAL);
+      pdf.text(String(val),x,metaY+6,{align:'center'});
+    });
+
+    // Sidfot vänster: signaturlinje
+    pdf.setDrawColor(...COAL);pdf.setLineWidth(0.35);
+    pdf.line(23.8,182,89.1,182);
+    pdf.setFont('courier','normal');pdf.setFontSize(9);pdf.setTextColor(...DIM);
+    pdf.text('NORDIC AGIR ACADEMY · STOCKHOLM',56.4,187,{align:'center',charSpace:0.4});
+
+    // Sidfot höger: ID + verifieringstext + QR
+    const qrSize=25,qrX=W-23.8-qrSize,qrY=158;
+    pdf.setFont('courier','normal');pdf.setFontSize(9.5);pdf.setTextColor(...DIM);
+    pdf.text(idLine,qrX-5,176,{align:'right',charSpace:0.25});
+    pdf.setFontSize(7.5);pdf.setTextColor(...GREY);
+    pdf.text('SKANNA FÖR ATT VERIFIERA ÄKTHET',qrX-5,181,{align:'right',charSpace:0.25});
+    if(qrData)pdf.addImage(qrData,'PNG',qrX,qrY,qrSize,qrSize);
+
     return pdf;
   }catch(e){
     console.error('buildCertPdf stannade vid',steg,e);
