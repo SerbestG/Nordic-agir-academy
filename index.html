@@ -672,7 +672,7 @@ body.fs-mode .player-actions,body.fs-mode .mobile-tip{display:none}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v6.7</span>
+    <span>Alla rättigheter förbehållna · v6.8</span>
   </div>
 </footer>
 
@@ -1748,30 +1748,37 @@ async function buildCertPdf(status){
   let steg='QR-koden';
   try{
     säg('Ritar QR-kod …');await drawCertQr();
-    steg='ritbiblioteket';säg('Laddar ritbibliotek …');
-    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js','html2canvas');
+    const el=document.getElementById('certEl');
     steg='PDF-biblioteket';säg('Laddar PDF-bibliotek …');
     await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js','jspdf');
-    steg='certifikatritningen';säg('Ritar certifikatet …');
-    const el=document.getElementById('certEl');
-    // Ritbiblioteket klonar HELA sidan och väntar på alla dess bilder.
-    // Skydd 1: pausa bilder som inte laddat klart (utanför certifikatet) så de inte kan blockera.
-    const pausade=[];
-    document.querySelectorAll('img').forEach(im=>{
-      if(!el.contains(im)&&!im.complete){pausade.push([im,im.src]);im.src='data:image/gif;base64,R0lGODlhAQABAAAAACw=';}
-    });
-    let canvas;
+    let img=null;
+    // Metod 1: html-to-image — fotograferar BARA certifikatet, klonar aldrig resten av sidan
     try{
-      // Skydd 2: hård tidsgräns — hellre tydligt fel än evig väntan
-      canvas=await Promise.race([
-        html2canvas(el,{scale:2,useCORS:true,backgroundColor:'#ffffff',imageTimeout:8000}),
-        new Promise((_,rej)=>setTimeout(()=>rej(new Error('ritningen tog över 25 sekunder — ladda om sidan (Cmd+Shift+R) och försök igen, gärna i inkognitofönster')),25000))
+      steg='ritbiblioteket';säg('Laddar ritbibliotek …');
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js','htmlToImage');
+      steg='certifikatritningen';säg('Ritar certifikatet …');
+      img=await Promise.race([
+        htmlToImage.toJpeg(el,{pixelRatio:2,quality:0.92,backgroundColor:'#ffffff',cacheBust:true}),
+        new Promise((_,rej)=>setTimeout(()=>rej(new Error('tidsgräns 20 s')),20000))
       ]);
-    }finally{
-      pausade.forEach(([im,src])=>{im.src=src;});
+    }catch(e1){
+      console.warn('Ritmetod 1 föll ('+e1.message+') — provar reservmetoden');
+      steg='reservbiblioteket';säg('Laddar reservbibliotek …');
+      await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js','html2canvas');
+      steg='reservritningen';säg('Ritar (reservmetod) …');
+      const pausade=[];
+      document.querySelectorAll('img').forEach(im=>{
+        if(!el.contains(im)&&!im.complete){pausade.push([im,im.src]);im.src='data:image/gif;base64,R0lGODlhAQABAAAAACw=';}
+      });
+      try{
+        const canvas=await Promise.race([
+          html2canvas(el,{scale:2,useCORS:true,backgroundColor:'#ffffff',imageTimeout:8000}),
+          new Promise((_,rej)=>setTimeout(()=>rej(new Error('reservritningen tog över 25 sekunder — ladda om sidan (Cmd+Shift+R) och försök igen')),25000))
+        ]);
+        img=canvas.toDataURL('image/jpeg',0.92);
+      }finally{pausade.forEach(([im,src])=>{im.src=src;});}
     }
     steg='PDF-sammansättningen';säg('Bygger PDF …');
-    const img=canvas.toDataURL('image/jpeg',0.92);
     const pdf=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
     pdf.addImage(img,'JPEG',0,0,297,210);
     return pdf;
