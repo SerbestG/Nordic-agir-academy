@@ -13,6 +13,14 @@ const MOMS = 1.25;
 
 // Kurskatalog: id -> { titel, pris exkl. moms } — håll i synk med create-checkout-session.js
 const KURSER = {
+  'mer':         { title: 'MER Anläggning — mät- och ersättningsregler för anläggningsarbeten', price: 1495 },
+  'schakt':      { title: 'Säker schakt — schaktarbete och schaktansvar', price: 995 },
+  'inst':        { title: 'Installationssamordning i byggprojekt', price: 1495 },
+  'fall':        { title: 'Fallskydd — arbete på höjd', price: 795 },
+  'bim':         { title: 'BIM — byggnadsinformationsmodellering i produktionen', price: 995 },
+  'ama-af':      { title: 'AMA AF — administrativa föreskrifter för entreprenader', price: 1495 },
+  'ramavtal':    { title: 'Ramavtal och avrop i offentlig upphandling', price: 1395 },
+  'ritning':     { title: 'Ritningsläsning i byggprojekt', price: 995 },
   'anbud':       { title: 'Anbudsarbete i offentlig upphandling — analys och kvalitetssäkring', price: 795 },
   'lou-praktik': { title: 'LOU — Lagen om offentlig upphandling', price: 1495 },
   'luf-praktik': { title: 'LUF — Lagen om upphandling inom försörjningssektorerna', price: 1395 },
