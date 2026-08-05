@@ -643,7 +643,7 @@ body.fs-mode .player-actions,body.fs-mode .mobile-tip{display:none}
   <div class="wrap reveal">
     <h2>Osäker på vilken kurs som passar dig?</h2>
     <p>Det är helt okej — hör av dig så tar vi det tillsammans. Vi hjälper dig hitta rätt, eller sätter ihop ett paket för hela teamet.</p>
-    <a href="mailto:info@nordicagir.se" class="btn btn-dark">Skriv till oss <span class="arrow">→</span></a>
+    <a href="mailto:academy@nordicagir.se" class="btn btn-dark">Skriv till oss <span class="arrow">→</span></a>
   </div>
 </section>
 
@@ -663,7 +663,7 @@ body.fs-mode .player-actions,body.fs-mode .mobile-tip{display:none}
     </div>
     <div>
       <h4>Kontakt</h4>
-      <a href="mailto:info@nordicagir.se">info@nordicagir.se</a>
+      <a href="mailto:academy@nordicagir.se">academy@nordicagir.se</a>
       <a href="tel:073-9129789">073-912 97 89</a>
       <p>Tegnérgatan 34<br>113 59 Stockholm</p>
       <a href="https://www.nordicagir.se" target="_blank" rel="noopener">nordicagir.se</a>
@@ -672,7 +672,7 @@ body.fs-mode .player-actions,body.fs-mode .mobile-tip{display:none}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v7.8</span>
+    <span>Alla rättigheter förbehållna · v8.0</span>
   </div>
 </footer>
 
@@ -1455,7 +1455,7 @@ function finishOrder(data,method,serverRef){
       <p>${method==='faktura'
         ?`En bekräftelse har skickats till <b>${order.buyer.email}</b>. Vi behandlar nu beställningen — inom kort får varje deltagare sina inloggningsuppgifter via e-post, och fakturan skickas separat med 30 dagars betalvillkor.`
         :`En orderbekräftelse skickas till <b>${order.buyer.email}</b>, och varje deltagare får sina inloggningsuppgifter via e-post inom kort.`}</p>
-      <p>Har du frågor under tiden? Hör av dig till <a href="mailto:info@nordicagir.se" style="color:var(--cyan-deep)">info@nordicagir.se</a> så hjälper vi dig.</p>
+      <p>Har du frågor under tiden? Hör av dig till <a href="mailto:academy@nordicagir.se" style="color:var(--cyan-deep)">academy@nordicagir.se</a> så hjälper vi dig.</p>
       <button class="btn btn-blue" onclick="closeCheckout()" style="margin-top:10px">Fortsätt utforska kurser</button>
     </div>`;
   if(adminLoggedIn)renderAdmin();
@@ -1710,7 +1710,7 @@ async function renderAdmin(){
             ?(r.p.certSent
               ?`<button class="mini-btn" style="background:var(--cyan);border-color:var(--cyan);color:#fff;white-space:nowrap" onclick="goCert(${i})" title="Intyget mejlades ${String(r.p.certSent).slice(0,10)} — klicka för att skicka igen (samma eller annan adress)">✓ SKICKAD ${String(r.p.certSent).slice(0,10)}</button>`
               :`<button class="mini-btn green" onclick="goCert(${i})">Skapa certifikat</button>`)
-            :`<span class="pill ${r.p.progress}">${PROG[r.p.progress]||PROG.vantar}</span>`}</td>
+            :`<span class="pill ${r.p.progress}">${PROG[r.p.progress]||PROG.vantar}</span>`}<br><a href="#" onclick="delRow(${i});return false" title="Ta bort raden permanent (testrensning)" style="color:#c0392b;font-size:12px;text-decoration:none">🗑 Ta bort</a></td>
         </tr>`;
       }).join('')}</tbody></table></div>
     <p class="admin-note">// När en deltagare markeras som <b>Klar</b> dyker knappen ”Skapa certifikat” upp — den tar dig direkt till certifikatfliken med allt ifyllt.</p>`;
@@ -1787,6 +1787,27 @@ function sendLogins(orderId){
   }));
   toast('Inloggningsuppgifter skickade till '+o.items.reduce((s,i)=>s+i.participants.length,0)+' deltagare');
   renderAdmin();
+}
+async function adminDelete(payload,beskrivning){
+  try{
+    const {data:{session}}=await supa.auth.getSession();
+    const res=await fetch('/api/admin-delete',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(Object.assign({token:session?.access_token||''},payload))});
+    const out=await res.json().catch(()=>({}));
+    if(res.ok){toast('Borttaget: '+out.deleted+' rad(er) 🗑');const m=document.getElementById('infoModal');if(m)m.remove();renderAdmin();}
+    else toast('Kunde inte ta bort: '+(out.error||('fel '+res.status)));
+  }catch(e){toast('Fel: '+e.message);}
+}
+function delRow(i){
+  const r=enr[i];if(!r)return;
+  const c=COURSES.find(x=>x.id===r.courseId)||{title:r.courseId};
+  if(!confirm('Ta bort raden permanent?\n\n'+r.p.name+' — '+c.title+'\n\nDeltagarens konto påverkas inte, bara kursraden. Detta går inte att ångra.'))return;
+  adminDelete({ids:[r.id]},r.p.name);
+}
+function delOrder(ref,antal){
+  if(!confirm('Ta bort HELA ordern '+ref+' med '+antal+' deltagarrad(er)?\n\nAnvänds för att rensa test- och felbeställningar. Detta går inte att ångra.'))return;
+  if(!confirm('Säker? '+antal+' rad(er) raderas permanent.'))return;
+  adminDelete({orderRef:ref},ref);
 }
 let giftRows=[];
 function giftInit(){if(!giftRows.length){const c=COURSES[0];giftRows=[{courseId:c.id,qty:1,price:c.price,parts:[{name:'',pnr:'',email:''}]}];}}
@@ -1957,6 +1978,7 @@ Betalningsvillkor: 30 dagar`;
       <hr style="border:none;border-top:1px solid var(--line-light);margin:14px 0">
       <div style="font-size:14px"><b>${antal} deltagarplats(er)</b> · ${fmt(o.total)} exkl. moms · <b>${inkl.toLocaleString('sv-SE')} kr inkl. moms</b></div>
       <button class="btn btn-blue" style="margin-top:16px;width:100%" onclick="navigator.clipboard.writeText(this.dataset.u).then(()=>toast('Fakturaunderlaget kopierat — klistra in i ert faktureringsprogram 📋'))" data-u="${underlag.replace(/"/g,'&quot;')}">📋 Kopiera fakturaunderlag</button>
+      <button class="mini-btn" style="margin-top:10px;width:100%;color:#c0392b;border-color:#c0392b" onclick="delOrder('${o.ref}',${antal})">🗑 Ta bort hela ordern (${antal} rader)</button>
     </div>`);
 }
 function showInfoModal(title,bodyHtml){
@@ -2365,8 +2387,30 @@ async function portalLogin(){
     const {data,error}=await supa.auth.signInWithPassword({email,password:pass});
     if(error){toast('Fel e-post eller lösenord — prova igen');return;}
     portalUser={email:data.user.email};
+    if(/^NAA-/i.test(pass))setTimeout(showFirstPassModal,600);
   }else portalUser={email};
   renderPortal();
+}
+function showFirstPassModal(){
+  showInfoModal('Välkommen! Välj ditt eget lösenord 🔑',
+    '<p style="margin-top:0">Du loggade in med engångslösenordet från mejlet. Välj ett eget lösenord nu — så slipper du leta i mejlkorgen nästa gång.</p>'
+    +'<input type="password" id="pwm1" placeholder="Nytt lösenord (minst 8 tecken)" style="width:100%;padding:12px;border:1px solid #ddd;font:inherit;margin-bottom:8px" autocomplete="new-password">'
+    +'<input type="password" id="pwm2" placeholder="Upprepa lösenordet" style="width:100%;padding:12px;border:1px solid #ddd;font:inherit" autocomplete="new-password">'
+    +'<div id="pwmHint" style="font-size:12px;color:#c0392b;min-height:16px;margin-top:4px"></div>'
+    +'<button class="btn btn-blue" style="width:100%;margin-top:8px" onclick="saveFirstPass(this)">Spara mitt lösenord</button>'
+    +'<p style="margin:10px 0 0"><a href="#" onclick="document.getElementById(\'infoModal\')?.remove();return false" style="color:#999;font-size:13px">Behåll det mejlade lösenordet tills vidare →</a></p>');
+  setTimeout(()=>document.getElementById('pwm1')?.focus(),100);
+}
+async function saveFirstPass(btn){
+  const p1=document.getElementById('pwm1').value, p2=document.getElementById('pwm2').value;
+  const hint=document.getElementById('pwmHint');
+  if(p1.length<8){hint.textContent='Minst 8 tecken, tack.';return;}
+  if(p1!==p2){hint.textContent='Lösenorden matchar inte — kontrollera båda fälten.';return;}
+  btn.disabled=true;btn.textContent='Sparar …';
+  const {error}=await supa.auth.updateUser({password:p1});
+  if(error){hint.textContent='Kunde inte spara: '+error.message;btn.disabled=false;btn.textContent='Spara mitt lösenord';return;}
+  document.getElementById('infoModal')?.remove();
+  toast('Klart! Från och med nu loggar du in med ditt egna lösenord ✓');
 }
 async function portalSetNewPass(){
   const p1=document.getElementById('pvNew1').value, p2=document.getElementById('pvNew2').value;
@@ -2603,7 +2647,7 @@ function renderCoursePage(id){
             <span class="ql">deltagare</span>
           </div>
           ${c.soon?'<span class="pill ny" style="font-size:14px;padding:10px 18px">🔜 Lanseras inom kort — mejla academy@nordicagir.se för förtur</span>':`<button class="btn btn-blue" onclick="cpAdd('${c.id}')">Lägg i kundvagn <span class="arrow">→</span></button>`}
-          <p class="fact-help">Bokar du för fler än 10? <a href="mailto:info@nordicagir.se">Hör av dig</a> så ger vi ett bra paketpris.</p>
+          <p class="fact-help">Bokar du för fler än 10? <a href="mailto:academy@nordicagir.se">Hör av dig</a> så ger vi ett bra paketpris.</p>
         </div>
       </aside>
     </div>
