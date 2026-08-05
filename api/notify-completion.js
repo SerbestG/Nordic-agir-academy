@@ -40,7 +40,7 @@ export default async function handler(req, res) {
         headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           from: 'Nordic Agir Academy <academy@nordicagir.se>',
-          to: [process.env.ADMIN_EMAIL || 'info@nordicagir.se'],
+          to: [process.env.ADMIN_EMAIL || 'academy@nordicagir.se'],
           subject: `🎓 Kurs slutförd — ${row.name} (${row.courses?.title || row.course_id})`,
           html: `<h2>Dags att skicka ett certifikat!</h2>
             <p><b>${row.name}</b> (${row.email})${row.buyer_company ? ' · ' + row.buyer_company : ''}

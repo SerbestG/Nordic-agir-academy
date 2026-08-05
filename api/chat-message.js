@@ -25,7 +25,7 @@ export default async function handler(req, res) {
       headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         from: 'Nordic Agir Academy <academy@nordicagir.se>',
-        to: [process.env.ADMIN_EMAIL || 'info@nordicagir.se'],
+        to: [process.env.ADMIN_EMAIL || 'academy@nordicagir.se'],
         reply_to: from,
         subject: `💬 Ny fråga från chatten — ${clean(name) || from}`,
         html: `<h2>Ny fråga via chatten på sajten</h2>
