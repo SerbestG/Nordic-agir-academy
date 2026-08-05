@@ -137,7 +137,7 @@ export default async function handler(req, res) {
 
     const kr = (s.amount_total / 100).toLocaleString('sv-SE');
     await sendMail(
-      process.env.ADMIN_EMAIL || 'info@nordicagir.se',
+      process.env.ADMIN_EMAIL || 'academy@nordicagir.se',
       `Ny kursbeställning — ${s.metadata.buyer_name || s.customer_email} (${kr} kr)`,
       `<h2>Ny betald beställning</h2>
        <p><b>Beställare:</b> ${s.metadata.buyer_name || '-'} · ${s.metadata.buyer_company || '-'}<br>
