@@ -2310,7 +2310,8 @@ async function loadCourseUrls(){
 }
 
 async function renderPortal(){
-  if(pendingReviewRow){const _r=pendingReviewRow;pendingReviewRow=null;setTimeout(()=>showReviewModal(_r),500);}
+  if(celebrateRow){setTimeout(()=>celebrate(),500);} // lämnade spelaren innan Grattis hunnit visas → visa nu
+  else if(pendingReviewRow){const _r=pendingReviewRow;pendingReviewRow=null;setTimeout(()=>showReviewModal(_r),500);}
   const el=document.getElementById('portalContent');
   if(!el)return;
   document.getElementById('pvLogoutBtn').style.display=portalUser?'inline-block':'none';
@@ -2439,12 +2440,39 @@ async function portalLogout(){
    SCORM-paketets APIWrapper letar efter ett objekt vid namn `API` i
    föräldrafönstret. Vi tillhandahåller det här: när kursen rapporterar
    lesson_status = completed/passed markeras kursen klar automatiskt. */
-let scormRow=null,scormData={},scormScoreSet=false;
+let scormRow=null,scormData={},scormScoreSet=false,scormPassed=false,celebrateAt=0,celebrateRow=null;
+
+/* Firandet sker i två steg:
+   1) När BÅDE provpoängen (score.raw) är inlämnad OCH kursen rapporterar passed/completed
+      registreras examen tyst i bakgrunden (DB + certifikat + notis) — ingen ruta visas ännu,
+      så deltagaren hinner se Courseaus egen resultatruta ("Ditt resultat: X%").
+   2) Grattis-rutan visas först vid deltagarens NÄSTA aktivitet minst 6 s senare
+      (t.ex. klick på "Granska svar" eller vidare-navigering), eller när kursen avslutas/
+      spelaren lämnas. När Grattis stängs öppnas omdömesrutan direkt. */
+function maybeCelebrate(){
+  if(celebrateRow&&celebrateAt&&Date.now()-celebrateAt>6000)celebrate();
+}
+function celebrate(){
+  if(!celebrateRow)return;
+  const r=celebrateRow;celebrateRow=null;celebrateAt=0;
+  showGrattisModal(r);
+}
+function showGrattisModal(row){
+  showInfoModal('Grattis! 🎉',
+    '<p><b>Du har slutfört kursen med godkänt resultat.</b></p>'
+    +'<p>Ditt certifikat sammanställs nu och skickas till din e-post av Nordic Agir Academy. Det är giltigt i fem år från examensdatumet.</p>'
+    +'<p style="font-size:13px;color:var(--text-dim)">Tips: spara certifikatet digitalt när det kommer — och grattis igen till ett starkt genomfört arbete!</p>');
+  // När Grattis stängs (× eller Stäng) öppnas omdömesrutan direkt
+  const m=document.getElementById('infoModal');
+  if(m)m.querySelectorAll('button').forEach(b=>{
+    b.onclick=()=>{m.remove();setTimeout(()=>showReviewModal(row),400);};
+  });
+}
 
 function buildScormAPI(){
   return {
-    LMSInitialize(){scormData={};scormScoreSet=false;return 'true';},
-    LMSFinish(){return 'true';},
+    LMSInitialize(){scormData={};scormScoreSet=false;scormPassed=false;celebrateAt=0;return 'true';},
+    LMSFinish(){celebrate();return 'true';},
     LMSGetValue(name){
       if(name==='cmi.core.student_name')return scormRow?.name||portalUser?.email||'';
       if(name==='cmi.core.student_id')return portalUser?.email||'';
@@ -2454,13 +2482,15 @@ function buildScormAPI(){
     },
     LMSSetValue(name,value){
       scormData[name]=value;
-      // Provresultat inlämnat? (kursen skriver poängen när provet lämnas in)
+      // Provresultat inlämnat? (kursen skriver poängen först när slutprovet lämnas in)
       if(name.indexOf('score.raw')!==-1&&String(value).trim()!=='')scormScoreSet=true;
-      // Godkänn ENDAST efter inlämnat prov: 'passed', eller 'completed' när poäng redan satts
-      if(name==='cmi.core.lesson_status'&&(value==='passed'||(value==='completed'&&scormScoreSet)))autoComplete();
+      if(name==='cmi.core.lesson_status'&&(value==='passed'||value==='completed'))scormPassed=true;
+      // Registrera examen TYST — kräver både inlämnad poäng och godkänt-status
+      if(scormScoreSet&&scormPassed&&!celebrateAt&&!celebrateRow)autoComplete();
+      else maybeCelebrate(); // senare aktivitet (t.ex. Granska svar) → visa Grattis
       return 'true';
     },
-    LMSCommit(){return 'true';},
+    LMSCommit(){maybeCelebrate();return 'true';},
     LMSGetLastError(){return '0';},
     LMSGetErrorString(){return 'No error';},
     LMSGetDiagnostic(){return 'No error';}
@@ -2476,7 +2506,7 @@ function stopScormBridge(){
 }
 async function autoComplete(){
   if(!scormRow||scormRow.status==='klar')return;
-  pendingReviewRow=scormRow; // rutan visas först när deltagaren lämnar spelaren och sett sitt resultat
+  celebrateAt=Date.now();celebrateRow=scormRow; // Grattis visas först efter nästa aktivitet (se maybeCelebrate)
   scormRow.status='klar';
   if(!scormRow.cert_id){
     scormRow.cert_id='NAA-2026-'+String(Math.floor(1000+Math.random()*9000));
@@ -2490,10 +2520,6 @@ async function autoComplete(){
       body:JSON.stringify({token:session?.access_token||'',rowId:scormRow.id})});
     if(!nres.ok)console.warn('Klarnotisen misslyckades:',nres.status,await nres.text().catch(()=>''));
   }catch(e){console.warn('Klarnotisen misslyckades:',e.message);}
-  showInfoModal('Grattis! 🎉',
-    '<p><b>Du har slutfört kursen med godkänt resultat.</b></p>'
-    +'<p>Ditt certifikat sammanställs nu och skickas till din e-post av Nordic Agir Academy. Det är giltigt i fem år från examensdatumet.</p>'
-    +'<p style="font-size:13px;color:var(--text-dim)">Tips: spara certifikatet digitalt när det kommer — och grattis igen till ett starkt genomfört arbete!</p>');
   const pill=document.getElementById('playerPill');
   if(pill){pill.className='pill klar';pill.textContent='Klar';}
   const act=document.getElementById('playerDone');
