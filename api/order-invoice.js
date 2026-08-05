@@ -13,6 +13,8 @@ const MOMS = 1.25;
 
 // Kurskatalog: id -> { titel, pris exkl. moms } — håll i synk med create-checkout-session.js
 const KURSER = {
+  'bas-en':      { title: 'BAS-P and BAS-U — Swedish Construction Coordination (in English)', price: 1495 },
+  'byggpl':      { title: 'Byggprojektledning — projektledarens roll och ansvar', price: 995 },
   'mer':         { title: 'MER Anläggning — mät- och ersättningsregler för anläggningsarbeten', price: 1495 },
   'schakt':      { title: 'Säker schakt — schaktarbete och schaktansvar', price: 995 },
   'inst':        { title: 'Installationssamordning i byggprojekt', price: 1495 },
