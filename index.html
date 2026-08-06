@@ -1799,10 +1799,10 @@ async function adminDelete(payload,beskrivning){
   }catch(e){toast('Fel: '+e.message);}
 }
 function delRow(i){
-  const r=enr[i];if(!r)return;
+  const r=allEnrollments()[i];if(!r)return;
   const c=COURSES.find(x=>x.id===r.courseId)||{title:r.courseId};
   if(!confirm('Ta bort raden permanent?\n\n'+r.p.name+' — '+c.title+'\n\nDeltagarens konto påverkas inte, bara kursraden. Detta går inte att ångra.'))return;
-  adminDelete({ids:[r.id]},r.p.name);
+  adminDelete({ids:[r.rowId]},r.p.name);
 }
 function delOrder(ref,antal){
   if(!confirm('Ta bort HELA ordern '+ref+' med '+antal+' deltagarrad(er)?\n\nAnvänds för att rensa test- och felbeställningar. Detta går inte att ångra.'))return;
@@ -2485,8 +2485,12 @@ function buildScormAPI(){
       // Provresultat inlämnat? (kursen skriver poängen först när slutprovet lämnas in)
       if(name.indexOf('score.raw')!==-1&&String(value).trim()!=='')scormScoreSet=true;
       if(name==='cmi.core.lesson_status'&&(value==='passed'||value==='completed'))scormPassed=true;
-      // Registrera examen TYST — kräver både inlämnad poäng och godkänt-status
-      if(scormScoreSet&&scormPassed&&!celebrateAt&&!celebrateRow)autoComplete();
+      // Godkänt prov i DENNA session (inlämnad poäng + godkänt-status):
+      // fira ALLTID — även vid omtest av redan klar kurs — men registrera examen tyst bara första gången
+      if(scormScoreSet&&scormPassed&&!celebrateAt&&!celebrateRow){
+        celebrateAt=Date.now();celebrateRow=scormRow;
+        autoComplete(); // DB + certifikat + notis — hoppar själv över om kursen redan är klar
+      }
       else maybeCelebrate(); // senare aktivitet (t.ex. Granska svar) → visa Grattis
       return 'true';
     },
@@ -2505,8 +2509,7 @@ function stopScormBridge(){
   try{delete window.API;}catch(_){window.API=undefined;}
 }
 async function autoComplete(){
-  if(!scormRow||scormRow.status==='klar')return;
-  celebrateAt=Date.now();celebrateRow=scormRow; // Grattis visas först efter nästa aktivitet (se maybeCelebrate)
+  if(!scormRow||scormRow.status==='klar')return; // redan klar: inget nytt certifikat/mejl — firandet sköts ändå
   scormRow.status='klar';
   if(!scormRow.cert_id){
     scormRow.cert_id='NAA-2026-'+String(Math.floor(1000+Math.random()*9000));
