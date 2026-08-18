@@ -685,7 +685,7 @@ body.fs-mode .player-actions,body.fs-mode .mobile-tip{display:none}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v8.6</span>
+    <span>Alla rättigheter förbehållna · v8.7</span>
   </div>
 </footer>
 
@@ -2232,9 +2232,11 @@ function paintCert(certId){
   const course=document.getElementById('certCourse').value||'Kursens namn';
   const d=document.getElementById('certDate').value;
   document.getElementById('cName').textContent=name;
-  document.getElementById('cCourse').textContent=course;
+  // Certifikatet: huvudnamnet som titel, förklaringen efter tankstrecket som underrubrik
+  const delat=String(course).split(' — ');
+  document.getElementById('cCourse').textContent=delat[0];
   const cx=document.getElementById('cExtra');
-  if(cx)cx.textContent=/^LOU\b/.test(course)?'Utbildningen avser upphandlingsjuridik (LOU)':'';
+  if(cx)cx.textContent=delat.length>1?delat.slice(1).join(' — '):'';
   if(d){
     const dd=new Date(d);
     document.getElementById('cDate').textContent=dd.toLocaleDateString('sv-SE');
