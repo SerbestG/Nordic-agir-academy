@@ -6,6 +6,11 @@
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
+  // Consent Mode v2: allt nekat tills besökaren valt (GDPR)
+  gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',wait_for_update:500});
+  try{if(localStorage.getItem('naaConsent')==='alla'){
+    gtag('consent','update',{ad_storage:'granted',ad_user_data:'granted',ad_personalization:'granted',analytics_storage:'granted'});
+  }}catch(e){}
   gtag('js', new Date());
   gtag('config', 'AW-18318666112');
 </script>
@@ -189,6 +194,11 @@ section{padding:clamp(64px,8vw,100px) clamp(20px,5vw,64px);position:relative}
 .cta-bars{position:absolute;left:-40px;bottom:-70px;display:flex;gap:16px;align-items:flex-end;opacity:.15}
 .cta-bars i{display:block;width:44px;transform:skewX(-24deg);background:#fff}
 .cta-bars i:nth-child(1){height:90px}.cta-bars i:nth-child(2){height:150px}.cta-bars i:nth-child(3){height:220px}
+.legal-wrap{max-width:820px;margin:0 auto;padding:40px 22px 80px}
+.legal-body h1{font-size:clamp(28px,4vw,40px);margin:18px 0 4px}
+.legal-body h2{font-size:19px;margin:26px 0 8px;color:var(--coal)}
+.legal-body p{line-height:1.65;color:#4a4747;margin:0 0 10px}
+.legal-body .lg-meta{color:var(--text-dim);font-size:13px}
 footer{background:var(--coal-darker);color:var(--text-light);padding:clamp(44px,5vw,70px) clamp(20px,5vw,64px) 32px;position:relative;overflow:hidden}
 .footer-bars{position:absolute;right:20px;top:-30px;display:flex;gap:14px;opacity:.08}
 .footer-bars i{display:block;width:40px;transform:skewX(-24deg);background:var(--cyan)}
@@ -665,16 +675,30 @@ body.fs-mode .player-actions,body.fs-mode .mobile-tip{display:none}
       <h4>Kontakt</h4>
       <a href="mailto:academy@nordicagir.se">academy@nordicagir.se</a>
       <a href="tel:073-9129789">073-912 97 89</a>
-      <p>Tegnérgatan 34<br>113 59 Stockholm</p>
+      <p>Anläggarvägen 34<br>Handen</p>
       <a href="https://www.nordicagir.se" target="_blank" rel="noopener">nordicagir.se</a>
+      <a href="#kopvillkor">Köpvillkor</a>
+      <a href="#integritetspolicy">Integritetspolicy</a>
+      <a onclick="oppnaKakval()" style="cursor:pointer">Kakinställningar</a>
       <a onclick="location.hash='admin'">Adminportal</a>
     </div>
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v8.5</span>
+    <span>Alla rättigheter förbehållna · v8.6</span>
   </div>
 </footer>
+
+<!-- ============ KAKRUTAN ============ -->
+<div id="cookieBar" style="display:none;position:fixed;left:0;right:0;bottom:0;z-index:9998;background:var(--coal-darker);color:#fff;padding:16px clamp(16px,4vw,42px);box-shadow:0 -6px 24px rgba(0,0,0,.25)">
+  <div style="max-width:1100px;margin:0 auto;display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between">
+    <p style="margin:0;font-size:13.5px;line-height:1.5;max-width:640px">🍪 Vi använder kakor för att mäta hur besökare hittar till oss och för att förbättra vår annonsering. Nödvändiga kakor (inloggning, kundvagn) används alltid. <a href="#integritetspolicy" style="color:var(--cyan);text-decoration:underline" onclick="document.getElementById('cookieBar').style.display='none'">Läs mer i integritetspolicyn</a></p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="mini-btn" style="background:transparent;color:#fff;border-color:#666" onclick="setConsent('nodv')">Endast nödvändiga</button>
+      <button class="btn btn-blue" style="padding:10px 22px" onclick="setConsent('alla')">Godkänn alla</button>
+    </div>
+  </div>
+</div>
 
 </div><!-- /shopView -->
 
@@ -1345,6 +1369,7 @@ function openCheckout(){track('begin_checkout',{items:cart.length});
         </label>
       </div>
       <button type="submit" class="btn btn-blue" style="width:100%;justify-content:center" id="orderBtn">Slutför beställning <span class="arrow">→</span></button>
+      <p style="font-size:12px;color:var(--text-dim);margin:10px 0 0;text-align:center">Genom att slutföra beställningen godkänner du våra <a href="https://nordicagiracademy.se/#kopvillkor" target="_blank" rel="noopener" style="color:var(--cyan-deep)">köpvillkor</a> och bekräftar att du tagit del av vår <a href="https://nordicagiracademy.se/#integritetspolicy" target="_blank" rel="noopener" style="color:var(--cyan-deep)">integritetspolicy</a>. Digitala kurser levereras direkt — se villkoren om ångerrätt.</p>
       <p style="font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-top:14px;text-align:center">Betalning sker mot faktura, 30 dagar. Genom att beställa godkänner du våra kursvillkor.</p>
     </form>`;
   document.getElementById('checkoutVeil').classList.add('open');
@@ -2690,21 +2715,105 @@ function renderCoursePage(id){
 }
 
 /* ================= ROUTING ================= */
+const LEGAL_TEXTER={villkor:`<h1>Köpvillkor</h1>
+<p class="lg-meta">Senast uppdaterade: 18 augusti 2026</p>
+
+<h2>1. Om oss</h2>
+<p>Nordic Agir Academy tillhandahålls av <b>Nordic Agir AB</b>, org.nr 559516-5373, Anläggarvägen 34, Handen. Kontakt: academy@nordicagir.se · 073-912 97 89. Villkoren gäller alla köp på nordicagiracademy.se.</p>
+
+<h2>2. Tjänsten</h2>
+<p>Vi säljer digitala distanskurser med avslutande kunskapsprov. Efter godkänt prov utfärdas ett personligt certifikat (PDF med verifierings-QR) giltigt i fem år från examensdatumet. Kurserna genomförs i egen takt via vår webbportal och tillgången till köpt kurs gäller så länge kursen tillhandahålls, dock minst tolv månader från köpet.</p>
+
+<h2>3. Beställning och avtal</h2>
+<p>Avtal ingås när beställningen bekräftats av oss — vid kortköp genom betalningsbekräftelsen, vid fakturaköp genom vår ordergranskning och orderbekräftelse. Vi förbehåller oss rätten att neka beställningar, t.ex. vid misstänkt missbruk eller uppenbara fel i pris.</p>
+
+<h2>4. Priser och betalning</h2>
+<p>Priser anges exklusive moms med totalpris inklusive moms (25&nbsp;%) i kassan. Betalning sker via kort eller Klarna (genom betalleverantören Stripe) eller mot faktura med 30 dagars betalningsvillkor. För företagsfaktura krävs organisationsnummer; för privatfaktura krävs fullständig fakturaadress. Vid försenad betalning debiteras dröjsmålsränta enligt räntelagen samt lagstadgade avgifter. Kampanjpriser gäller så länge de visas på webbplatsen.</p>
+
+<h2>5. Leverans</h2>
+<p>Leverans sker digitalt: inloggningsuppgifter skickas per e-post normalt inom några minuter efter genomförd kortbetalning respektive efter godkänd fakturaorder. Kontrollera skräpposten om mejlet dröjer och kontakta oss om det inte kommit fram.</p>
+
+<h2>6. Ångerrätt (konsumenter)</h2>
+<p>Som privatperson har du 14 dagars ångerrätt enligt lagen om distansavtal och avtal utanför affärslokaler. <b>Genom att påbörja en kurs samtycker du till att leveransen av det digitala innehållet inleds direkt och att ångerrätten därmed upphör för den kursen.</b> Vill du utnyttja ångerrätten kontaktar du oss inom 14 dagar från köpet på academy@nordicagir.se — har kursen inte påbörjats återbetalar vi hela beloppet inom 14 dagar. Du kan även använda Konsumentverkets standardformulär för ångerrätt. Ångerrätten gäller inte köp i näringsverksamhet (företagsköp).</p>
+
+<h2>7. Examen och certifikat</h2>
+<p>Kunskapsprovet kan göras om utan begränsning tills godkänt resultat nås. Certifikatet utfärdas på de deltagaruppgifter (namn och i förekommande fall personnummer) som angetts vid beställningen — kontrollera att de stämmer. Certifikatets äkthet kan verifieras via QR-koden.</p>
+
+<h2>8. Ansvar och reklamation</h2>
+<p>Vi ansvarar för att tjänsten fungerar som beskrivet, men kan inte garantera oavbruten tillgänglighet (underhåll, driftstörningar hos underleverantörer). Fel reklameras till academy@nordicagir.se; som konsument har du reklamationsrätt enligt konsumentlagstiftningen. Vårt ansvar är, i den mån tvingande lag inte säger annat, begränsat till kursens pris. Kursinnehållet är utbildningsmaterial och ersätter inte juridisk eller teknisk rådgivning i enskilda ärenden.</p>
+
+<h2>9. Immateriella rättigheter</h2>
+<p>Allt kursinnehåll tillhör Nordic Agir AB eller våra licensgivare. Tillgången är personlig — inloggning och material får inte delas, spridas eller användas för egen utbildningsverksamhet.</p>
+
+<h2>10. Tvist</h2>
+<p>Vid tvist som vi inte lyckas lösa tillsammans kan du som konsument vända dig till Allmänna reklamationsnämnden (ARN), Box 174, 101 23 Stockholm, www.arn.se, eller använda EU-kommissionens tvistlösningsplattform. Vi medverkar i ARN:s prövning. I övrigt gäller svensk rätt och allmän domstol.</p>
+
+<h2>11. Ändringar</h2>
+<p>Vi kan uppdatera villkoren; den version som gällde vid ditt köp gäller för det köpet. Aktuell version finns alltid på denna sida.</p>`,policy:`<h1>Integritetspolicy</h1>
+<p class="lg-meta">Senast uppdaterad: 18 augusti 2026</p>
+
+<h2>1. Personuppgiftsansvarig</h2>
+<p><b>Nordic Agir AB</b>, org.nr 559516-5373, Anläggarvägen 34, Handen, är personuppgiftsansvarig för behandlingen av personuppgifter på nordicagiracademy.se. Kontakt i dataskyddsfrågor: academy@nordicagir.se.</p>
+
+<h2>2. Vilka uppgifter vi behandlar och varför</h2>
+<p><b>Köp och kurstillgång</b> — namn, e-post, telefon, företagsuppgifter, faktura-/adressuppgifter, orderhistorik, kursframsteg och examensresultat. Rättslig grund: fullgörande av avtal.</p>
+<p><b>Personnummer</b> — anges för deltagare och skrivs på certifikatet. Behandlingen är motiverad för säker identifiering av certifikatinnehavaren, eftersom certifikaten används som kompetensbevis gentemot arbetsgivare och beställare. Rättslig grund: fullgörande av avtal samt vårt och deltagarens berättigade intresse av tillförlitliga kompetensbevis.</p>
+<p><b>Certifikatverifiering</b> — certifikat-ID, namn, kurs och examensdatum sparas så länge certifikatet är giltigt (fem år) plus rimlig marginal, så att äktheten kan verifieras via QR-koden. Rättslig grund: berättigat intresse.</p>
+<p><b>Bokföring</b> — order- och betalningsuppgifter sparas i sju år enligt bokföringslagen. Rättslig grund: rättslig förpliktelse.</p>
+<p><b>Omdömen</b> — betyg, kommentar, förnamn och e-post när du frivilligt lämnar ett kursomdöme; förnamn och kommentar kan visas på kurssidan och i vår marknadsföring. Rättslig grund: samtycke (lämnas genom att skicka omdömet; kontakta oss för radering).</p>
+<p><b>Marknadsföring till företag</b> — namn, roll och kontaktuppgifter till företrädare för företag i bygg- och anläggningsbranschen, inhämtade från offentliga källor, för relevanta B2B-utskick. Rättslig grund: berättigat intresse (intresseavvägning); varje utskick innehåller avregistreringslänk och du kan invända när som helst.</p>
+<p><b>Support och chatt</b> — meddelanden du skickar via vår chatt eller e-post. Rättslig grund: berättigat intresse att besvara din förfrågan.</p>
+
+<h2>3. Mottagare av uppgifter</h2>
+<p>Vi använder noggrant utvalda personuppgiftsbiträden: Supabase (databas och inloggning), Vercel (drift), Stripe (betalningar — kortuppgifter hanteras enbart av Stripe), Resend och Brevo (e-postutskick) samt Google (annons- och besöksmätning, se avsnitt 5). Vissa leverantörer behandlar uppgifter i USA; överföringen skyddas genom EU-kommissionens standardavtalsklausuler och/eller EU-U.S. Data Privacy Framework. Vi säljer aldrig personuppgifter.</p>
+
+<h2>4. Lagringstider</h2>
+<p>Konto- och kursuppgifter: så länge kontot är aktivt och därefter så länge certifikatverifiering kräver. Bokföringsunderlag: sju år. Marknadsföringsuppgifter: tills du avregistrerar dig eller invänder. Chattmeddelanden: upp till tolv månader.</p>
+
+<h2>5. Kakor (cookies) och mätning</h2>
+<p>Webbplatsen använder nödvändiga kakor och lokal lagring för inloggning, kundvagn och ditt kakval — dessa kräver inget samtycke. Därutöver använder vi Googles mättjänster (Google Ads) för att förstå hur besökare hittar till oss och för att mäta annonsering. <b>Dessa mätkakor sätts först om du godkänner dem i kakrutan</b>; utan godkännande skickas endast anonymiserad, kakfri signal (Googles Consent Mode). Du kan när som helst ändra ditt val via länken "Kakinställningar" i sidfoten.</p>
+
+<h2>6. Dina rättigheter</h2>
+<p>Du har rätt att begära tillgång till (registerutdrag), rättelse av eller radering av dina personuppgifter, begränsning av behandling, dataportabilitet samt att invända mot behandling som stödjer sig på berättigat intresse — inklusive direktmarknadsföring, där invändan alltid respekteras. Kontakta academy@nordicagir.se. Du har även rätt att lämna klagomål till Integritetsskyddsmyndigheten (IMY), www.imy.se.</p>
+
+<h2>7. Ändringar</h2>
+<p>Vid väsentliga ändringar av policyn informerar vi på webbplatsen. Aktuell version finns alltid på denna sida.</p>`};
+function renderLegal(typ){
+  document.getElementById('courseView').innerHTML=
+    '<div class="legal-wrap"><button class="cp-back" onclick="location.hash=\'\'">← Till startsidan</button>'
+    +'<div class="legal-body">'+LEGAL_TEXTER[typ]+'</div>'
+    +'<p style="margin-top:30px"><a href="#'+(typ==='policy'?'kopvillkor':'integritetspolicy')+'" style="color:var(--cyan-deep);font-weight:700;text-decoration:none">Läs även våra '+(typ==='policy'?'köpvillkor':'')+(typ==='villkor'?'vår integritetspolicy':'')+' →</a></p></div>';
+  window.scrollTo(0,0);
+}
 function route(){
   const h=location.hash;
   const isAdmin=h==='#admin';
   const isPortal=h==='#minasidor';
   const courseMatch=h.match(/^#kurs\/(.+)$/);
   const verifyMatch=h.match(/^#verifiera\/(.+)$/);
+  const legalMatch=h==='#integritetspolicy'?'policy':(h==='#kopvillkor'?'villkor':null);
   if(verifyMatch){renderVerify(decodeURIComponent(verifyMatch[1]));return;}
   document.body.classList.toggle('admin-mode',isAdmin);
   document.body.classList.toggle('portal-mode',isPortal);
-  document.body.classList.toggle('course-mode',!!courseMatch);
+  document.body.classList.toggle('course-mode',!!courseMatch||!!legalMatch);
   if(isPortal)renderPortal();else stopScormBridge();
   if(courseMatch)renderCoursePage(courseMatch[1]);
+  else if(legalMatch)renderLegal(legalMatch);
   else document.getElementById('courseView').innerHTML='';
   if(!isAdmin)closeCheckout();
 }
+function setConsent(val){
+  try{localStorage.setItem('naaConsent',val);}catch(e){}
+  if(val==='alla'&&typeof gtag==='function'){
+    gtag('consent','update',{ad_storage:'granted',ad_user_data:'granted',ad_personalization:'granted',analytics_storage:'granted'});
+  }
+  document.getElementById('cookieBar').style.display='none';
+}
+function visaKakruta(){
+  try{if(!localStorage.getItem('naaConsent'))document.getElementById('cookieBar').style.display='';}catch(e){}
+}
+function oppnaKakval(){try{localStorage.removeItem('naaConsent');}catch(e){}document.getElementById('cookieBar').style.display='';}
+setTimeout(visaKakruta,800);
 window.addEventListener('hashchange',route);
 route();
 
