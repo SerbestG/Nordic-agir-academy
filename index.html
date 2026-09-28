@@ -554,6 +554,7 @@ body.fs-mode .player-actions,body.fs-mode .mobile-tip{display:none}
     <div class="nav-links" id="navLinks">
       <a href="#kategorier">Kursområden</a>
       <a onclick="setFilter('alla');scrollToCourses()">Alla kurser</a>
+      <a onclick="setFilter('english');scrollToCourses()">In English</a>
       <a href="#villkor">Så funkar det</a>
       <a href="https://jobb.nordicagir.se" target="_blank" rel="noopener">Lediga jobb</a>
       <a href="https://www.nordicagir.se" target="_blank" rel="noopener">Nordicagir.se</a>
@@ -685,7 +686,7 @@ body.fs-mode .player-actions,body.fs-mode .mobile-tip{display:none}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v8.7</span>
+    <span>Alla rättigheter förbehållna · v8.8</span>
   </div>
 </footer>
 
@@ -799,26 +800,27 @@ const CATS={
   bygg:       {name:'Bygg & anläggning',     grad:'linear-gradient(135deg,#0090C9,#006E9E)'},
   projekt:    {name:'Projektledning',        grad:'linear-gradient(135deg,#00ADEF,#0090C9)'},
   juridik:    {name:'Entreprenadjuridik',    grad:'linear-gradient(135deg,#4F4C4C,#2E2C2C)'},
-  upphandling:{name:'Offentlig upphandling', grad:'linear-gradient(135deg,#006E9E,#00446B)'}
+  upphandling:{name:'Offentlig upphandling', grad:'linear-gradient(135deg,#006E9E,#00446B)'},
+  english:    {name:'In English',            grad:'linear-gradient(135deg,#232121,#0090C9)'}
 };
 const IMG=q=>'https://images.unsplash.com/photo-'+q+'?auto=format&fit=crop&w=800&q=60';
 const COURSES=[
- {id:'anbud',cat:'upphandling',abbr:'Analysera anbud',sub:'Analys och kvalitetssäkring',title:'Anbudsarbete i offentlig upphandling — analys och kvalitetssäkring',desc:'Lär dig granska anbudet som en upphandlare — hitta varje skall-krav, täpp till luckorna och lämna in med trygghet.',dur:'ca 2 tim',price:795,orig:999,img:IMG('1454165804606-c3d57bc86b40'),kw:'anbud analysera kvalitetssäkra skall-krav offentlig upphandling granska'},
- {id:'lou-praktik',cat:'upphandling',abbr:'LOU i praktiken',sub:'Lagen om offentlig upphandling',title:'LOU — Lagen om offentlig upphandling',desc:'Så fungerar offentlig upphandling på riktigt: processen, utvärderingsmodellerna och strategin som vinner kontrakt.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1589829545856-d10d557cf95f'),kw:'lou praktik anbud överprövning utvärdering offentlig upphandling'},
+ {id:'anbud',en:'anbud-en',cat:'upphandling',abbr:'Analysera anbud',sub:'Analys och kvalitetssäkring',title:'Anbudsarbete i offentlig upphandling — analys och kvalitetssäkring',desc:'Lär dig granska anbudet som en upphandlare — hitta varje skall-krav, täpp till luckorna och lämna in med trygghet.',dur:'ca 2 tim',price:795,orig:999,img:IMG('1454165804606-c3d57bc86b40'),kw:'anbud analysera kvalitetssäkra skall-krav offentlig upphandling granska'},
+ {id:'lou-praktik',en:'lou-praktik-en',cat:'upphandling',abbr:'LOU i praktiken',sub:'Lagen om offentlig upphandling',title:'LOU — Lagen om offentlig upphandling',desc:'Så fungerar offentlig upphandling på riktigt: processen, utvärderingsmodellerna och strategin som vinner kontrakt.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1589829545856-d10d557cf95f'),kw:'lou praktik anbud överprövning utvärdering offentlig upphandling'},
  {id:'luf-praktik',cat:'upphandling',abbr:'LUF i praktiken',sub:'Upphandling inom försörjningssektorerna',title:'LUF — Lagen om upphandling inom försörjningssektorerna',desc:'Vatten, energi och transport spelar efter egna regler. Lär dig skillnaderna mot LOU — och hur du drar nytta av dem.',dur:'ca 3 tim',price:1395,orig:1795,img:IMG('1466611653911-95081537e5b7'),kw:'luf försörjningssektor upphandling energi vatten transport'},
- {id:'ejur',cat:'juridik',abbr:'Entreprenadjuridik',sub:'AB 04, ABT 06 och ABK 09',title:'Entreprenadjuridik — AB 04, ABT 06 och ABK 09',desc:'Hela entreprenadjuridiken i en kurs. Efter den här läser du standardavtalen med nya ögon — och vet var fallgroparna finns.',dur:'ca 4 tim',price:2195,orig:2795,img:IMG('1505664194779-8beaceb93744'),kw:'entreprenadjuridik ab04 abt06 abk09 avtal standardavtal'},
- {id:'ab-abt',cat:'juridik',abbr:'AB 04 och ABT 06',sub:'Standardavtal för entreprenader',title:'AB 04 och ABT 06 — standardavtal för entreprenader',desc:'Utförande- och totalentreprenad på djupet: vem ansvarar för vad, hur ekonomin regleras och vad som gäller när något går snett.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1450101499163-c8848c66ca85'),kw:'ab04 abt06 utförandeentreprenad totalentreprenad standardavtal'},
- {id:'abk',cat:'juridik',abbr:'ABK 09',sub:'Allmänna bestämmelser för konsultuppdrag',title:'ABK 09 — Allmänna bestämmelser för konsultuppdrag',desc:'Konsultuppdragets spelregler: omfattning, ansvar, försäkring och vem som äger resultatet. För dig som köper eller säljer konsulttjänster.',dur:'ca 2 tim',price:995,orig:1295,img:IMG('1521791136064-7986c2920216'),kw:'abk09 konsult konsulträtt uppdrag ansvar'},
- {id:'ata',cat:'juridik',abbr:'ÄTA-hantering',sub:'Ändrings-, tilläggs- och avgående',title:'ÄTA-arbeten — ändrings-, tilläggs- och avgående arbeten',desc:'Det arbete du utför ska du få betalt för. Underrätta i rätt tid, dokumentera rätt och stå stadigt om det blir diskussion.',dur:'ca 3 tim',price:995,orig:1295,img:IMG('1554224155-6726b3ff858f'),kw:'äta ändring tillägg avgående underrättelse'},
- {id:'lyft',cat:'bygg',abbr:'Säkra lyft',sub:'Lastkoppling och signalering',title:'Säkra lyft — lastkoppling, signalering och riskbedömning',desc:'För dig som kopplar last eller dirigerar lyft: rätt redskap, rätt riskbedömning och rutiner som gör att alla går hem hela.',dur:'ca 2 tim',price:795,orig:999,img:IMG('1504307651254-35680f356dfd'),kw:'säkra lyft kran lastkoppling signalman afs riskbedömning'},
- {id:'bas',cat:'bygg',abbr:'BAS-P och BAS-U',sub:'Byggarbetsmiljösamordning',title:'BAS-P och BAS-U — byggarbetsmiljösamordning',desc:'Bli trygg som byggarbetsmiljösamordnare: ansvaret, arbetsmiljöplanen och samordningen som håller från planering till utförande.',dur:'ca 4 tim',price:1495,orig:1995,img:IMG('1541888946425-d81bb19240f5'),kw:'bas-p bas-u byggarbetsmiljösamordnare arbetsmiljö arbetsmiljöplan'},
- {id:'apv',cat:'bygg',abbr:'Arbete på väg',sub:'APV Steg 1 · 1.1 · 1.2 · 1.3',title:'Arbete på väg — APV Steg 1 (1.1, 1.2 och 1.3)',desc:'Grundkompetensen för alla som arbetar på eller vid väg, enligt Trafikverkets krav — hela steg 1 med kompetenserna 1.1, 1.2 och 1.3.',dur:'ca 2 tim',price:995,orig:1295,img:IMG('1724204408341-adb2e4538a73'),kw:'apv arbete på väg trafikverket steg 1 1.1 1.2 1.3 vägarbetsplats väghållningsfordon'},
+ {id:'ejur',en:'ejur-en',cat:'juridik',abbr:'Entreprenadjuridik',sub:'AB 04, ABT 06 och ABK 09',title:'Entreprenadjuridik — AB 04, ABT 06 och ABK 09',desc:'Hela entreprenadjuridiken i en kurs. Efter den här läser du standardavtalen med nya ögon — och vet var fallgroparna finns.',dur:'ca 4 tim',price:2195,orig:2795,img:IMG('1505664194779-8beaceb93744'),kw:'entreprenadjuridik ab04 abt06 abk09 avtal standardavtal'},
+ {id:'ab-abt',en:'ab-abt-en',cat:'juridik',abbr:'AB 04 och ABT 06',sub:'Standardavtal för entreprenader',title:'AB 04 och ABT 06 — standardavtal för entreprenader',desc:'Utförande- och totalentreprenad på djupet: vem ansvarar för vad, hur ekonomin regleras och vad som gäller när något går snett.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1450101499163-c8848c66ca85'),kw:'ab04 abt06 utförandeentreprenad totalentreprenad standardavtal'},
+ {id:'abk',en:'abk-en',cat:'juridik',abbr:'ABK 09',sub:'Allmänna bestämmelser för konsultuppdrag',title:'ABK 09 — Allmänna bestämmelser för konsultuppdrag',desc:'Konsultuppdragets spelregler: omfattning, ansvar, försäkring och vem som äger resultatet. För dig som köper eller säljer konsulttjänster.',dur:'ca 2 tim',price:995,orig:1295,img:IMG('1521791136064-7986c2920216'),kw:'abk09 konsult konsulträtt uppdrag ansvar'},
+ {id:'ata',en:'ata-en',cat:'juridik',abbr:'ÄTA-hantering',sub:'Ändrings-, tilläggs- och avgående',title:'ÄTA-arbeten — ändrings-, tilläggs- och avgående arbeten',desc:'Det arbete du utför ska du få betalt för. Underrätta i rätt tid, dokumentera rätt och stå stadigt om det blir diskussion.',dur:'ca 3 tim',price:995,orig:1295,img:IMG('1554224155-6726b3ff858f'),kw:'äta ändring tillägg avgående underrättelse'},
+ {id:'lyft',en:'lyft-en',cat:'bygg',abbr:'Säkra lyft',sub:'Lastkoppling och signalering',title:'Säkra lyft — lastkoppling, signalering och riskbedömning',desc:'För dig som kopplar last eller dirigerar lyft: rätt redskap, rätt riskbedömning och rutiner som gör att alla går hem hela.',dur:'ca 2 tim',price:795,orig:999,img:IMG('1504307651254-35680f356dfd'),kw:'säkra lyft kran lastkoppling signalman afs riskbedömning'},
+ {id:'bas',en:'bas-en',cat:'bygg',abbr:'BAS-P och BAS-U',sub:'Byggarbetsmiljösamordning',title:'BAS-P och BAS-U — byggarbetsmiljösamordning',desc:'Bli trygg som byggarbetsmiljösamordnare: ansvaret, arbetsmiljöplanen och samordningen som håller från planering till utförande.',dur:'ca 4 tim',price:1495,orig:1995,img:IMG('1541888946425-d81bb19240f5'),kw:'bas-p bas-u byggarbetsmiljösamordnare arbetsmiljö arbetsmiljöplan'},
+ {id:'apv',en:'apv-en',cat:'bygg',abbr:'Arbete på väg',sub:'APV Steg 1 · 1.1 · 1.2 · 1.3',title:'Arbete på väg — APV Steg 1 (1.1, 1.2 och 1.3)',desc:'Grundkompetensen för alla som arbetar på eller vid väg, enligt Trafikverkets krav — hela steg 1 med kompetenserna 1.1, 1.2 och 1.3.',dur:'ca 2 tim',price:995,orig:1295,img:IMG('1724204408341-adb2e4538a73'),kw:'apv arbete på väg trafikverket steg 1 1.1 1.2 1.3 vägarbetsplats väghållningsfordon'},
 
- {id:'bas-en',cat:'bygg',abbr:'BAS-P & BAS-U',sub:'In English',title:'BAS-P and BAS-U — Swedish Construction Coordination (in English)',desc:'Working in Sweden? BAS-P and BAS-U are legal requirements on every Swedish construction site. The full coordination course — in English — for foreign professionals and companies.',dur:'ca 4 tim',price:1495,orig:1995,img:IMG('1541888946425-d81bb19240f5'),kw:'bas english engelska bas-p bas-u construction coordination sweden foreign utländsk arbetskraft'},
- {id:'byggpl',cat:'projekt',abbr:'Byggprojekt-ledning',sub:'Projektledarens roll',title:'Byggprojektledning — projektledarens roll och ansvar',desc:'Från uppdrag till överlämning: rollen, mandatet, laget och besluten. Kursen för dig som leder byggprojekt — eller ska börja.',dur:'ca 3–4 tim',price:995,orig:1295,img:IMG('1579847188804-ecba0e2ea330'),kw:'byggprojektledning projektledare roll ansvar ledarskap byggledning platsledning'},
+ {id:'bas-en',sv:'bas',cat:'english',abbr:'BAS-P & BAS-U',sub:'Construction coordination',title:'BAS-P and BAS-U — Swedish Construction Coordination (in English)',desc:'Working in Sweden? BAS-P and BAS-U are legal requirements on every Swedish construction site. The full coordination course — in English — for foreign professionals and companies.',dur:'approx. 4 h',price:1495,orig:1995,img:IMG('1541888946425-d81bb19240f5'),kw:'bas english engelska bas-p bas-u construction coordination sweden foreign utländsk arbetskraft'},
+ {id:'byggpl',en:'byggpl-en',cat:'projekt',abbr:'Byggprojekt-ledning',sub:'Projektledarens roll',title:'Byggprojektledning — projektledarens roll och ansvar',desc:'Från uppdrag till överlämning: rollen, mandatet, laget och besluten. Kursen för dig som leder byggprojekt — eller ska börja.',dur:'ca 3–4 tim',price:995,orig:1295,img:IMG('1579847188804-ecba0e2ea330'),kw:'byggprojektledning projektledare roll ansvar ledarskap byggledning platsledning'},
 
- {id:'ama-af',cat:'bygg',abbr:'AMA AF',sub:'Administrativa föreskrifter',title:'AMA AF — administrativa föreskrifter för entreprenader',desc:'AF-delen sätter spelreglerna: anbudskrav, tider, ansvar, viten och möten. Lär dig läsa och använda de administrativa föreskrifterna — innan de används mot dig.',dur:'ca 3–4 tim',price:1495,orig:1995,img:IMG('1562564055-71e051d33c19'),kw:'ama af administrativa föreskrifter afc afd entreprenadföreskrifter upphandlingsföreskrifter'},
- {id:'ramavtal',cat:'upphandling',abbr:'Ramavtal & avrop',sub:'Strategi för leverantörer',title:'Ramavtal och avrop i offentlig upphandling',desc:'Att vinna ramavtalet är halva matchen — avropen är den andra. Rangordning, förnyad konkurrensutsättning och strategin som gör ramavtalet lönsamt.',dur:'ca 3 tim',price:1395,orig:1795,img:IMG('1638262052640-82e94d64664a'),kw:'ramavtal avrop förnyad konkurrensutsättning rangordning offentlig upphandling leverantör'},
+ {id:'ama-af',en:'ama-af-en',cat:'bygg',abbr:'AMA AF',sub:'Administrativa föreskrifter',title:'AMA AF — administrativa föreskrifter för entreprenader',desc:'AF-delen sätter spelreglerna: anbudskrav, tider, ansvar, viten och möten. Lär dig läsa och använda de administrativa föreskrifterna — innan de används mot dig.',dur:'ca 3–4 tim',price:1495,orig:1995,img:IMG('1562564055-71e051d33c19'),kw:'ama af administrativa föreskrifter afc afd entreprenadföreskrifter upphandlingsföreskrifter'},
+ {id:'ramavtal',en:'ramavtal-en',cat:'upphandling',abbr:'Ramavtal & avrop',sub:'Strategi för leverantörer',title:'Ramavtal och avrop i offentlig upphandling',desc:'Att vinna ramavtalet är halva matchen — avropen är den andra. Rangordning, förnyad konkurrensutsättning och strategin som gör ramavtalet lönsamt.',dur:'ca 3 tim',price:1395,orig:1795,img:IMG('1638262052640-82e94d64664a'),kw:'ramavtal avrop förnyad konkurrensutsättning rangordning offentlig upphandling leverantör'},
  {id:'ritning',cat:'bygg',abbr:'Ritningsläsning',sub:'Planer, sektioner & detaljer',title:'Ritningsläsning i byggprojekt',desc:'Ritningen är byggets språk. Skalor, beteckningar, planer, sektioner, detaljer och revisioner — läs dem rätt och led därefter.',dur:'ca 2–3 tim',price:995,orig:1295,img:IMG('1503387762-592deb58ef4e'),kw:'ritningsläsning ritning skala sektion detalj plan bygghandling relationshandling revision'},
 
  {id:'mer',cat:'bygg',abbr:'MER Anläggning',sub:'Mät- och ersättningsregler',title:'MER Anläggning — mät- och ersättningsregler för anläggningsarbeten',desc:'Mängdförteckningen bestämmer vad du får betalt — MER bestämmer hur den läses. Teoretisk mängd, reglerbara mängder och gränsdragningen mot ÄTA.',dur:'ca 4–5 tim',price:1495,orig:1995,img:IMG('1585110587043-36d457f3e803'),kw:'mer anläggning mängdförteckning mätregler ersättning teoretisk mängd ama'},
@@ -826,13 +828,31 @@ const COURSES=[
  {id:'inst',cat:'projekt',abbr:'Installations-samordnare',sub:'Rör, luft, el & styr i samma hus',title:'Installationssamordning i byggprojekt',desc:'Huset byggs en gång — installationerna krockar tre gånger om ingen samordnar. Gränsdragningslistor, montageordning och samordnad provning.',dur:'ca 4 tim',price:1495,orig:1995,img:IMG('1589939705384-5185137a7f0f'),kw:'installationssamordnare installationer samordning vvs el ventilation gränsdragning'},
  {id:'fall',cat:'bygg',abbr:'Fallskydd',sub:'Arbete på höjd',title:'Fallskydd — arbete på höjd',desc:'Fem meter tar en sekund, kunskapen tar två timmar. Skyddens rangordning, selens fysik, förankringar och räddningen ur hängtraumat.',dur:'ca 2–3 tim',price:795,orig:999,img:IMG('1531834685032-c34bf0d84c77'),kw:'fallskydd fall höjd sele fallstopp förankring hängtrauma tak'},
  {id:'bim',cat:'projekt',abbr:'BIM',sub:'För produktionen',title:'BIM — byggnadsinformationsmodellering i produktionen',desc:'Modellen finns redan — frågan är om du kan läsa den. Granska, mängda och döda krockarna på skärmen, med gratis verktyg och kontraktet i ryggen.',dur:'ca 3–4 tim',price:995,orig:1295,img:IMG('1460925895917-afdab827c52f'),kw:'bim ifc modell kollisionskontroll mängdavtagning digital produktion'},
- {id:'ama-hus',cat:'bygg',abbr:'AMA Hus',sub:'Material- och arbetsbeskrivning',title:'AMA Hus — allmän material- och arbetsbeskrivning för husbyggnad',desc:'Lär dig läsa och skriva tekniska beskrivningar för husbyggnad: koder, rubriker och pyramidregeln — utan huvudvärk.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1587582423116-ec07293f0395'),kw:'ama hus beskrivning kod rubrik husbyggnad'},
- {id:'ama-anl',cat:'bygg',abbr:'AMA Anläggning',sub:'Material- och arbetsbeskrivning',title:'AMA Anläggning — allmän material- och arbetsbeskrivning för anläggning',desc:'AMA och MER för mark- och anläggningsjobb: struktur, mätregler och kopplingen som gör att kalkylen stämmer med verkligheten.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1517089152318-42ec560349c0'),kw:'ama anläggning mark mängdförteckning mer mätregler'},
- {id:'kma',cat:'bygg',abbr:'KMA i praktiken',sub:'Kvalitet, miljö och arbetsmiljö',title:'KMA — kvalitet, miljö och arbetsmiljö i bygg och anläggning',desc:'Kvalitet, miljö och arbetsmiljö som fungerar ute i produktionen: egenkontroller, KMA-planer och dokumentation som håller.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1705579612477-20866d78deeb'),kw:'kma kvalitet miljö arbetsmiljö egenkontroll'},
+ {id:'ama-hus',en:'ama-hus-en',cat:'bygg',abbr:'AMA Hus',sub:'Material- och arbetsbeskrivning',title:'AMA Hus — allmän material- och arbetsbeskrivning för husbyggnad',desc:'Lär dig läsa och skriva tekniska beskrivningar för husbyggnad: koder, rubriker och pyramidregeln — utan huvudvärk.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1587582423116-ec07293f0395'),kw:'ama hus beskrivning kod rubrik husbyggnad'},
+ {id:'ama-anl',en:'ama-anl-en',cat:'bygg',abbr:'AMA Anläggning',sub:'Material- och arbetsbeskrivning',title:'AMA Anläggning — allmän material- och arbetsbeskrivning för anläggning',desc:'AMA och MER för mark- och anläggningsjobb: struktur, mätregler och kopplingen som gör att kalkylen stämmer med verkligheten.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1517089152318-42ec560349c0'),kw:'ama anläggning mark mängdförteckning mer mätregler'},
+ {id:'kma',en:'kma-en',cat:'bygg',abbr:'KMA i praktiken',sub:'Kvalitet, miljö och arbetsmiljö',title:'KMA — kvalitet, miljö och arbetsmiljö i bygg och anläggning',desc:'Kvalitet, miljö och arbetsmiljö som fungerar ute i produktionen: egenkontroller, KMA-planer och dokumentation som håller.',dur:'ca 3 tim',price:1495,orig:1995,img:IMG('1705579612477-20866d78deeb'),kw:'kma kvalitet miljö arbetsmiljö egenkontroll'},
  {id:'pl',cat:'projekt',abbr:'Projektledning',sub:'Ledning av byggprojekt',title:'Projektledning i bygg- och anläggningsprojekt',desc:'Att leda byggprojekt handlar om människor lika mycket som planer. Här får du verktygen för båda — från startmöte till överlämning.',dur:'ca 4 tim',price:995,orig:1295,img:IMG('1552664730-d307ca884978'),kw:'projektledning projektledare styrning ledarskap'},
  {id:'prl',cat:'projekt',abbr:'Projekteringsledning',sub:'I bygg- och anläggningsprojekt',title:'Projekteringsledning i bygg- och anläggningsprojekt',desc:'Håll ihop projekteringen: styr konsultgruppen, hantera gränssnitten och se till att handlingarna håller måttet — i tid.',dur:'ca 3 tim',price:995,orig:1295,img:IMG('1581092160562-40aa08e78837'),kw:'projekteringsledning projektering konsultgrupp handlingar'},
- {id:'tid',cat:'projekt',abbr:'Tidsplanering',sub:'I byggprojekt',title:'Tidsplanering i byggprojekt',desc:'Tidplaner som håller även när verkligheten stökar: kritiska linjen, resurssättning och uppföljning som fångar avvikelser i tid.',dur:'ca 2 tim',price:995,orig:1295,img:IMG('1506784983877-45594efa4cbe'),kw:'tidplan tidsplanering kritiska linjen gantt produktion'},
- {id:'kalk',cat:'projekt',abbr:'Kalkylering',sub:'Anbuds- och produktionskalkyl',title:'Kalkylering för entreprenader — anbuds- och produktionskalkyl',desc:'Från mängdförteckning till anbudssumma: metoder, påslag och risktänk som vinner jobben utan att du förlorar pengar på dem.',dur:'ca 3 tim',price:995,orig:1295,img:IMG('1603796846097-bee99e4a601f'),kw:'kalkyl kalkylering anbud mängd prissättning vinst'}
+ {id:'tid',en:'tid-en',cat:'projekt',abbr:'Tidsplanering',sub:'I byggprojekt',title:'Tidsplanering i byggprojekt',desc:'Tidplaner som håller även när verkligheten stökar: kritiska linjen, resurssättning och uppföljning som fångar avvikelser i tid.',dur:'ca 2 tim',price:995,orig:1295,img:IMG('1506784983877-45594efa4cbe'),kw:'tidplan tidsplanering kritiska linjen gantt produktion'},
+ {id:'kalk',en:'kalk-en',cat:'projekt',abbr:'Kalkylering',sub:'Anbuds- och produktionskalkyl',title:'Kalkylering för entreprenader — anbuds- och produktionskalkyl',desc:'Från mängdförteckning till anbudssumma: metoder, påslag och risktänk som vinner jobben utan att du förlorar pengar på dem.',dur:'ca 3 tim',price:995,orig:1295,img:IMG('1603796846097-bee99e4a601f'),kw:'kalkyl kalkylering anbud mängd prissättning vinst'},
+
+ /* ---- IN ENGLISH — kurser på engelska (v8.8) ---- */
+ {id:'apv-en',sv:'apv',cat:'english',abbr:'APV Step 1',sub:'Working on or beside roads',title:'Safe roadwork site – Basic competence APV Step 1',desc:'The mandatory basic competence for everyone working on or beside Swedish roads — full APV Step 1 (1.1, 1.2 and 1.3), entirely in English.',dur:'approx. 2 h',price:995,orig:1295,img:IMG('1724204408341-adb2e4538a73'),kw:'apv english road work roadwork trafikverket step 1 traffic in english safe roadwork site'},
+ {id:'lyft-en',sv:'lyft',cat:'english',abbr:'Safe Lifting',sub:'Risk assessment & equipment',title:'Safe Lifting: Risk Assessment and Equipment',desc:'For everyone attaching loads or directing lifts: the right equipment, the right risk assessment and routines that send everyone home safe.',dur:'approx. 2 h',price:795,orig:999,img:IMG('1504307651254-35680f356dfd'),kw:'safe lifting english crane slinger signaller rigging risk assessment in english säkra lyft'},
+ {id:'kma-en',sv:'kma',cat:'english',abbr:'QEHS',sub:'Quality, environment, H&S',title:'QEHS in Practice – Construction and Civil Engineering',desc:'Quality, environment and health & safety that actually work on site: self-inspections, QEHS plans and documentation that holds up.',dur:'approx. 3 h',price:1495,orig:1995,img:IMG('1705579612477-20866d78deeb'),kw:'qehs kma english quality environment health safety self-inspection in english'},
+ {id:'ata-en',sv:'ata',cat:'english',abbr:'ÄTA Management',sub:'Contract variations',title:'ÄTA management: From theory to practice',desc:'Work you perform is work you should be paid for. Notify on time, document correctly — and stand firm when the discussion comes.',dur:'approx. 3 h',price:995,orig:1295,img:IMG('1554224155-6726b3ff858f'),kw:'ata äta english variations additional work change orders ab04 abt06 in english'},
+ {id:'ab-abt-en',sv:'ab-abt',cat:'english',abbr:'AB 04 & ABT 06',sub:'Standard contracts',title:'AB04 and ABT06 – The Standard Contracts in Construction',desc:'The two Swedish standard contracts in depth: who is responsible for what, how the money is regulated and what applies when things go wrong.',dur:'approx. 3 h',price:1495,orig:1995,img:IMG('1450101499163-c8848c66ca85'),kw:'ab04 abt06 english standard contracts construction design build sweden in english'},
+ {id:'ejur-en',sv:'ejur',cat:'english',abbr:'Contract Law',sub:'AB 04 · ABT 06 · ABK 09',title:'Construction Contract Law: AB 04, ABT 06, and ABK 09',desc:'All of Swedish construction contract law in one course. Read AB 04, ABT 06 and ABK 09 with new eyes — and know where the pitfalls are.',dur:'approx. 4 h',price:2195,orig:2795,img:IMG('1505664194779-8beaceb93744'),kw:'construction contract law english ab04 abt06 abk09 entreprenadjuridik in english'},
+ {id:'abk-en',sv:'abk',cat:'english',abbr:'ABK 09',sub:'Consulting engagements',title:'ABK 09: Contracts and Liability in Consulting Engagements',desc:'The rules of the consulting engagement: scope, liability, insurance and who owns the result. For buyers and sellers of consultancy services.',dur:'approx. 2 h',price:995,orig:1295,img:IMG('1521791136064-7986c2920216'),kw:'abk09 english consultant consulting agreement liability in english'},
+ {id:'kalk-en',sv:'kalk',cat:'english',abbr:'Estimating',sub:'From bid to profit',title:'Estimating for construction contracts – from bid to profit',desc:'From bill of quantities to bid sum: methods, mark-ups and risk thinking that win the jobs without losing money on them.',dur:'approx. 3 h',price:995,orig:1295,img:IMG('1603796846097-bee99e4a601f'),kw:'estimating english calculation bid tender pricing mark-up in english kalkylering'},
+ {id:'tid-en',sv:'tid',cat:'english',abbr:'Scheduling',sub:'From plan to production',title:'Scheduling in Construction Projects – From Plan to Production',desc:'Schedules that survive reality: the critical path, resources and follow-up that catches deviations in time.',dur:'approx. 2 h',price:995,orig:1295,img:IMG('1506784983877-45594efa4cbe'),kw:'scheduling english time planning critical path gantt construction in english tidsplanering'},
+ {id:'byggpl-en',sv:'byggpl',cat:'english',abbr:'Project Management',sub:'Construction projects',title:'Construction Project Management: Your Role as a Project Manager',desc:'From assignment to handover: the role, the mandate, the team and the decisions. For those leading construction projects in Sweden — or about to.',dur:'approx. 3–4 h',price:995,orig:1295,img:IMG('1579847188804-ecba0e2ea330'),kw:'construction project management english project manager leadership in english byggprojektledning'},
+ {id:'ama-anl-en',sv:'ama-anl',cat:'english',abbr:'AMA Anläggning',sub:'Civil works in practice',title:'AMA Anläggning in practice – quality on the job site',desc:'AMA Anläggning and MER for civil works: structure, measurement rules and the link that makes your estimate match reality.',dur:'approx. 3 h',price:1495,orig:1995,img:IMG('1517089152318-42ec560349c0'),kw:'ama anläggning english civil works bill of quantities mer measurement in english'},
+ {id:'ama-hus-en',sv:'ama-hus',cat:'english',abbr:'AMA Hus',sub:'Building works in practice',title:'AMA Hus in practice – from code to quality',desc:'Learn to read and write technical specifications for building works: codes, headings and the pyramid rule — headache-free.',dur:'approx. 3 h',price:1495,orig:1995,img:IMG('1587582423116-ec07293f0395'),kw:'ama hus english building specification bsab codes in english'},
+ {id:'ama-af-en',sv:'ama-af',cat:'english',abbr:'AMA AF',sub:'Administrative provisions',title:'AMA AF: Administrative Provisions in Practice',desc:'The AF part sets the rules of the game: bid requirements, deadlines, liability, penalties and meetings. Learn to use it — before it is used against you.',dur:'approx. 3–4 h',price:1495,orig:1995,img:IMG('1562564055-71e051d33c19'),kw:'ama af english administrative provisions tender contract in english'},
+ {id:'anbud-en',sv:'anbud',cat:'english',abbr:'Public Bids',sub:'Analysis & quality assurance',title:'Analyzing and Quality-Assuring Public Bids',desc:'Review your bid like a procurement officer — find every mandatory requirement, close the gaps and submit with confidence.',dur:'approx. 2 h',price:795,orig:999,img:IMG('1454165804606-c3d57bc86b40'),kw:'public bids english tender analysis quality assurance mandatory requirements in english'},
+ {id:'lou-praktik-en',sv:'lou-praktik',cat:'english',abbr:'LOU',sub:'Public procurement',title:'LOU in practice – public procurement',desc:'How Swedish public procurement really works: the process, the award models and the strategy that wins contracts.',dur:'approx. 3 h',price:1495,orig:1995,img:IMG('1589829545856-d10d557cf95f'),kw:'lou english public procurement sweden award models tender in english'},
+ {id:'ramavtal-en',sv:'ramavtal',cat:'english',abbr:'Framework Agreements',sub:'Call-off strategy',title:'Framework agreements and call-offs: strategy for suppliers',desc:'Winning the framework agreement is half the game — the call-offs are the other half. Ranking, mini-competitions and the strategy that makes it profitable.',dur:'approx. 3 h',price:1395,orig:1795,img:IMG('1638262052640-82e94d64664a'),kw:'framework agreements english call-offs ranking renewed competition public procurement in english ramavtal'}
 ];
 const fmt=n=>n.toLocaleString('sv-SE')+' kr';
 /* Nylanseringskampanj: ordinarie pris (genomstruket) per kampanjpris */
@@ -843,7 +863,7 @@ const origOf=c=>c.orig||c.price;
 const saleOff=c=>Math.round((1-c.price/origOf(c))*100);
 
 /* ============ KURSDETALJER ============ */
-const KURSORDNING=['apv','fall','schakt','ejur','ata','bas','kalk','ritning','kma','lyft','mer','ama-anl','ama-hus','inst','byggpl','pl','tid','ama-af','bim','anbud','lou-praktik','ramavtal','ab-abt','abk','prl','luf-praktik','bas-en'];
+const KURSORDNING=['apv','fall','schakt','ejur','ata','bas','kalk','ritning','kma','lyft','mer','ama-anl','ama-hus','inst','byggpl','pl','tid','ama-af','bim','anbud','lou-praktik','ramavtal','ab-abt','abk','prl','luf-praktik','bas-en','apv-en','lyft-en','kma-en','ata-en','ejur-en','ab-abt-en','abk-en','kalk-en','tid-en','byggpl-en','ama-anl-en','ama-hus-en','ama-af-en','anbud-en','lou-praktik-en','ramavtal-en'];
 COURSES.sort((a,b)=>{const x=KURSORDNING.indexOf(a.id),y=KURSORDNING.indexOf(b.id);return (x<0?99:x)-(y<0?99:y);});
 
 const DETAILS={
@@ -1141,13 +1161,186 @@ const DETAILS={
    {t:'Omkostnader, risk och påslag',d:'Gemensamma kostnader, centraladministration, vinst och riskvärdering.'},
    {t:'Granska och lämna',d:'Rimlighetskontroll, känslighetsanalys och anbudsgenomgång.'},
    {t:'Examen',d:'Kunskapsprov online med obegränsade försök.'}
+  ]},
+
+ /* ---- IN ENGLISH — kursdetaljer (v8.8) ---- */
+ 'apv-en':{
+  audience:'For everyone working on or beside roads in Sweden where Trafikverket sets competence requirements. The course covers all of APV Step 1 — competences 1.1, 1.2 and 1.3 — and provides the documented basic competence required to be present and work on a road work site. Held entirely in English.',
+  goals:['Meet Trafikverket\u2019s requirements for general basic competence (step 1.1)','Know the requirements for drivers of road maintenance vehicles (step 1.2)','Work safely with road works close to passing traffic (step 1.3)','Understand your role, your responsibility and the risks on the road work site'],
+  modules:[
+   {t:'The road as a workplace',d:'The risk picture, the accident statistics and why the rules exist — for your safety and the road users\u2019.'},
+   {t:'Step 1.1 — General basic competence',d:'The essentials everyone on site must know: the rules, protective arrangements, zoning and personal protective equipment.'},
+   {t:'Step 1.2 — Drivers of road maintenance vehicles',d:'The requirements for those driving maintenance, service and works vehicles on and beside the road.'},
+   {t:'Step 1.3 — Road works close to traffic',d:'For those carrying out the work itself: safe working methods next to passing traffic and correct temporary signage.'},
+   {t:'Final exam',d:'Online knowledge test with unlimited attempts. Certificate in English.'}
+  ]},
+ 'lyft-en':{
+  audience:'For those attaching loads, acting as signaller or supervising work where lifting takes place. The course meets the Swedish work environment requirement for documented knowledge. Held entirely in English.',
+  goals:['Choose the right lifting equipment and inspect it before use','Assess weight, centre of gravity and risks before the lift','Signal and communicate safely with the crane operator','Know the responsibilities under Swedish work environment rules'],
+  modules:[
+   {t:'Rules and responsibility',d:'The Swedish Work Environment Act and the AFS requirements — who is responsible for what during a lift.'},
+   {t:'Lifting equipment and inspection',d:'Slings, chains, lifting beams — markings, discard criteria and daily checks.'},
+   {t:'Planning the lift',d:'Weight, centre of gravity, angles and surroundings. The three-minute risk assessment that saves lives.'},
+   {t:'Attaching and signalling',d:'Safe attachment methods and standardised hand signals for communicating with the operator.'},
+   {t:'Final exam',d:'Online knowledge test with unlimited attempts. Certificate in English.'}
+  ]},
+ 'kma-en':{
+  audience:'For site managers, supervisors and QEHS coordinators who want quality, environment and health & safety routines that work out in production — not just in the binder. Held entirely in English.',
+  goals:['Build a QEHS plan the project actually uses','Carry out self-inspections that catch faults in time','Meet the client\u2019s and the law\u2019s documentation requirements','Create environment and safety routines that hold up in daily work'],
+  modules:[
+   {t:'QEHS — what, why and for whom',d:'Quality, environment and work environment as one whole. The requirements from law, clients and certifications.'},
+   {t:'The QEHS plan',d:'Structure, content and the art of keeping it short enough to actually be used.'},
+   {t:'Self-inspections and checklists',d:'Inspection plans, photo documentation and digital follow-up.'},
+   {t:'Environment in production',d:'Waste, chemicals, mass handling and environmental requirements in procurement.'},
+   {t:'Deviations and continuous improvement',d:'Report, correct, learn — without turning it into bureaucracy.'},
+   {t:'Final exam',d:'Online knowledge test with unlimited attempts. Certificate in English.'}
+  ]},
+ 'ata-en':{
+  audience:'For site managers, supervisors, contract engineers and project managers — everyone who runs into variations and additional work in daily operations and wants to stop working for free. Held entirely in English.',
+  goals:['Recognise ÄTA work (variations) when it appears — including the deemed ones','Notify on time, in the right way, to the right person','Document so the claim holds even if it ends in a dispute','Price and settle variations without unnecessary conflict'],
+  modules:[
+   {t:'What is ÄTA work, really?',d:'Alterations, additions and omissions under AB 04/ABT 06 — and the deemed variations many miss.'},
+   {t:'The duty to notify',d:'When, how and to whom. The formal requirements that decide whether you get paid or not.'},
+   {t:'Documentation that holds',d:'Site diary, photos, e-mails and meeting minutes — building your evidence while the work is ongoing.'},
+   {t:'Pricing and settlement',d:'Unit prices, cost-plus and mark-ups. How to calculate and how to negotiate.'},
+   {t:'When the discussion comes anyway',d:'Strategies in disagreement — from site meeting to dispute resolution.'},
+   {t:'Final exam',d:'Online knowledge test with unlimited attempts. Certificate in English.'}
+  ]},
+ 'ab-abt-en':{
+  audience:'For those working in Swedish construction or design-and-build contracts who want to truly know the standard contracts — not just know they exist in the back pocket. Held entirely in English.',
+  goals:['Tell the difference between construction and design-and-build liability','Handle notifications, obstacles and extensions of time correctly','Understand the financial regulation and the payment flow','Be confident going into inspection and the warranty period'],
+  modules:[
+   {t:'Two contracts, two worlds',d:'AB 04 and ABT 06 side by side — the similarities, the differences and when each applies.'},
+   {t:'Scope and estimating assumptions',d:'Chapter 1: the ranking of documents, contradictions and what you are entitled to assume.'},
+   {t:'Execution, organisation and time',d:'Quality responsibility, coordination, obstacles, acceleration and liquidated damages.'},
+   {t:'The economics of the contract',d:'Payment plan, indexation, securities and final settlement.'},
+   {t:'Inspection and liability after handover',d:'Final inspection, warranty period, liability period and limitation.'},
+   {t:'Final exam',d:'Online knowledge test with unlimited attempts. Certificate in English.'}
+  ]},
+ 'ejur-en':{
+  audience:'For those who want the whole picture — site manager, project manager, contract engineer, consultant or client. No prior knowledge required, but deep enough even for experienced professionals. Held entirely in English.',
+  goals:['Understand the system of AB 04, ABT 06 and ABK 09','Know who is responsible for what — and when responsibility passes','Handle time, damages, variations and financial regulation correctly','Spot the risks in draft contracts before you sign'],
+  modules:[
+   {t:'The world of the standard contracts',d:'Why the AB system exists, how the contracts fit together and what happens when you deviate from them.'},
+   {t:'Contract forms and liability',d:'Construction versus design-and-build, functional responsibility and the boundary that decides disputes.'},
+   {t:'Organisation, time and damages',d:'Representatives, notifications, obstacles, acceleration and liquidated damages — chapters 3–5 in practice.'},
+   {t:'Variations and economy',d:'Ordering, formal requirements, deemed variations and the right to compensation.'},
+   {t:'Inspection, defects and warranties',d:'The legal effect of final inspection, liability periods and handling of remarks.'},
+   {t:'The consulting engagement — ABK 09',d:'Scope of the engagement, limitations of liability and the differences from the construction contracts.'},
+   {t:'Final exam',d:'Online knowledge test with unlimited attempts. Certificate in English.'}
+  ]},
+ 'abk-en':{
+  audience:'For consultants, consultant brokers and buyers of technical services — everyone who writes or signs consulting agreements and wants to know what they actually mean. Held entirely in English.',
+  goals:['Define the engagement so both parties know what is included','Understand the consultant\u2019s liability and how it is limited','Set the right insurance requirements — and meet them','Know who owns the result and may use it'],
+  modules:[
+   {t:'The nature of the consulting engagement',d:'What ABK 09 regulates, how the agreement is built and why the scope description is everything.'},
+   {t:'Performance and changes',d:'Time schedule, reporting, changed conditions and the right to compensation for additional work.'},
+   {t:'Liability and limitation of liability',d:'Damages, caps, professional indemnity insurance and how far liability extends in time.'},
+   {t:'The right to the result',d:'Right of use, ownership and what the client may do with the documents.'},
+   {t:'Final exam',d:'Online knowledge test with unlimited attempts. Certificate in English.'}
+  ]},
+ 'kalk-en':{
+  audience:'For estimators, contract engineers, site managers and business owners who price jobs — and want to win them with the margin intact. Held entirely in English.',
+  goals:['Go from tender documents to a complete estimate with a method','Calculate labour, materials, machinery and subcontractors correctly','Set mark-ups that cover risk and overheads','Quality-assure the estimate before the bid is submitted'],
+  modules:[
+   {t:'The estimate\u2019s role in the bid',d:'From enquiry to bid sum — the process and the decisions along the way.'},
+   {t:'Quantities and choice of method',d:'Take-off from the documents, production methods and the link to AMA and MER.'},
+   {t:'Cost type by cost type',d:'Labour, materials, machinery, subcontractors — sources, unit times and pitfalls.'},
+   {t:'Overheads, risk and mark-up',d:'Site overheads, central administration, profit and risk valuation.'},
+   {t:'Review and submit',d:'Sanity check, sensitivity analysis and the bid review meeting.'},
+   {t:'Final exam',d:'Online knowledge test with unlimited attempts. Certificate in English.'}
+  ]},
+ 'tid-en':{
+  audience:'For site managers, supervisors, project managers and contract engineers who build or follow up schedules — and are tired of plans that crack in week two. Held entirely in English.',
+  goals:['Build a schedule with the right activities, dependencies and resources','Find and monitor the critical path','Follow up systematically and act before the delay is a fact','Use the schedule for obstacles, acceleration and extension-of-time claims'],
+  modules:[
+   {t:'The building blocks',d:'Activities, durations, dependencies and milestones — the foundation everything rests on.'},
+   {t:'The critical path',d:'Find it, understand it and know where you have float to play with.'},
+   {t:'Resources and production rate',d:'Resourcing, work preparation and sanity-checking durations.'},
+   {t:'Follow-up that works',d:'Progress reviews, forecasts and the art of updating without starting over.'},
+   {t:'The schedule as a legal tool',d:'Obstacles, acceleration and extension of time — the link to AB/ABT.'},
+   {t:'Final exam',d:'Online knowledge test with unlimited attempts. Certificate in English.'}
+  ]},
+ 'byggpl-en':{
+  audience:'For new and aspiring construction project managers — and experienced ones who want structure in the role: contract engineers, supervisors on the way up and client-side project managers. Held entirely in English.',
+  goals:['Understand the project manager\u2019s assignment, mandate and interfaces with the site manager and the client','Lead the project through its phases: start-up, production, close-out','Control economy, time and changes with the right tools and meeting culture','Lead people: the team, the conflicts and the communication that decides'],
+  modules:[
+   {t:'The role and the mandate',d:'What a construction project manager actually owns — and the boundaries towards site manager, client and estimating.'},
+   {t:'The project start',d:'Assignment review, organisation, contract review and the kick-off meeting that sets the tone.'},
+   {t:'Control during production',d:'Financial and schedule follow-up, change management and everyday decision logic.'},
+   {t:'The people',d:'The team, subcontractor relations, the conflict ladder and communication up and down.'},
+   {t:'The close-out',d:'Inspection, handover, lessons learned — and the art of finishing profitably.'},
+   {t:'Final exam',d:'Online knowledge test with unlimited attempts. Certificate in English.'}
+  ]},
+ 'ama-anl-en':{
+  audience:'For those in civil and ground works — contract engineers, estimators, designers and supervisors who meet AMA Anläggning and bills of quantities daily. Held entirely in English.',
+  goals:['Navigate the structure and codes of AMA Anläggning','Understand the MER measurement rules — what decides what you get paid for','Link the bill of quantities to estimating and settlement','Handle deviations between documents and reality'],
+  modules:[
+   {t:'AMA Anläggning and MER',d:'The system, the codes and the measurement and compensation rules that govern the economy.'},
+   {t:'The bill of quantities',d:'Structure, adjustable quantities and the link to the contract sum.'},
+   {t:'Measurement rules in practice',d:'Excavation, fill, pipe bedding — examples of how MER decides the compensation.'},
+   {t:'Deviations and settlement',d:'When reality does not match the documents: geotechnics, quantity changes and the ÄTA boundary.'},
+   {t:'Final exam',d:'Online knowledge test with unlimited attempts. Certificate in English.'}
+  ]},
+ 'ama-hus-en':{
+  audience:'For those who write, read or estimate from technical specifications for building works — designers, contract engineers, estimators and site managers. Held entirely in English.',
+  goals:['Understand the structure of the AMA system and its link to AB/ABT','Find your way in codes, headings and the pyramid rule','Write specifications that are unambiguous and estimable','Avoid the classic traps where specification meets drawing'],
+  modules:[
+   {t:'The AMA system',d:'AMA, RA and AMA-nytt — how the parts fit together and how they become contract content.'},
+   {t:'Codes, headings and the pyramid rule',d:'The BSAB system and how an invoked code pulls in the text above it.'},
+   {t:'Specification technique',d:'Writing unambiguously: prescribing materials, workmanship and inspection without contradictions.'},
+   {t:'The specification meets the drawing',d:'Ranking in case of contradiction and the interplay between the documents.'},
+   {t:'Final exam',d:'Online knowledge test with unlimited attempts. Certificate in English.'}
+  ]},
+ 'ama-af-en':{
+  audience:'For contract engineers, estimators, site managers and bid managers — everyone who meets the AF part in tender documents and contracts. Held entirely in English.',
+  goals:['Understand the AF part\u2019s role in the AMA family and the ranking of documents','Read and interpret the provisions on bids, time, liability and economy','Recognise penalties, insurance requirements and securities before they cost you','Use the AF part actively in bid work and project control'],
+  modules:[
+   {t:'The AF part\u2019s place in the system',d:'AMA AF, the ranking against AB/ABT and why the AF part is read BEFORE the quantities.'},
+   {t:'The bid provisions',d:'Formal requirements, deadlines, references and exclusion grounds — what disqualifies bids unnecessarily.'},
+   {t:'The contract provisions',d:'Time, penalties, insurance, securities and inspections — the economy between the lines.'},
+   {t:'Meetings, organisation and communication',d:'Site meetings, notification paths and diary requirements governed by the AF part.'},
+   {t:'AF in daily work',d:'From bid review to close-out — the checklists that turn the AF part into a tool.'},
+   {t:'Final exam',d:'Online knowledge test with unlimited attempts. Certificate in English.'}
+  ]},
+ 'anbud-en':{
+  audience:'For those who write or review bids in Swedish public procurement — bid managers, estimators and business owners who want higher hit rates and fewer unnecessary rejections. Held entirely in English.',
+  goals:['Read the tender documents systematically and find every mandatory requirement','Build a requirement matrix that ensures nothing is missed','Write answers the evaluator understands and can score','Final-check the bid before submission — formalities, attachments and evidence'],
+  modules:[
+   {t:'The tender documents under the magnifier',d:'The structure of the documents, mandatory requirements versus award criteria — and reading like a procurement officer.'},
+   {t:'The requirement matrix',d:'Build a simple matrix linking every requirement to an answer, evidence and a responsible person.'},
+   {t:'Write for the evaluator',d:'Clear answers, the right references and attachments that prove what you promise — without padding.'},
+   {t:'The final review',d:'The pre-submission checklist: formalities, signatures and the most common disqualification mistakes.'},
+   {t:'Final exam',d:'Online knowledge test with unlimited attempts. Certificate in English.'}
+  ]},
+ 'lou-praktik-en':{
+  audience:'For those who have already submitted a few bids or work with procurement and want to move up a level — win more contracts and know when it is time to put your foot down. Held entirely in English.',
+  goals:['See through the different award models and price strategically','Ask the right questions during the bidding period — and interpret the answers','Handle reference requirements and qualification smartly','Judge when a review application pays off and how the process works'],
+  modules:[
+   {t:'Award models in practice',d:'Lowest price, best price-quality ratio, added-value models — and how to calculate on them.'},
+   {t:'Qualification and reference assignments',d:'Meeting requirements on financial standing, technical ability and references — even as a smaller company.'},
+   {t:'Questions, answers and clarifications',d:'The art of asking questions that improve your odds without revealing your strategy.'},
+   {t:'Abnormally low bids and rejection',d:'What applies, how to defend your price and when a competitor\u2019s price can be challenged.'},
+   {t:'Standstill and review',d:'Deadlines, the process in the administrative court and how to judge whether it is worth it.'},
+   {t:'Final exam',d:'Online knowledge test with unlimited attempts. Certificate in English.'}
+  ]},
+ 'ramavtal-en':{
+  audience:'For suppliers to the Swedish public sector: bid managers, sales people and business owners who want to win framework agreements — and make money on the call-offs. Held entirely in English.',
+  goals:['Understand the logic of framework agreements: ranking, allocation keys and renewed competition','Calculate and position the bid strategically for call-off wins','Monitor call-offs, respond correctly and on time — and avoid the passivity trap','Handle deviations, price adjustments and extensions during the agreement period'],
+  modules:[
+   {t:'The anatomy of a framework agreement',d:'One or several suppliers, ranking, allocation key or renewed competition — the playing fields.'},
+   {t:'Winning the place',d:'Award models, tactical but honest pricing and the references that decide.'},
+   {t:'The call-offs — where the money is',d:'Monitoring, response times, mini-competitions and the art of prioritising the right call-offs.'},
+   {t:'During the agreement period',d:'Price adjustments, volumes without guarantees, deviations and the relationship with the client.'},
+   {t:'The traps and pitfalls',d:'Passivity, miscalculated ceiling prices and framework agreements that turn unprofitable — and how to avoid them.'},
+   {t:'Final exam',d:'Online knowledge test with unlimited attempts. Certificate in English.'}
   ]}
 };
 
 /* ================= BUTIK ================= */
 let activeFilter=null,query='';
 const catGrid=document.getElementById('catGrid');
-const CAT_IMG={alla:'bas',upphandling:'lou-praktik',juridik:'ejur',bygg:'ama-hus',projekt:'pl'};
+const CAT_IMG={alla:'bas',upphandling:'lou-praktik',juridik:'ejur',bygg:'ama-hus',projekt:'pl',english:'bas-en'};
 catGrid.innerHTML=Object.entries(CATS).map(([id,c],i)=>{
   const inCat=COURSES.filter(x=>x.cat===id);
   const n=id==='alla'?COURSES.length:inCat.length;
@@ -1168,7 +1361,7 @@ catGrid.querySelectorAll('.cat-card').forEach(b=>b.addEventListener('click',()=>
 
 const grid=document.getElementById('courseGrid');
 function cardHTML(c){
-  const cat=CATS[c.cat],inCart=cart.some(i=>i.id===c.id);
+  const cat=CATS[c.cat],inCart=cart.some(i=>i.id===c.id),en=!!c.sv;
   return `<article class="kcard" onclick="openCoursePage('${c.id}')">
     <div class="kcard-visual" style="background:${cat.grad}">
       <img src="${c.img}" alt="${c.title}" loading="lazy" onerror="this.remove()">
@@ -1181,8 +1374,8 @@ function cardHTML(c){
       <h3>${c.title}</h3>
       <p>${c.desc}</p>
       <div class="kcard-foot">
-        <div><span class="price"><s class="oldp">${fmt(origOf(c))}</s>${fmt(c.price)}</span><br><span class="meta">Distans · ${c.dur}</span></div>
-        ${c.soon?'<span class="pill ny" style="white-space:nowrap">Lanseras inom kort</span>':`<button class="add-btn${inCart?' added':''}" onclick="event.stopPropagation();addToCart('${c.id}',this)">${inCart?'✓ Tillagd':'Lägg i kundvagn'}</button>`}
+        <div><span class="price"><s class="oldp">${fmt(origOf(c))}</s>${fmt(c.price)}</span><br><span class="meta">${en?'Distance':'Distans'} · ${c.dur}${!en&&c.en?' · Även på engelska':''}</span></div>
+        ${c.soon?'<span class="pill ny" style="white-space:nowrap">Lanseras inom kort</span>':`<button class="add-btn${inCart?' added':''}" onclick="event.stopPropagation();addToCart('${c.id}',this)">${inCart?(en?'✓ Added':'✓ Tillagd'):(en?'Add to cart':'Lägg i kundvagn')}</button>`}
       </div>
     </div>
   </article>`;
@@ -1200,7 +1393,7 @@ function render(){
   });
   grid.innerHTML=hits.map(cardHTML).join('');
   document.getElementById('noHits').style.display=hits.length?'none':'block';
-  const label=f==='alla'?'':' inom <b>'+CATS[f].name+'</b>';
+  const label=f==='alla'?'':(f==='english'?' på engelska':' inom <b>'+CATS[f].name+'</b>');
   const qlabel=q?' som matchar <b>”'+query.trim()+'”</b>':'';
   document.getElementById('resultsText').innerHTML=hits.length+' kurser'+label+qlabel;
   catGrid.querySelectorAll('.cat-card').forEach(b=>b.classList.toggle('active',b.dataset.cat===f));
@@ -2275,6 +2468,23 @@ if(supa){supa.auth.onAuthStateChange((ev,session)=>{
    filer behöver laddas upp. Kan även läsas från tabellen `courses` i Supabase. */
 const COURSE_URLS={
   'bas-en':'https://app.courseau.co/projects/dd7d378a-1766-4390-b290-b3daeee957a3/preview?scorm=true&token=sct_BibZI5FghwyadJ9m6epl70uQf3RO6-Xc2Wwm6m4p41M',
+  /* ---- IN ENGLISH (v8.8) ---- */
+  'apv-en':'https://app.courseau.co/projects/4b8d4f80-1dd7-4d59-81ee-689d544517a6/preview?scorm=true&token=sct_DvPhQdsWYY2GsPmvhQJ36P4UhNOgIXd8t5kksOk4fcQ',
+  'lyft-en':'https://app.courseau.co/projects/98917904-74d9-47ca-87f5-c80daa4387e2/preview?scorm=true&token=sct_SjLB9vrLK5YNHQQpWXGF4bR64pF7fgeicvv1wLcr1-U',
+  'kma-en':'https://app.courseau.co/projects/1ce2aab6-ed76-4803-836b-5265bc91f590/preview?scorm=true&token=sct_6sSrUgC3x1W9IxvynKcJV35idIfFr8LIS3AEGtc94GM',
+  'ata-en':'https://app.courseau.co/projects/9b7787a3-036c-4511-8c09-41c62bc4e0a5/preview?scorm=true&token=sct_ARdz2HpJxh5vb8A1ZGNqWqwNnWCGDNiOgVUhPA_UW-g',
+  'ab-abt-en':'https://app.courseau.co/projects/9619562f-359b-4300-94c1-72ff80978959/preview?scorm=true&token=sct_RRTnu_4yxeOG5z5qmij6vOCChc_sGAlLZvU3okN5hpg',
+  'ejur-en':'https://app.courseau.co/projects/e9aed45a-b657-4b6a-955b-08df34d9226c/preview?scorm=true&token=sct_UFUR_wWnzvqbUe5r6qg6WE_pbvKD2t2a1pTP6LglrvI',
+  'abk-en':'https://app.courseau.co/projects/d3b39254-4640-476a-8388-265efe50b6da/preview?scorm=true&token=sct_y4-DLKPIhJ7J2pV16vfvFgISEvt97FyfqOO8WrZ3ZrQ',
+  'kalk-en':'https://app.courseau.co/projects/45bd240f-1dd4-490a-97d5-a5fbc8873c46/preview?scorm=true&token=sct_KptWmt9GeE6AfyUrKirc8dJkXhzHf-xcLh7-4BBiTQw',
+  'tid-en':'https://app.courseau.co/projects/120000d6-ce6e-4373-8ba4-5fe59476b41d/preview?scorm=true&token=sct_84r_DfOr2fT4Nd92lWtRyiAouVcbiBqonxsZyJIcivE',
+  'byggpl-en':'https://app.courseau.co/projects/c086f636-e79c-48b4-9a85-a8d1a6f16b92/preview?scorm=true&token=sct_TyFdZ85Am4Nak5nJYicJxvH-Y8yp6rAJFbSWdMlf-fw',
+  'ama-anl-en':'https://app.courseau.co/projects/10425075-3ae9-4e88-9cea-917b915a4f34/preview?scorm=true&token=sct_v7Oq9GM4K4pHIp7J4vJEappF3KmbS_xxExLhxid3voY',
+  'ama-hus-en':'https://app.courseau.co/projects/79f9ea32-4993-4e95-8ff4-609e28e20777/preview?scorm=true&token=sct_5ItqS-HnyPtG9i2AJmitq9f1tIpj9z6x1SDcNh_z7jA',
+  'ama-af-en':'https://app.courseau.co/projects/5e998e7b-264c-46a8-8ff6-4480f6cbc7e2/preview?scorm=true&token=sct_oF4NHmgdkuHPm2DyA6FOgyIIyugax5ux2mMr4mJUnik',
+  'anbud-en':'https://app.courseau.co/projects/34892865-89f5-4e8b-b198-4c208316e90f/preview?scorm=true&token=sct_uv9S1LClbI7vWXXB1MvSqf8bg-H-2nrwNWrApM4z0KE',
+  'lou-praktik-en':'https://app.courseau.co/projects/415381b9-a43a-464f-bf75-73f0ec16a079/preview?scorm=true&token=sct_f4M5Arf7w2Y6O4Cs9CRy_8XWVx4X6k1L_dBnaM2x3uA',
+  'ramavtal-en':'https://app.courseau.co/projects/45e5a61b-4d0f-4e3d-8210-f9bb718ed69a/preview?scorm=true&token=sct_g6KiYmMxQLiziZghEfkaMtLGoQoEQQv-F2DZTwOooDo',
   'byggpl':'https://app.courseau.co/projects/d599c718-f7fd-470b-94f9-ee01b13a16b8/preview?scorm=true&token=sct_TCRl8EhLF4TB-fFj-EL1CAgFZsxtDhXR3BwZDuuZf9M',
 
   'mer':'https://app.courseau.co/projects/8749c54b-6c61-4177-abda-112e63311591/preview?scorm=true&token=sct_ipcEuJwInw_3Am3rTkXSaxeiKokHGFpMWitWvnJiV70',
@@ -2633,12 +2843,12 @@ function toggleModule(el){el.closest('.module').classList.toggle('open');}
 function renderCoursePage(id){
   const c=COURSES.find(x=>x.id===id);
   if(!c){location.hash='';return;}
-  const d=DETAILS[id],cat=CATS[c.cat];
+  const d=DETAILS[id],cat=CATS[c.cat],en=!!c.sv;
   cpQty=1;
   const related=COURSES.filter(x=>x.cat===c.cat&&x.id!==id).slice(0,3);
   document.getElementById('courseView').innerHTML=`
     <div class="cp-top">
-      <button class="cp-back" onclick="closeCoursePage()">← Tillbaka till kurserna</button>
+      <button class="cp-back" onclick="closeCoursePage()">${en?'← Back to courses':'← Tillbaka till kurserna'}</button>
       <button class="cart-btn" onclick="openCart()">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M3 3h2l2.6 12.5a2 2 0 0 0 2 1.5h7.9a2 2 0 0 0 2-1.6L21 7H6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="21" r="1.4" fill="#fff"/><circle cx="18" cy="21" r="1.4" fill="#fff"/></svg>
         Kundvagn <span class="cart-count cartCount2">${cart.reduce((s,i)=>s+i.qty,0)}</span>
@@ -2650,23 +2860,24 @@ function renderCoursePage(id){
         <span class="cp-crumb">${cat.name} · ${c.sub}</span>
         <h1>${c.title}</h1>
         <p class="cp-short">${c.desc}</p>
+        ${c.en?`<button class="cp-lang" onclick="openCoursePage('${c.en}')" style="margin-top:14px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.45);color:#fff;padding:9px 16px;font-size:13px;cursor:pointer">🇬🇧 This course is also available in English — switch to the English version</button>`:''}${c.sv?`<button class="cp-lang" onclick="openCoursePage('${c.sv}')" style="margin-top:14px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.45);color:#fff;padding:9px 16px;font-size:13px;cursor:pointer">🇸🇪 Kursen finns även på svenska — byt till svenska versionen</button>`:''}
         <div class="cp-hero-meta">
-          <span><i></i>Distans</span>
+          <span><i></i>${en?'Distance':'Distans'}</span>
           <span><i></i>${c.dur}</span>
-          <span><i></i>Starta när du vill</span>
-          <span><i></i>Certifikat ingår</span>
+          <span><i></i>${en?'Start anytime':'Starta när du vill'}</span>
+          <span><i></i>${en?'Certificate included':'Certifikat ingår'}</span>
         </div>
       </div>
     </div>
     <div class="cp-main">
       <div class="cp-content">
         <section>
-          <h2>Det här får du med dig</h2>
+          <h2>${en?'What you will take away':'Det här får du med dig'}</h2>
           <ul class="goal-list">${d.goals.map(g=>`<li>${g}</li>`).join('')}</ul>
         </section>
         <section>
-          <h2>Kursinnehåll</h2>
-          <p>Kursen är uppdelad i ${d.modules.length} delar. Klicka på en del för att se vad den innehåller.</p>
+          <h2>${en?'Course content':'Kursinnehåll'}</h2>
+          <p>${en?`The course is divided into ${d.modules.length} parts. Click a part to see what it covers.`:`Kursen är uppdelad i ${d.modules.length} delar. Klicka på en del för att se vad den innehåller.`}</p>
           ${d.modules.map((m,i)=>`
             <div class="module${i===0?' open':''}">
               <div class="module-head" onclick="toggleModule(this)">
@@ -2678,38 +2889,39 @@ function renderCoursePage(id){
             </div>`).join('')}
         </section>
         <section>
-          <h2>Vem passar kursen för?</h2>
+          <h2>${en?'Who is this course for?':'Vem passar kursen för?'}</h2>
           <p>${d.audience}</p>
         </section>
         <section>
-          <h2>Så går det till</h2>
-          <p>Direkt efter beställning får varje deltagare sina inloggningsuppgifter via e-post. Du loggar in när det passar dig och tar kursen i din egen takt — pausa och fortsätt hur du vill. Kursen avslutas med ett kunskapsprov online, och du gör om provet så många gånger du behöver utan extra kostnad.</p>
-          <p>När du är godkänd får du ditt personliga certifikat, och ditt intyg är giltigt i fem år från examensdatumet.</p>
+          <h2>${en?'How it works':'Så går det till'}</h2>
+          ${en?`<p>Right after ordering, each participant receives their login details by e-mail. You log in whenever it suits you and take the course at your own pace — pause and resume as you like. The course ends with an online knowledge test, and you can retake the test as many times as you need at no extra cost.</p>
+          <p>Once you pass, you receive your personal certificate, and your certificate is valid for five years from the exam date.</p>`:`<p>Direkt efter beställning får varje deltagare sina inloggningsuppgifter via e-post. Du loggar in när det passar dig och tar kursen i din egen takt — pausa och fortsätt hur du vill. Kursen avslutas med ett kunskapsprov online, och du gör om provet så många gånger du behöver utan extra kostnad.</p>
+          <p>När du är godkänd får du ditt personliga certifikat, och ditt intyg är giltigt i fem år från examensdatumet.</p>`}
         </section>
       </div>
       <aside class="cp-side">
         <div class="fact-card">
-          <div class="fact-price"><s class="oldp">Ord. pris ${fmt(origOf(c))}</s>${fmt(c.price)}<small>Nylanseringspris · −${saleOff(c)} % · per deltagare, exkl. moms</small></div>
+          <div class="fact-price"><s class="oldp">${en?'Reg. price':'Ord. pris'} ${fmt(origOf(c))}</s>${fmt(c.price)}<small>${en?`Launch price · −${saleOff(c)} % · per participant, excl. VAT`:`Nylanseringspris · −${saleOff(c)} % · per deltagare, exkl. moms`}</small></div>
           <ul class="fact-list">
-            <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#00ADEF" stroke-width="1.6"/><path d="M12 7v5l3.5 2" stroke="#00ADEF" stroke-width="1.6" stroke-linecap="round"/></svg>Omfattning: ${c.dur}</li>
-            <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="13" rx="1.5" stroke="#00ADEF" stroke-width="1.6"/><path d="M8 21h8M12 17v4" stroke="#00ADEF" stroke-width="1.6" stroke-linecap="round"/></svg>Helt på distans — starta när du vill</li>
-            <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1 0 2.3-5.6" stroke="#00ADEF" stroke-width="1.6" stroke-linecap="round"/><path d="M4 3v4h4" stroke="#00ADEF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Obegränsade provförsök</li>
-            <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="17" rx="1.5" stroke="#00ADEF" stroke-width="1.6"/><path d="M9 15l2 2 4-4" stroke="#00ADEF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Intyg giltigt i 5 år</li>
-            <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="9" r="5.5" stroke="#00ADEF" stroke-width="1.6"/><path d="M8.5 13.5L7 22l5-3 5 3-1.5-8.5" stroke="#00ADEF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Personligt certifikat vid examen</li>
+            <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#00ADEF" stroke-width="1.6"/><path d="M12 7v5l3.5 2" stroke="#00ADEF" stroke-width="1.6" stroke-linecap="round"/></svg>${en?'Duration':'Omfattning'}: ${c.dur}</li>
+            <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="13" rx="1.5" stroke="#00ADEF" stroke-width="1.6"/><path d="M8 21h8M12 17v4" stroke="#00ADEF" stroke-width="1.6" stroke-linecap="round"/></svg>${en?'Fully online — start anytime':'Helt på distans — starta när du vill'}</li>
+            <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 1 0 2.3-5.6" stroke="#00ADEF" stroke-width="1.6" stroke-linecap="round"/><path d="M4 3v4h4" stroke="#00ADEF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>${en?'Unlimited exam attempts':'Obegränsade provförsök'}</li>
+            <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="17" rx="1.5" stroke="#00ADEF" stroke-width="1.6"/><path d="M9 15l2 2 4-4" stroke="#00ADEF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>${en?'Certificate valid for 5 years':'Intyg giltigt i 5 år'}</li>
+            <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="9" r="5.5" stroke="#00ADEF" stroke-width="1.6"/><path d="M8.5 13.5L7 22l5-3 5 3-1.5-8.5" stroke="#00ADEF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>${en?'Personal certificate on completion':'Personligt certifikat vid examen'}</li>
           </ul>
           <div class="qty-pick">
             <button onclick="cpChQty(-1)">−</button>
             <span class="qv" id="cpQty">1</span>
             <button onclick="cpChQty(1)">+</button>
-            <span class="ql">deltagare</span>
+            <span class="ql">${en?'participants':'deltagare'}</span>
           </div>
-          ${c.soon?'<span class="pill ny" style="font-size:14px;padding:10px 18px">🔜 Lanseras inom kort — mejla academy@nordicagir.se för förtur</span>':`<button class="btn btn-blue" onclick="cpAdd('${c.id}')">Lägg i kundvagn <span class="arrow">→</span></button>`}
-          <p class="fact-help">Bokar du för fler än 10? <a href="mailto:academy@nordicagir.se">Hör av dig</a> så ger vi ett bra paketpris.</p>
+          ${c.soon?'<span class="pill ny" style="font-size:14px;padding:10px 18px">🔜 Lanseras inom kort — mejla academy@nordicagir.se för förtur</span>':`<button class="btn btn-blue" onclick="cpAdd('${c.id}')">${en?'Add to cart':'Lägg i kundvagn'} <span class="arrow">→</span></button>`}
+          <p class="fact-help">${en?`Booking for more than 10 participants? <a href="mailto:academy@nordicagir.se">Get in touch</a> for a package price.`:`Bokar du för fler än 10? <a href="mailto:academy@nordicagir.se">Hör av dig</a> så ger vi ett bra paketpris.`}</p>
         </div>
       </aside>
     </div>
     ${related.length?`<div class="cp-related">
-      <h2>Fler kurser inom ${cat.name}</h2>
+      <h2>${en?'More courses in English':'Fler kurser inom '+cat.name}</h2>
       <div class="course-grid">${related.map(cardHTML).join('')}</div>
     </div>`:''}`;
   document.getElementById('courseView').scrollTop=0;

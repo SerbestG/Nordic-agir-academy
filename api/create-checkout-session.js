@@ -39,6 +39,23 @@ const COURSES = {
   'prl':         { title: 'Projekteringsledning i bygg- och anläggningsprojekt', price: 995 },
   'tid':         { title: 'Tidsplanering i byggprojekt', price: 995 },
   'kalk':        { title: 'Kalkylering för entreprenader — anbuds- och produktionskalkyl', price: 995 },
+  /* ---- IN ENGLISH (v8.8) ---- */
+  'apv-en':        { title: 'Safe roadwork site – Basic competence APV Step 1', price: 995 },
+  'lyft-en':       { title: 'Safe Lifting: Risk Assessment and Equipment', price: 795 },
+  'kma-en':        { title: 'QEHS in Practice – Construction and Civil Engineering', price: 1495 },
+  'ata-en':        { title: 'ÄTA management: From theory to practice', price: 995 },
+  'ab-abt-en':     { title: 'AB04 and ABT06 – The Standard Contracts in Construction', price: 1495 },
+  'ejur-en':       { title: 'Construction Contract Law: AB 04, ABT 06, and ABK 09', price: 2195 },
+  'abk-en':        { title: 'ABK 09: Contracts and Liability in Consulting Engagements', price: 995 },
+  'kalk-en':       { title: 'Estimating for construction contracts – from bid to profit', price: 995 },
+  'tid-en':        { title: 'Scheduling in Construction Projects – From Plan to Production', price: 995 },
+  'byggpl-en':     { title: 'Construction Project Management: Your Role as a Project Manager', price: 995 },
+  'ama-anl-en':    { title: 'AMA Anläggning in practice – quality on the job site', price: 1495 },
+  'ama-hus-en':    { title: 'AMA Hus in practice – from code to quality', price: 1495 },
+  'ama-af-en':     { title: 'AMA AF: Administrative Provisions in Practice', price: 1495 },
+  'anbud-en':      { title: 'Analyzing and Quality-Assuring Public Bids', price: 795 },
+  'lou-praktik-en': { title: 'LOU in practice – public procurement', price: 1495 },
+  'ramavtal-en':   { title: 'Framework agreements and call-offs: strategy for suppliers', price: 1395 },
 };
 
 export default async function handler(req, res) {
