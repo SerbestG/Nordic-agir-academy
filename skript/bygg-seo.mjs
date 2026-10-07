@@ -15,6 +15,7 @@ import { fileURLToPath } from 'url';
 
 const ROT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SAJT = 'https://www.nordicagiracademy.se'; // adressen utan www skickar vidare hit
+const GUIDE = `${SAJT}/guider/vad-kostar-bas-p-utbildning.html`;
 const IDAG = new Date().toISOString().slice(0, 10);
 const MOMS = 1.25; // samma som api/create-checkout-session.js
 
@@ -166,7 +167,7 @@ ${tvilling ? `<p class="sprak">${t.sprak(`${tvilling.id}.html`)}</p>\n` : ''}<di
 <h2>${t.inneh}</h2>${d.modules.map((m) => `<div class="modul"><b>${eh(m.t ?? m.title ?? m[0])}</b>${eh(m.d ?? m.desc ?? m[1] ?? '')}</div>`).join('')}
 <h2>${t.faq}</h2>${fragor.map(([q, a]) => `<h3>${eh(q)}</h3><p>${eh(a)}</p>`).join('')}
 <p><a class="cta" href="${kopLank(c)}">${t.kop}</a></p>
-<p><a href="${SAJT}/kurser/">${t.alla(kurser.length)}</a></p>
+${c.id === 'bas' ? `<p><a href="${GUIDE}">Vad kostar BAS-P-utbildning? Läs prisguiden →</a></p>\n` : ''}<p><a href="${SAJT}/kurser/">${t.alla(kurser.length)}</a></p>
 </main>
 ${sidfot(t)}
 </body></html>
@@ -204,11 +205,120 @@ ${sidhuvud(T.sv)}
 <h1>${kurser.length} distanskurser med certifikat för bygg och anläggning</h1>
 <p class="sub">Certifikat giltigt i fem år efter godkänt kunskapsprov. Plugga i egen takt — start direkt efter köp. Betala med kort, Klarna eller faktura. Priser från ${kr(lagst)} exkl. moms.</p>
 ${grupper.map(([k, l]) => `<h2${k === 'english' ? ' lang="en"' : ''}>${eh(CATS[k].name)}</h2><ul>${l.map((c) => `<li><a href="${c.id}.html">${eh(c.title)}</a> — ${kr(c.price)} exkl. moms</li>`).join('')}</ul>`).join('\n')}
+<p>Guide: <a href="${GUIDE}">Vad kostar BAS-P-utbildning?</a></p>
 <p><a class="cta" href="${SAJT}">Till kursbutiken →</a></p>
 </main>
 ${sidfot(T.sv)}
 </body></html>
 `;
+}
+
+// ---- 4b. Prisguiden för BAS-P/BAS-U -------------------------------------------
+// Svarar på frågan «vad kostar BAS-P-utbildning?». Bara belagda uppgifter: våra egna priser
+// ur katalogen och allmänna fakta om formen — inga påhittade konkurrentpriser.
+function prisguide() {
+  const b = perId.bas, be = perId['bas-en'];
+  if (!b) throw new Error('Kursen bas saknas i katalogen — prisguiden kan inte byggas');
+  const fem = b.price * 5;
+  const fragor = [
+    ['Vad kostar BAS-P- och BAS-U-utbildning?', `Hos Nordic Agir Academy kostar kursen ${kr(b.price)} exkl. moms (${kr(inklMoms(b.price))} inkl. 25 % moms) per deltagare, ordinarie pris ${kr(origOf(b))}. Både BAS-P och BAS-U ingår i samma kurs, liksom kunskapsprov och certifikat.`],
+    ['Ingår både BAS-P och BAS-U?', 'Ja. Kursen tar upp båda rollerna — samordning under planering och projektering (BAS-P) och under utförandet (BAS-U) — och gränsen mellan dem. Du köper en kurs, inte två.'],
+    ['Finns det dolda avgifter?', 'Nej. Priset gäller per deltagare och inkluderar kursen, kunskapsprovet med obegränsade omprov och det personliga certifikatet. Moms tillkommer med 25 %.'],
+    ['Kan man läsa BAS-P och BAS-U på distans?', `Ja. Kursen går helt online, ${tid(b)}, i din egen takt. Du startar direkt efter köpet och gör provet när du känner dig redo.`],
+    ['Kräver lagen en viss BAS-kurs?', 'Nej, lagen pekar inte ut en viss kurs eller utbildare. Byggherren ska utse en byggarbetsmiljösamordnare som har den utbildning, erfarenhet och kompetens som uppdraget kräver. En kurs med certifikat är ett sätt att visa och dokumentera utbildningen.'],
+    ['Hur länge gäller certifikatet?', 'Certifikatet gäller i fem år från examensdatumet och har en QR-kod som arbetsgivare och beställare kan skanna för att kontrollera äktheten.'],
+    ...(be ? [['Finns kursen på engelska?', `Ja. «${be.title}» kostar ${kr(be.price)} exkl. moms och riktar sig till utländska yrkespersoner och företag som arbetar på svenska byggarbetsplatser.`]] : []),
+  ];
+  const faq = { '@context': 'https://schema.org', '@type': 'FAQPage',
+    mainEntity: fragor.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
+  const artikel = { '@context': 'https://schema.org', '@type': 'Article', headline: `Vad kostar BAS-P-utbildning? Priser ${IDAG.slice(0, 4)}`,
+    dateModified: IDAG, inLanguage: 'sv', url: GUIDE, publisher: leverantor, about: { '@type': 'Course', name: b.title, url: sida(b) } };
+  return `<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vad kostar BAS-P-utbildning? Pris ${IDAG.slice(0, 4)} — BAS-P och BAS-U från ${kr(b.price)}</title>
+<meta name="description" content="BAS-P och BAS-U på distans för ${kr(b.price)} exkl. moms per deltagare — båda rollerna, prov och certifikat ingår. Så räknar du kostnaden för en BAS-utbildning.">
+<link rel="canonical" href="${GUIDE}">
+<meta property="og:title" content="Vad kostar BAS-P-utbildning?">
+<meta property="og:url" content="${GUIDE}">
+<meta property="og:image" content="${SAJT}/og-image.png">
+<link rel="icon" href="${SAJT}/favicon.png">
+<script type="application/ld+json">${json(artikel)}</script>
+<script type="application/ld+json">${json(faq)}</script>
+<style>${STIL}
+table{border-collapse:collapse;width:100%;margin:12px 0}td,th{border-bottom:1px solid #e3e1dc;padding:8px 6px;text-align:left;vertical-align:top}th{color:#5a5757;font-weight:600}</style>
+</head>
+<body>
+${sidhuvud(T.sv)}
+<main>
+<p class="sub">Prisguide · Uppdaterad ${IDAG}</p>
+<h1>Vad kostar BAS-P-utbildning?</h1>
+<p class="sub">Kort svar: hos Nordic Agir Academy kostar BAS-P och BAS-U <b>${kr(b.price)} exkl. moms</b> per deltagare — båda rollerna i samma kurs, på distans, med prov och certifikat.</p>
+<div class="prisruta"><b>${kr(b.price)}</b> exkl. moms &nbsp;·&nbsp; ${kr(inklMoms(b.price))} inkl. moms${origOf(b) > b.price ? ` &nbsp;·&nbsp; <span class="gammalt">${kr(origOf(b))}</span> ordinarie` : ''}<br><span style="font-size:.9em">Per deltagare. Kort, Klarna eller faktura (30 dagar för företag).</span></div>
+<a class="cta" href="${sida(b)}">Se kursen BAS-P och BAS-U →</a>
+
+<h2>Det här ingår i priset</h2>
+<ul><li>Hela kursen: både BAS-P (planering och projektering) och BAS-U (utförande)</li><li>${eh(tid(b))} kursinnehåll i din egen takt — mobil, platta eller dator</li><li>Kunskapsprov online med obegränsade omprov, utan extra kostnad</li><li>Personligt certifikat per mejl, giltigt i fem år, med QR-kod för äkthetskontroll</li><li>Tillgång till kursen i minst tolv månader</li></ul>
+
+<h2>Vad påverkar priset på en BAS-utbildning?</h2>
+<table><tr><th>Det här</th><th>Varför det spelar roll för kostnaden</th></tr>
+<tr><td>Distans eller lärarledd</td><td>En lärarledd kurs kräver lokal, lärare och fasta datum. Deltagaren är borta från jobbet hela kursdagen och har ofta restid. En distanskurs görs när det passar — kostnaden är i praktiken kursavgiften.</td></tr>
+<tr><td>En kurs eller två</td><td>Vissa utbildare säljer BAS-P och BAS-U som separata kurser. Kontrollera om priset gäller båda rollerna. Hos oss ingår båda.</td></tr>
+<tr><td>Omprov</td><td>Kostar omprovet extra? Hos oss ingår obegränsade försök.</td></tr>
+<tr><td>Certifikatets giltighet</td><td>Hur länge gäller intyget, och kan beställaren kontrollera det? Vårt certifikat gäller i fem år och har QR-kod.</td></tr>
+<tr><td>Moms</td><td>Priser till företag anges oftast exklusive moms. Jämför alltid samma sak.</td></tr></table>
+
+<h2>Räkneexempel: fem medarbetare</h2>
+<p>5 deltagare × ${kr(b.price)} = <b>${kr(fem)} exkl. moms</b> (${kr(inklMoms(fem))} inkl. moms). Alla kan börja samma dag, men gör kursen var för sig när det passar. Lägg alla deltagare i samma beställning och betala mot faktura. För större grupper eller ramavtal ger vi paketpris — mejla academy@nordicagir.se.</p>
+${be ? `
+<h2 lang="en">BAS-P and BAS-U in English</h2>
+<p lang="en">Foreign professionals working on Swedish construction sites can take the course entirely in English: <a href="${sida(be)}">${eh(be.title)}</a> — ${kr(be.price, 1)} excl. VAT.</p>
+` : ''}
+<h2>Vanliga frågor</h2>${fragor.map(([q, a]) => `<h3>${eh(q)}</h3><p>${eh(a)}</p>`).join('')}
+<p><a class="cta" href="${kopLank(b)}">Köp BAS-P och BAS-U →</a></p>
+<p><a href="${SAJT}/kurser/">← Alla ${kurser.length} kurser och priser</a></p>
+</main>
+${sidfot(T.sv)}
+</body></html>
+`;
+}
+
+// ---- 4c. llms.txt — kort presentation för AI-assistenter (llmstxt.org) ---------
+function llmsTxt() {
+  const lagst = Math.min(...kurser.map((c) => c.price));
+  const grupper = Object.keys(CATS).map((k) => [k, kurser.filter((c) => c.cat === k)]).filter(([, l]) => l.length);
+  return `# Nordic Agir Academy
+
+> Svensk utbildare med ${kurser.length} distanskurser för bygg- och anläggningsbranschen, varav ${kurser.filter(arEngelsk).length} på engelska. Kurserna görs helt online i egen takt och avslutas med ett kunskapsprov (obegränsade omprov). Godkänd deltagare får ett personligt certifikat, giltigt i fem år, med QR-kod för äkthetskontroll. Priser från ${kr(lagst)} exkl. moms per deltagare. Betalning med kort, Klarna eller faktura (30 dagar för företag).
+
+Nordic Agir Academy är en del av Nordic Agir AB (org.nr 559516-5373), Anläggarvägen 34, Handen. Kontakt: academy@nordicagir.se, 073-912 97 89. Alla priser nedan är exklusive 25 % moms och gäller per deltagare.
+
+## Guider
+
+- [Vad kostar BAS-P-utbildning?](${GUIDE}): pris, vad som ingår och vad som påverkar kostnaden
+
+${grupper.map(([k, l]) => `## ${CATS[k].name}\n\n${l.map((c) => `- [${c.title}](${sida(c)}): ${kr(c.price, arEngelsk(c))}, ${c.dur}. ${c.desc}`).join('\n')}`).join('\n\n')}
+
+## Övrigt
+
+- [Alla kurser och priser](${SAJT}/kurser/)
+- [Köpvillkor](${SAJT}/#kopvillkor)
+`;
+}
+
+// ---- 4d. Kurslistan i startsidans råtext -------------------------------------------
+// Startsidan ritar kurserna med JavaScript. Robotar som inte kör JavaScript läser i stället
+// <noscript>-blocket mellan markörerna — samma kurser, samma priser, länkar till kurssidorna.
+const START = '<!-- SEO-KURSLISTA START (skrivs av skript/bygg-seo.mjs, ändra inte för hand) -->';
+const SLUT = '<!-- SEO-KURSLISTA SLUT -->';
+function kurslistaStartsida() {
+  const grupper = Object.keys(CATS).map((k) => [k, kurser.filter((c) => c.cat === k)]).filter(([, l]) => l.length);
+  return `${START}
+<noscript><section class="wrap" style="padding:24px 16px"><h2>Alla ${kurser.length} kurser och priser</h2>
+${grupper.map(([k, l]) => `<h3>${eh(CATS[k].name)}</h3><ul>${l.map((c) => `<li><a href="/kurser/${c.id}.html">${eh(c.title)}</a> — ${kr(c.price)} exkl. moms</li>`).join('')}</ul>`).join('\n')}
+<p><a href="/guider/vad-kostar-bas-p-utbildning.html">Vad kostar BAS-P-utbildning?</a> · <a href="/kurser/">Alla kurser</a></p></section></noscript>
+${SLUT}`;
 }
 
 // ---- 5. Skriv filerna -----------------------------------------------------------
@@ -218,7 +328,22 @@ fs.mkdirSync(MAPP);
 for (const c of kurser) fs.writeFileSync(path.join(MAPP, `${c.id}.html`), kurssida(c));
 fs.writeFileSync(path.join(MAPP, 'index.html'), oversikt());
 
-const adresser = [`${SAJT}/`, `${SAJT}/kurser/`, ...kurser.map(sida)];
+fs.mkdirSync(path.join(ROT, 'guider'), { recursive: true });
+fs.writeFileSync(path.join(ROT, 'guider', 'vad-kostar-bas-p-utbildning.html'), prisguide());
+fs.writeFileSync(path.join(ROT, 'llms.txt'), llmsTxt());
+
+// Kurslistan i startsidan: ersätt blocket mellan markörerna, eller lägg in det första gången
+const startsida = fs.readFileSync(path.join(ROT, 'index.html'), 'utf8');
+const ankare = '<!-- KATEGORIER -->';
+let nyStart;
+if (startsida.includes(START)) {
+  nyStart = startsida.slice(0, startsida.indexOf(START)) + kurslistaStartsida() + startsida.slice(startsida.indexOf(SLUT) + SLUT.length);
+} else if (startsida.includes(ankare)) {
+  nyStart = startsida.replace(ankare, kurslistaStartsida() + '\n\n' + ankare);
+} else throw new Error('Hittar varken kurslistans markörer eller «<!-- KATEGORIER -->» i index.html');
+if (nyStart !== startsida) fs.writeFileSync(path.join(ROT, 'index.html'), nyStart);
+
+const adresser = [`${SAJT}/`, `${SAJT}/kurser/`, GUIDE, ...kurser.map(sida)];
 fs.writeFileSync(path.join(ROT, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${adresser.map((u) => `  <url><loc>${u}</loc><lastmod>${IDAG}</lastmod></url>`).join('\n')}
@@ -237,4 +362,4 @@ ${robotar.map((r) => `User-agent: ${r}\nAllow: /\nDisallow: /api/\n`).join('\n')
 Sitemap: ${SAJT}/sitemap.xml
 `);
 
-console.log(`Klart: ${kurser.length} kurssidor (${kurser.filter(arEngelsk).length} på engelska), kurser/index.html, sitemap.xml (${adresser.length} adresser), robots.txt`);
+console.log(`Klart: ${kurser.length} kurssidor (${kurser.filter(arEngelsk).length} på engelska), kurser/index.html, prisguide, llms.txt, kurslista i index.html, sitemap.xml (${adresser.length} adresser), robots.txt`);
