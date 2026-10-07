@@ -14,7 +14,7 @@ import vm from 'vm';
 import { fileURLToPath } from 'url';
 
 const ROT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const SAJT = 'https://nordicagiracademy.se';
+const SAJT = 'https://www.nordicagiracademy.se'; // adressen utan www skickar vidare hit
 const IDAG = new Date().toISOString().slice(0, 10);
 const MOMS = 1.25; // samma som api/create-checkout-session.js
 
