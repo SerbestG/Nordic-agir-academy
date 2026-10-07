@@ -1,0 +1,72 @@
+# Nordic Agir Academy
+
+> Svensk utbildare med 43 distanskurser för bygg- och anläggningsbranschen, varav 17 på engelska. Kurserna görs helt online i egen takt och avslutas med ett kunskapsprov (obegränsade omprov). Godkänd deltagare får ett personligt certifikat, giltigt i fem år, med QR-kod för äkthetskontroll. Priser från 795 kr exkl. moms per deltagare. Betalning med kort, Klarna eller faktura (30 dagar för företag).
+
+Nordic Agir Academy är en del av Nordic Agir AB (org.nr 559516-5373), Anläggarvägen 34, Handen. Kontakt: academy@nordicagir.se, 073-912 97 89. Alla priser nedan är exklusive 25 % moms och gäller per deltagare.
+
+## Guider
+
+- [Vad kostar BAS-P-utbildning?](https://www.nordicagiracademy.se/guider/vad-kostar-bas-p-utbildning.html): pris, vad som ingår och vad som påverkar kostnaden
+
+## Bygg & anläggning
+
+- [Arbete på väg — APV Steg 1 (1.1, 1.2 och 1.3)](https://www.nordicagiracademy.se/kurser/apv.html): 995 kr, ca 2 tim. Grundkompetensen för alla som arbetar på eller vid väg, enligt Trafikverkets krav — hela steg 1 med kompetenserna 1.1, 1.2 och 1.3.
+- [Fallskydd — arbete på höjd](https://www.nordicagiracademy.se/kurser/fall.html): 795 kr, ca 2–3 tim. Fem meter tar en sekund, kunskapen tar två timmar. Skyddens rangordning, selens fysik, förankringar och räddningen ur hängtraumat.
+- [Säker schakt — schaktarbete och schaktansvar](https://www.nordicagiracademy.se/kurser/schakt.html): 995 kr, ca 3–4 tim. Ett schakt rasar på två sekunder — planeringen tar två timmar. Jordarter, slänt eller stöd, dagliga kontroller och räddningsplanen som skrivs innan.
+- [BAS-P och BAS-U — byggarbetsmiljösamordning](https://www.nordicagiracademy.se/kurser/bas.html): 1 495 kr, ca 4 tim. Bli trygg som byggarbetsmiljösamordnare: ansvaret, arbetsmiljöplanen och samordningen som håller från planering till utförande.
+- [Ritningsläsning i byggprojekt](https://www.nordicagiracademy.se/kurser/ritning.html): 995 kr, ca 2–3 tim. Ritningen är byggets språk. Skalor, beteckningar, planer, sektioner, detaljer och revisioner — läs dem rätt och led därefter.
+- [KMA — kvalitet, miljö och arbetsmiljö i bygg och anläggning](https://www.nordicagiracademy.se/kurser/kma.html): 1 495 kr, ca 3 tim. Kvalitet, miljö och arbetsmiljö som fungerar ute i produktionen: egenkontroller, KMA-planer och dokumentation som håller.
+- [Säkra lyft — lastkoppling, signalering och riskbedömning](https://www.nordicagiracademy.se/kurser/lyft.html): 795 kr, ca 2 tim. För dig som kopplar last eller dirigerar lyft: rätt redskap, rätt riskbedömning och rutiner som gör att alla går hem hela.
+- [MER Anläggning — mät- och ersättningsregler för anläggningsarbeten](https://www.nordicagiracademy.se/kurser/mer.html): 1 495 kr, ca 4–5 tim. Mängdförteckningen bestämmer vad du får betalt — MER bestämmer hur den läses. Teoretisk mängd, reglerbara mängder och gränsdragningen mot ÄTA.
+- [AMA Anläggning — allmän material- och arbetsbeskrivning för anläggning](https://www.nordicagiracademy.se/kurser/ama-anl.html): 1 495 kr, ca 3 tim. AMA och MER för mark- och anläggningsjobb: struktur, mätregler och kopplingen som gör att kalkylen stämmer med verkligheten.
+- [AMA Hus — allmän material- och arbetsbeskrivning för husbyggnad](https://www.nordicagiracademy.se/kurser/ama-hus.html): 1 495 kr, ca 3 tim. Lär dig läsa och skriva tekniska beskrivningar för husbyggnad: koder, rubriker och pyramidregeln — utan huvudvärk.
+- [AMA AF — administrativa föreskrifter för entreprenader](https://www.nordicagiracademy.se/kurser/ama-af.html): 1 495 kr, ca 3–4 tim. AF-delen sätter spelreglerna: anbudskrav, tider, ansvar, viten och möten. Lär dig läsa och använda de administrativa föreskrifterna — innan de används mot dig.
+
+## Projektledning
+
+- [Kalkylering för entreprenader — anbuds- och produktionskalkyl](https://www.nordicagiracademy.se/kurser/kalk.html): 995 kr, ca 3 tim. Från mängdförteckning till anbudssumma: metoder, påslag och risktänk som vinner jobben utan att du förlorar pengar på dem.
+- [Installationssamordning i byggprojekt](https://www.nordicagiracademy.se/kurser/inst.html): 1 495 kr, ca 4 tim. Huset byggs en gång — installationerna krockar tre gånger om ingen samordnar. Gränsdragningslistor, montageordning och samordnad provning.
+- [Byggprojektledning — projektledarens roll och ansvar](https://www.nordicagiracademy.se/kurser/byggpl.html): 995 kr, ca 3–4 tim. Från uppdrag till överlämning: rollen, mandatet, laget och besluten. Kursen för dig som leder byggprojekt — eller ska börja.
+- [Projektledning i bygg- och anläggningsprojekt](https://www.nordicagiracademy.se/kurser/pl.html): 995 kr, ca 4 tim. Att leda byggprojekt handlar om människor lika mycket som planer. Här får du verktygen för båda — från startmöte till överlämning.
+- [Tidsplanering i byggprojekt](https://www.nordicagiracademy.se/kurser/tid.html): 995 kr, ca 2 tim. Tidplaner som håller även när verkligheten stökar: kritiska linjen, resurssättning och uppföljning som fångar avvikelser i tid.
+- [BIM — byggnadsinformationsmodellering i produktionen](https://www.nordicagiracademy.se/kurser/bim.html): 995 kr, ca 3–4 tim. Modellen finns redan — frågan är om du kan läsa den. Granska, mängda och döda krockarna på skärmen, med gratis verktyg och kontraktet i ryggen.
+- [Projekteringsledning i bygg- och anläggningsprojekt](https://www.nordicagiracademy.se/kurser/prl.html): 995 kr, ca 3 tim. Håll ihop projekteringen: styr konsultgruppen, hantera gränssnitten och se till att handlingarna håller måttet — i tid.
+
+## Entreprenadjuridik
+
+- [Entreprenadjuridik — AB 04, ABT 06 och ABK 09](https://www.nordicagiracademy.se/kurser/ejur.html): 2 195 kr, ca 4 tim. Hela entreprenadjuridiken i en kurs. Efter den här läser du standardavtalen med nya ögon — och vet var fallgroparna finns.
+- [ÄTA-arbeten — ändrings-, tilläggs- och avgående arbeten](https://www.nordicagiracademy.se/kurser/ata.html): 995 kr, ca 3 tim. Det arbete du utför ska du få betalt för. Underrätta i rätt tid, dokumentera rätt och stå stadigt om det blir diskussion.
+- [AB 04 och ABT 06 — standardavtal för entreprenader](https://www.nordicagiracademy.se/kurser/ab-abt.html): 1 495 kr, ca 3 tim. Utförande- och totalentreprenad på djupet: vem ansvarar för vad, hur ekonomin regleras och vad som gäller när något går snett.
+- [ABK 09 — Allmänna bestämmelser för konsultuppdrag](https://www.nordicagiracademy.se/kurser/abk.html): 995 kr, ca 2 tim. Konsultuppdragets spelregler: omfattning, ansvar, försäkring och vem som äger resultatet. För dig som köper eller säljer konsulttjänster.
+
+## Offentlig upphandling
+
+- [Anbudsarbete i offentlig upphandling — analys och kvalitetssäkring](https://www.nordicagiracademy.se/kurser/anbud.html): 795 kr, ca 2 tim. Lär dig granska anbudet som en upphandlare — hitta varje skall-krav, täpp till luckorna och lämna in med trygghet.
+- [LOU — Lagen om offentlig upphandling](https://www.nordicagiracademy.se/kurser/lou-praktik.html): 1 495 kr, ca 3 tim. Så fungerar offentlig upphandling på riktigt: processen, utvärderingsmodellerna och strategin som vinner kontrakt.
+- [Ramavtal och avrop i offentlig upphandling](https://www.nordicagiracademy.se/kurser/ramavtal.html): 1 395 kr, ca 3 tim. Att vinna ramavtalet är halva matchen — avropen är den andra. Rangordning, förnyad konkurrensutsättning och strategin som gör ramavtalet lönsamt.
+- [LUF — Lagen om upphandling inom försörjningssektorerna](https://www.nordicagiracademy.se/kurser/luf-praktik.html): 1 395 kr, ca 3 tim. Vatten, energi och transport spelar efter egna regler. Lär dig skillnaderna mot LOU — och hur du drar nytta av dem.
+
+## In English
+
+- [BAS-P and BAS-U — Swedish Construction Coordination (in English)](https://www.nordicagiracademy.se/kurser/bas-en.html): 1 495 SEK, approx. 4 h. Working in Sweden? BAS-P and BAS-U are legal requirements on every Swedish construction site. The full coordination course — in English — for foreign professionals and companies.
+- [Safe roadwork site – Basic competence APV Step 1](https://www.nordicagiracademy.se/kurser/apv-en.html): 995 SEK, approx. 2 h. The mandatory basic competence for everyone working on or beside Swedish roads — full APV Step 1 (1.1, 1.2 and 1.3), entirely in English.
+- [Safe Lifting: Risk Assessment and Equipment](https://www.nordicagiracademy.se/kurser/lyft-en.html): 795 SEK, approx. 2 h. For everyone attaching loads or directing lifts: the right equipment, the right risk assessment and routines that send everyone home safe.
+- [QEHS in Practice – Construction and Civil Engineering](https://www.nordicagiracademy.se/kurser/kma-en.html): 1 495 SEK, approx. 3 h. Quality, environment and health & safety that actually work on site: self-inspections, QEHS plans and documentation that holds up.
+- [ÄTA management: From theory to practice](https://www.nordicagiracademy.se/kurser/ata-en.html): 995 SEK, approx. 3 h. Work you perform is work you should be paid for. Notify on time, document correctly — and stand firm when the discussion comes.
+- [Construction Contract Law: AB 04, ABT 06, and ABK 09](https://www.nordicagiracademy.se/kurser/ejur-en.html): 2 195 SEK, approx. 4 h. All of Swedish construction contract law in one course. Read AB 04, ABT 06 and ABK 09 with new eyes — and know where the pitfalls are.
+- [AB04 and ABT06 – The Standard Contracts in Construction](https://www.nordicagiracademy.se/kurser/ab-abt-en.html): 1 495 SEK, approx. 3 h. The two Swedish standard contracts in depth: who is responsible for what, how the money is regulated and what applies when things go wrong.
+- [ABK 09: Contracts and Liability in Consulting Engagements](https://www.nordicagiracademy.se/kurser/abk-en.html): 995 SEK, approx. 2 h. The rules of the consulting engagement: scope, liability, insurance and who owns the result. For buyers and sellers of consultancy services.
+- [Estimating for construction contracts – from bid to profit](https://www.nordicagiracademy.se/kurser/kalk-en.html): 995 SEK, approx. 3 h. From bill of quantities to bid sum: methods, mark-ups and risk thinking that win the jobs without losing money on them.
+- [Scheduling in Construction Projects – From Plan to Production](https://www.nordicagiracademy.se/kurser/tid-en.html): 995 SEK, approx. 2 h. Schedules that survive reality: the critical path, resources and follow-up that catches deviations in time.
+- [Construction Project Management: Your Role as a Project Manager](https://www.nordicagiracademy.se/kurser/byggpl-en.html): 995 SEK, approx. 3–4 h. From assignment to handover: the role, the mandate, the team and the decisions. For those leading construction projects in Sweden — or about to.
+- [AMA Anläggning in practice – quality on the job site](https://www.nordicagiracademy.se/kurser/ama-anl-en.html): 1 495 SEK, approx. 3 h. AMA Anläggning and MER for civil works: structure, measurement rules and the link that makes your estimate match reality.
+- [AMA Hus in practice – from code to quality](https://www.nordicagiracademy.se/kurser/ama-hus-en.html): 1 495 SEK, approx. 3 h. Learn to read and write technical specifications for building works: codes, headings and the pyramid rule — headache-free.
+- [AMA AF: Administrative Provisions in Practice](https://www.nordicagiracademy.se/kurser/ama-af-en.html): 1 495 SEK, approx. 3–4 h. The AF part sets the rules of the game: bid requirements, deadlines, liability, penalties and meetings. Learn to use it — before it is used against you.
+- [Analyzing and Quality-Assuring Public Bids](https://www.nordicagiracademy.se/kurser/anbud-en.html): 795 SEK, approx. 2 h. Review your bid like a procurement officer — find every mandatory requirement, close the gaps and submit with confidence.
+- [LOU in practice – public procurement](https://www.nordicagiracademy.se/kurser/lou-praktik-en.html): 1 495 SEK, approx. 3 h. How Swedish public procurement really works: the process, the award models and the strategy that wins contracts.
+- [Framework agreements and call-offs: strategy for suppliers](https://www.nordicagiracademy.se/kurser/ramavtal-en.html): 1 395 SEK, approx. 3 h. Winning the framework agreement is half the game — the call-offs are the other half. Ranking, mini-competitions and the strategy that makes it profitable.
+
+## Övrigt
+
+- [Alla kurser och priser](https://www.nordicagiracademy.se/kurser/)
+- [Köpvillkor](https://www.nordicagiracademy.se/#kopvillkor)
