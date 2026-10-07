@@ -12,6 +12,7 @@ import fs from 'fs';
 import path from 'path';
 import vm from 'vm';
 import { fileURLToPath } from 'url';
+import { guider } from './guider.mjs';
 
 const ROT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SAJT = 'https://www.nordicagiracademy.se'; // adressen utan www skickar vidare hit
@@ -112,6 +113,15 @@ const sidfot = (t) => `<footer>Nordic Agir Academy · ${t.del} · Org.nr 559516-
 academy@nordicagir.se · 073-912 97 89 · <a href="${SAJT}/#kopvillkor">${t.villkor}</a> · <a href="${SAJT}/#integritetspolicy">${t.integritet}</a></footer>`;
 
 // ---- 3. En sida per kurs --------------------------------------------------------
+// ---- Guiderna (innehållet bor i skript/guider.mjs) -------------------------------
+const GUIDERNA = guider({ k: perId, kr, inklMoms, tid });
+const guideUrl = (g) => `${SAJT}/guider/${g.slug}.html`;
+const ALLA_GUIDER = [
+  { url: GUIDE, titel: 'Vad kostar BAS-P-utbildning?', lang: 'sv', kurser: ['bas'], kort: 'pris, vad som ingår och vad som påverkar kostnaden' },
+  ...GUIDERNA.map((g) => ({ url: guideUrl(g), titel: g.h1, lang: g.lang, kurser: g.kurser, kort: g.beskrivning })),
+];
+const guidelank = (g, lang) => `<a href="${g.url}"${g.lang !== lang ? ` hreflang="${g.lang}" lang="${g.lang}"` : ''}>${eh(g.titel)}</a>`;
+
 function kurssida(c) {
   const t = arEngelsk(c) ? T.en : T.sv;
   const d = DETAILS[c.id];
@@ -167,7 +177,7 @@ ${tvilling ? `<p class="sprak">${t.sprak(`${tvilling.id}.html`)}</p>\n` : ''}<di
 <h2>${t.inneh}</h2>${d.modules.map((m) => `<div class="modul"><b>${eh(m.t ?? m.title ?? m[0])}</b>${eh(m.d ?? m.desc ?? m[1] ?? '')}</div>`).join('')}
 <h2>${t.faq}</h2>${fragor.map(([q, a]) => `<h3>${eh(q)}</h3><p>${eh(a)}</p>`).join('')}
 <p><a class="cta" href="${kopLank(c)}">${t.kop}</a></p>
-${c.id === 'bas' ? `<p><a href="${GUIDE}">Vad kostar BAS-P-utbildning? Läs prisguiden →</a></p>\n` : ''}<p><a href="${SAJT}/kurser/">${t.alla(kurser.length)}</a></p>
+${ALLA_GUIDER.filter((g) => g.kurser.includes(c.id)).map((g) => `<p>${t.lang === 'en' ? 'Guide' : 'Läs guiden'}: ${guidelank(g, t.lang)} →</p>\n`).join('')}<p><a href="${SAJT}/kurser/">${t.alla(kurser.length)}</a></p>
 </main>
 ${sidfot(t)}
 </body></html>
@@ -205,7 +215,7 @@ ${sidhuvud(T.sv)}
 <h1>${kurser.length} distanskurser med certifikat för bygg och anläggning</h1>
 <p class="sub">Certifikat giltigt i fem år efter godkänt kunskapsprov. Plugga i egen takt — start direkt efter köp. Betala med kort, Klarna eller faktura. Priser från ${kr(lagst)} exkl. moms.</p>
 ${grupper.map(([k, l]) => `<h2${k === 'english' ? ' lang="en"' : ''}>${eh(CATS[k].name)}</h2><ul>${l.map((c) => `<li><a href="${c.id}.html">${eh(c.title)}</a> — ${kr(c.price)} exkl. moms</li>`).join('')}</ul>`).join('\n')}
-<p>Guide: <a href="${GUIDE}">Vad kostar BAS-P-utbildning?</a></p>
+<h2>Guider</h2><ul>${ALLA_GUIDER.map((g) => `<li>${guidelank(g, 'sv')}</li>`).join('')}</ul>
 <p><a class="cta" href="${SAJT}">Till kursbutiken →</a></p>
 </main>
 ${sidfot(T.sv)}
@@ -247,7 +257,7 @@ function prisguide() {
 <script type="application/ld+json">${json(artikel)}</script>
 <script type="application/ld+json">${json(faq)}</script>
 <style>${STIL}
-table{border-collapse:collapse;width:100%;margin:12px 0}td,th{border-bottom:1px solid #e3e1dc;padding:8px 6px;text-align:left;vertical-align:top}th{color:#5a5757;font-weight:600}</style>
+table{border-collapse:collapse;width:100%;margin:12px 0}td,th{border-bottom:1px solid #e3e1dc;padding:8px 6px;text-align:left;vertical-align:top;overflow-wrap:break-word}th{color:#5a5757;font-weight:600}</style>
 </head>
 <body>
 ${sidhuvud(T.sv)}
@@ -284,6 +294,51 @@ ${sidfot(T.sv)}
 `;
 }
 
+// ---- 4b2. Övriga guider -------------------------------------------------------------
+function guidesida(g) {
+  const en = g.lang === 'en';
+  const t = en ? T.en : T.sv;
+  const relaterade = g.kurser.map((id) => perId[id]).filter(Boolean);
+  const faq = { '@context': 'https://schema.org', '@type': 'FAQPage',
+    mainEntity: g.fragor.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
+  const artikel = { '@context': 'https://schema.org', '@type': 'Article', headline: g.h1, description: g.beskrivning,
+    dateModified: IDAG, inLanguage: g.lang, url: guideUrl(g), publisher: leverantor,
+    about: relaterade.map((c) => ({ '@type': 'Course', name: c.title, url: sida(c) })) };
+  return `<!DOCTYPE html>
+<html lang="${g.lang}">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${eh(g.titel)} | Nordic Agir Academy</title>
+<meta name="description" content="${eh(g.beskrivning)}">
+<link rel="canonical" href="${guideUrl(g)}">
+<meta property="og:title" content="${eh(g.h1)}">
+<meta property="og:description" content="${eh(g.beskrivning)}">
+<meta property="og:url" content="${guideUrl(g)}">
+<meta property="og:image" content="${SAJT}/og-image.png">
+<link rel="icon" href="${SAJT}/favicon.png">
+<script type="application/ld+json">${json(artikel)}</script>
+<script type="application/ld+json">${json(faq)}</script>
+<style>${STIL}
+table{border-collapse:collapse;width:100%;margin:12px 0}td,th{border-bottom:1px solid #e3e1dc;padding:8px 6px;text-align:left;vertical-align:top;overflow-wrap:break-word}th{color:#5a5757;font-weight:600}</style>
+</head>
+<body>
+${sidhuvud(t)}
+<main>
+<p class="sub">${en ? 'Guide · Updated' : 'Guide · Uppdaterad'} ${IDAG}</p>
+<h1>${eh(g.h1)}</h1>
+<p class="sub">${eh(g.kort)}</p>
+${g.delar.map(([h, html]) => `<h2>${eh(h)}</h2>${html}`).join('\n')}
+<h2>${en ? 'Courses' : 'Kurser'}</h2>
+<ul>${relaterade.map((c) => `<li><a href="${sida(c)}"${arEngelsk(c) !== en ? ` hreflang="${arEngelsk(c) ? 'en' : 'sv'}"` : ''}>${eh(c.title)}</a> — ${kr(c.price, arEngelsk(c))} ${arEngelsk(c) ? 'excl. VAT' : 'exkl. moms'}</li>`).join('')}</ul>
+<h2>${t.faq}</h2>${g.fragor.map(([q, a]) => `<h3>${eh(q)}</h3><p>${eh(a)}</p>`).join('')}
+${relaterade[0] ? `<p><a class="cta" href="${sida(relaterade[0])}">${en ? 'See the course →' : 'Se kursen →'}</a></p>` : ''}
+<p><a href="${SAJT}/kurser/">${t.alla(kurser.length)}</a></p>
+</main>
+${sidfot(t)}
+</body></html>
+`;
+}
+
 // ---- 4c. llms.txt — kort presentation för AI-assistenter (llmstxt.org) ---------
 function llmsTxt() {
   const lagst = Math.min(...kurser.map((c) => c.price));
@@ -296,7 +351,7 @@ Nordic Agir Academy är en del av Nordic Agir AB (org.nr 559516-5373), Anläggar
 
 ## Guider
 
-- [Vad kostar BAS-P-utbildning?](${GUIDE}): pris, vad som ingår och vad som påverkar kostnaden
+${ALLA_GUIDER.map((g) => `- [${g.titel}](${g.url}): ${g.kort}`).join('\n')}
 
 ${grupper.map(([k, l]) => `## ${CATS[k].name}\n\n${l.map((c) => `- [${c.title}](${sida(c)}): ${kr(c.price, arEngelsk(c))}, ${c.dur}. ${c.desc}`).join('\n')}`).join('\n\n')}
 
@@ -317,7 +372,8 @@ function kurslistaStartsida() {
   return `${START}
 <noscript><section class="wrap" style="padding:24px 16px"><h2>Alla ${kurser.length} kurser och priser</h2>
 ${grupper.map(([k, l]) => `<h3>${eh(CATS[k].name)}</h3><ul>${l.map((c) => `<li><a href="/kurser/${c.id}.html">${eh(c.title)}</a> — ${kr(c.price)} exkl. moms</li>`).join('')}</ul>`).join('\n')}
-<p><a href="/guider/vad-kostar-bas-p-utbildning.html">Vad kostar BAS-P-utbildning?</a> · <a href="/kurser/">Alla kurser</a></p></section></noscript>
+<h3>Guider</h3><ul>${ALLA_GUIDER.map((g) => `<li><a href="${g.url.replace(SAJT, '')}">${eh(g.titel)}</a></li>`).join('')}</ul>
+<p><a href="/kurser/">Alla kurser</a></p></section></noscript>
 ${SLUT}`;
 }
 
@@ -330,6 +386,7 @@ fs.writeFileSync(path.join(MAPP, 'index.html'), oversikt());
 
 fs.mkdirSync(path.join(ROT, 'guider'), { recursive: true });
 fs.writeFileSync(path.join(ROT, 'guider', 'vad-kostar-bas-p-utbildning.html'), prisguide());
+for (const g of GUIDERNA) fs.writeFileSync(path.join(ROT, 'guider', `${g.slug}.html`), guidesida(g));
 fs.writeFileSync(path.join(ROT, 'llms.txt'), llmsTxt());
 
 // Kurslistan i startsidan: ersätt blocket mellan markörerna, eller lägg in det första gången
@@ -343,7 +400,7 @@ if (startsida.includes(START)) {
 } else throw new Error('Hittar varken kurslistans markörer eller «<!-- KATEGORIER -->» i index.html');
 if (nyStart !== startsida) fs.writeFileSync(path.join(ROT, 'index.html'), nyStart);
 
-const adresser = [`${SAJT}/`, `${SAJT}/kurser/`, GUIDE, ...kurser.map(sida)];
+const adresser = [`${SAJT}/`, `${SAJT}/kurser/`, ...ALLA_GUIDER.map((g) => g.url), ...kurser.map(sida)];
 fs.writeFileSync(path.join(ROT, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${adresser.map((u) => `  <url><loc>${u}</loc><lastmod>${IDAG}</lastmod></url>`).join('\n')}
@@ -362,4 +419,4 @@ ${robotar.map((r) => `User-agent: ${r}\nAllow: /\nDisallow: /api/\n`).join('\n')
 Sitemap: ${SAJT}/sitemap.xml
 `);
 
-console.log(`Klart: ${kurser.length} kurssidor (${kurser.filter(arEngelsk).length} på engelska), kurser/index.html, prisguide, llms.txt, kurslista i index.html, sitemap.xml (${adresser.length} adresser), robots.txt`);
+console.log(`Klart: ${kurser.length} kurssidor (${kurser.filter(arEngelsk).length} på engelska), kurser/index.html, ${ALLA_GUIDER.length} guider, llms.txt, kurslista i index.html, sitemap.xml (${adresser.length} adresser), robots.txt`);
