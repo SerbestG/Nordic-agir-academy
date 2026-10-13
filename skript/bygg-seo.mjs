@@ -96,6 +96,7 @@ h1{font-size:1.9em;line-height:1.25;margin:.2em 0}h2{margin-top:1.6em;font-size:
 .sprak{background:#f5f9fb;padding:10px 14px;font-size:.95em}
 .prisruta{background:#f5f9fb;border-left:5px solid #00ADEF;padding:16px 20px;margin:20px 0}
 .prisruta b{font-size:1.5em;color:#00537A}.gammalt{text-decoration:line-through;color:#767373}
+.kursbild{display:block;width:100%;max-height:320px;object-fit:cover;margin:14px 0}
 .cta{display:inline-block;background:#0077AD;color:#fff;padding:13px 26px;font-weight:700;text-decoration:none;margin:8px 0}
 ul{padding-left:22px}li{margin:5px 0}
 .modul{border-left:3px solid #ddd;padding:6px 14px;margin:10px 0}.modul b{display:block}
@@ -131,8 +132,10 @@ function kurssida(c) {
   const alt = tvilling
     ? `<link rel="alternate" hreflang="${t.lang}" href="${sida(c)}">\n<link rel="alternate" hreflang="${arEngelsk(c) ? 'sv' : 'en'}" href="${sida(tvilling)}">\n`
     : '';
+  // Kursens egen bild (samma som i butiken) — produktkort i AI-sök och shopping visar den
+  const bild = c.img ? String(c.img).replace(/w=\d+/, 'w=1200') : `${SAJT}/og-image.png`;
   const kurs = {
-    '@context': 'https://schema.org', '@type': 'Course', name: c.title, description: c.desc,
+    '@context': 'https://schema.org', '@type': 'Course', name: c.title, description: c.desc, image: bild,
     provider: leverantor, url: sida(c), inLanguage: t.lang, educationalCredentialAwarded: t.cred,
     teaches: d.goals,
     offers: {
@@ -141,6 +144,19 @@ function kurssida(c) {
       priceSpecification: { '@type': 'UnitPriceSpecification', price: c.price, priceCurrency: 'SEK', valueAddedTaxIncluded: false },
     },
     hasCourseInstance: { '@type': 'CourseInstance', courseMode: 'Online', courseWorkload: arbetstid(c.dur) },
+  };
+  // Samma kurs som produkt: det är produktuppgifterna (bild, pris, säljare) som
+  // ChatGPT, Bing och Google bygger sina köpkort av.
+  const produkt = {
+    '@context': 'https://schema.org', '@type': 'Product', name: c.title, description: c.desc, image: bild,
+    sku: c.id, url: sida(c), category: arEngelsk(c) ? 'Online course' : 'Distanskurs',
+    brand: { '@type': 'Brand', name: 'Nordic Agir Academy' },
+    offers: {
+      '@type': 'Offer', price: String(c.price), priceCurrency: 'SEK', url: sida(c),
+      availability: 'https://schema.org/InStock', itemCondition: 'https://schema.org/NewCondition',
+      seller: { '@type': 'Organization', name: 'Nordic Agir Academy' },
+      priceSpecification: { '@type': 'UnitPriceSpecification', price: c.price, priceCurrency: 'SEK', valueAddedTaxIncluded: false },
+    },
   };
   const faq = {
     '@context': 'https://schema.org', '@type': 'FAQPage',
@@ -157,9 +173,10 @@ ${alt}<meta property="og:title" content="${eh(c.title)}">
 <meta property="og:description" content="${eh(c.desc)}">
 <meta property="og:url" content="${sida(c)}">
 <meta property="og:type" content="website">
-<meta property="og:image" content="${SAJT}/og-image.png">
+<meta property="og:image" content="${eh(bild)}">
 <link rel="icon" href="${SAJT}/favicon.png">
 <script type="application/ld+json">${json(kurs)}</script>
+<script type="application/ld+json">${json(produkt)}</script>
 <script type="application/ld+json">${json(faq)}</script>
 <style>${STIL}</style>
 </head>
@@ -169,6 +186,7 @@ ${sidhuvud(t)}
 <p class="sub">${eh(kategori)}</p>
 <h1>${eh(c.title)}</h1>
 <p class="sub">${eh(c.desc)}</p>
+${c.img ? `<img class="kursbild" src="${eh(String(c.img))}" alt="${eh(c.title)}" width="800" height="320" loading="lazy">\n` : ""}
 ${tvilling ? `<p class="sprak">${t.sprak(`${tvilling.id}.html`)}</p>\n` : ''}<div class="fakta"><span>⏱ ${eh(tid(c))}</span><span>🎓 ${t.cert}</span><span>📱 ${t.enhet}</span></div>
 <div class="prisruta"><b>${kr(c.price, arEngelsk(c))}</b> ${t.exkl} &nbsp;·&nbsp; ${kr(inklMoms(c.price), arEngelsk(c))} ${t.inkl}${origOf(c) > c.price ? ` &nbsp;·&nbsp; <span class="gammalt">${kr(origOf(c), arEngelsk(c))}</span> ${t.ord}` : ''}<br><span style="font-size:.9em">${t.prisrad}</span></div>
 <a class="cta" href="${kopLank(c)}">${t.kop}</a>
