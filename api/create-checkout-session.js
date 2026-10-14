@@ -56,6 +56,14 @@ const COURSES = {
   'anbud-en':      { title: 'Analyzing and Quality-Assuring Public Bids', price: 795 },
   'lou-praktik-en': { title: 'LOU in practice – public procurement', price: 1495 },
   'ramavtal-en':   { title: 'Framework agreements and call-offs: strategy for suppliers', price: 1395 },
+  'fall-en':       { title: 'Fall Protection: Working Safely at Height', price: 795 },
+  'schakt-en':     { title: 'Safe excavation: plan, assess, and act correctly', price: 995 },
+  'ritning-en':    { title: 'Drawing Reading for Site Managers in the Construction Industry', price: 995 },
+  'mer-en':        { title: 'MER Anläggning: how to read your bill of quantities', price: 1495 },
+  'inst-en':       { title: 'The MEP Coordinator: from clash to control', price: 1495 },
+  'pl-en':         { title: 'Project Management in Construction and Civil Engineering Projects', price: 995 },
+  'bim-en':        { title: 'BIM in production: read, review, and use the model', price: 995 },
+  'prl-en':        { title: 'Design Management in Building and Civil Engineering Projects', price: 995 },
 };
 
 export default async function handler(req, res) {
