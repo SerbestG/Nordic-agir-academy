@@ -1,6 +1,6 @@
 # Nordic Agir Academy
 
-> Svensk utbildare med 43 distanskurser för bygg- och anläggningsbranschen, varav 17 på engelska. Kurserna görs helt online i egen takt och avslutas med ett kunskapsprov (obegränsade omprov). Godkänd deltagare får ett personligt certifikat, giltigt i fem år, med QR-kod för äkthetskontroll. Priser från 795 kr exkl. moms per deltagare. Betalning med kort, Klarna eller faktura (30 dagar för företag).
+> Svensk utbildare med 51 distanskurser för bygg- och anläggningsbranschen, varav 25 på engelska. Kurserna görs helt online i egen takt och avslutas med ett kunskapsprov (obegränsade omprov). Godkänd deltagare får ett personligt certifikat, giltigt i fem år, med QR-kod för äkthetskontroll. Priser från 795 kr exkl. moms per deltagare. Betalning med kort, Klarna eller faktura (30 dagar för företag).
 
 Nordic Agir Academy är en del av Nordic Agir AB (org.nr 559516-5373), Anläggarvägen 34, Handen. Kontakt: academy@nordicagir.se, 073-912 97 89. Alla priser nedan är exklusive 25 % moms och gäller per deltagare.
 
@@ -75,6 +75,14 @@ Nordic Agir Academy är en del av Nordic Agir AB (org.nr 559516-5373), Anläggar
 - [Analyzing and Quality-Assuring Public Bids](https://www.nordicagiracademy.se/kurser/anbud-en.html): 795 SEK, approx. 2 h. Review your bid like a procurement officer — find every mandatory requirement, close the gaps and submit with confidence.
 - [LOU in practice – public procurement](https://www.nordicagiracademy.se/kurser/lou-praktik-en.html): 1 495 SEK, approx. 3 h. How Swedish public procurement really works: the process, the award models and the strategy that wins contracts.
 - [Framework agreements and call-offs: strategy for suppliers](https://www.nordicagiracademy.se/kurser/ramavtal-en.html): 1 395 SEK, approx. 3 h. Winning the framework agreement is half the game — the call-offs are the other half. Ranking, mini-competitions and the strategy that makes it profitable.
+- [Fall Protection: Working Safely at Height](https://www.nordicagiracademy.se/kurser/fall-en.html): 795 SEK, approx. 2–3 h. Five metres take one second, the knowledge takes two hours. The hierarchy of protection, the physics of the harness, anchorages and rescue from suspension trauma.
+- [Safe excavation: plan, assess, and act correctly](https://www.nordicagiracademy.se/kurser/schakt-en.html): 995 SEK, approx. 3–4 h. A trench collapses in two seconds — the planning takes two hours. Soil types, slopes or shoring, daily inspections and the rescue plan written in advance.
+- [Drawing Reading for Site Managers in the Construction Industry](https://www.nordicagiracademy.se/kurser/ritning-en.html): 995 SEK, approx. 2–3 h. The drawing is the language of construction. Scales, symbols, plans, sections, details and revisions — read them right and lead accordingly.
+- [MER Anläggning: how to read your bill of quantities](https://www.nordicagiracademy.se/kurser/mer-en.html): 1 495 SEK, approx. 4–5 h. The bill of quantities decides what you get paid — MER decides how it is read. Theoretical quantities, adjustable quantities and the line against variations.
+- [The MEP Coordinator: from clash to control](https://www.nordicagiracademy.se/kurser/inst-en.html): 1 495 SEK, approx. 4 h. The building is built once — the services clash three times if nobody coordinates. Responsibility matrices, installation sequence and coordinated testing.
+- [Project Management in Construction and Civil Engineering Projects](https://www.nordicagiracademy.se/kurser/pl-en.html): 995 SEK, approx. 4 h. Leading construction projects is as much about people as about plans. The tools for both — from kick-off to handover.
+- [BIM in production: read, review, and use the model](https://www.nordicagiracademy.se/kurser/bim-en.html): 995 SEK, approx. 3–4 h. The model already exists — the question is whether you can read it. Review, take off quantities and kill the clashes on screen, with free tools and the contract behind you.
+- [Design Management in Building and Civil Engineering Projects](https://www.nordicagiracademy.se/kurser/prl-en.html): 995 SEK, approx. 3 h. Hold the design together: lead the consultant team, manage the interfaces and make sure the documents are fit for construction — on time.
 
 ## Övrigt
 
