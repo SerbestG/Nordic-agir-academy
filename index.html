@@ -699,7 +699,7 @@ body.fs-mode .player-actions,body.fs-mode .mobile-tip{display:none}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v8.11</span>
+    <span>Alla rättigheter förbehållna · v8.12</span>
   </div>
 </footer>
 
@@ -2201,7 +2201,9 @@ async function adminGift(btn){
       body:JSON.stringify({token:session?.access_token||'',type:gtype,company,buyerName,buyerEmail,rows})});
     const out=await res.json().catch(()=>({}));
     if(res.ok){
-      toast('Klart! '+antal+' deltagarplats(er) tilldelade — välkomstmejl skickade ✓');
+      const hopp=(out.hoppade||[]);
+      toast('Klart! '+(out.participants??antal)+' deltagarplats(er) tilldelade — välkomstmejl skickade ✓'
+        +(hopp.length?' · Hoppade över (har redan kursen, ej klar): '+hopp.join(', '):''));
       giftRows=[];renderAdmin();
     }else{
       toast('Kunde inte skapa: '+(out.error||('fel '+res.status)));
