@@ -62,6 +62,32 @@ export default async function handler(req, res) {
     if (rows.some((r) => !titleOf(r.courseId)))
       return res.status(400).json({ error: 'Okänd kurs vald — kontrollera courses-tabellen' });
 
+    // 2b) Dubbletter: har deltagaren redan kursen och inte gjort klart den, hoppar vi över
+    // den platsen. Annars får deltagaren två likadana kort under Mina sidor, gör klart det
+    // ena — och adminvyn visar det andra som ej klart (hände 2026-10-16). En redan KLAR
+    // kurs får tilldelas igen (t.ex. förnyelse när certifikatet gått ut).
+    const mejlen = [...new Set(rows.flatMap((r) => r.participants.map((p) => p.email.trim().toLowerCase())))];
+    const inLista = (v) => v.map((x) => encodeURIComponent('"' + String(x).replace(/["\\]/g, '') + '"')).join(',');
+    const exRes = await fetch(
+      `${SUPA}/rest/v1/enrollments?email=in.(${inLista(mejlen)})&course_id=in.(${inLista(ids)})&status=neq.klar&select=email,course_id`,
+      { headers: { apikey: KEY, Authorization: `Bearer ${KEY}` } }
+    );
+    if (!exRes.ok) return res.status(502).json({ error: 'Kunde inte kontrollera befintliga kurser' });
+    const finns = new Set((await exRes.json()).map((e) => (e.email || '').toLowerCase() + '|' + e.course_id));
+    const hoppade = [];
+    for (const r of rows) {
+      r.participants = (r.participants || []).filter((p) => {
+        const nyckel = p.email.trim().toLowerCase() + '|' + r.courseId;
+        if (finns.has(nyckel)) { hoppade.push(`${p.name.trim()} (${titleOf(r.courseId)})`); return false; }
+        finns.add(nyckel); // samma person två gånger i samma tilldelning
+        return true;
+      });
+    }
+    rows = rows.filter((r) => r.participants.length);
+    if (!rows.length)
+      return res.status(409).json({ error: 'Har redan kursen och har inte gjort klart den: ' + hoppade.join(', '), hoppade });
+    const tilldelade = rows.reduce((s, r) => s + r.participants.length, 0);
+
     // 3) Konton per unik deltagarmejl
     const konton = {}; // email -> {isNew, password}
     for (const em of [...new Set(rows.flatMap((r) => r.participants.map((p) => p.email.toLowerCase())))]) {
@@ -171,8 +197,8 @@ export default async function handler(req, res) {
       }
     }
 
-    console.log((isPaid ? 'FAKTURA' : 'GRATIS') + ' tilldelning:', orderRef, platser + ' platser,', ids.join(','));
-    return res.status(200).json({ ok: true, orderRef, participants: platser });
+    console.log((isPaid ? 'FAKTURA' : 'GRATIS') + ' tilldelning:', orderRef, tilldelade + ' platser,', ids.join(','), hoppade.length ? 'hoppade över: ' + hoppade.join(', ') : '');
+    return res.status(200).json({ ok: true, orderRef, participants: tilldelade, hoppade });
   } catch (err) {
     console.error('admin-enroll:', err.message);
     return res.status(500).json({ error: 'Något gick fel' });
