@@ -699,7 +699,7 @@ body.fs-mode .player-actions,body.fs-mode .mobile-tip{display:none}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v8.12</span>
+    <span>Alla rättigheter förbehållna · v8.13</span>
   </div>
 </footer>
 
@@ -3153,6 +3153,9 @@ route();
 
 /* ================= CHATT ================= */
 let chatStarted=false;
+/* Hela samtalet följer med när besökaren skickar formuläret — annars når bara det
+   sista meddelandet er (2026-10-18 kom «my email address is …» utan själva frågan). */
+let chatLogg=[],chatEn=false;
 function toggleChat(){
   const p=document.getElementById('chatPanel');
   p.classList.toggle('open');
@@ -3168,6 +3171,8 @@ function chatAdd(html,who){
   const d=document.createElement('div');
   d.className='chat-msg '+who;
   d.innerHTML=html;
+  chatLogg.push({who,text:(d.textContent||'').trim().slice(0,500)});
+  if(chatLogg.length>40)chatLogg.shift();
   m.appendChild(d);
   m.scrollTop=m.scrollHeight;
 }
@@ -3187,9 +3192,32 @@ function chatSend(){
 function chatCourseLinks(list){
   return list.slice(0,3).map(c=>`<a onclick="location.hash='kurs/${c.id}';toggleChat()">${c.title}</a> — ${fmt(c.price)} exkl. moms`).join('<br>');
 }
+function chatArEngelska(q){
+  const ord=q.toLowerCase().match(/[a-zåäö']+/g)||[];
+  const en=['the','is','are','you','your','my','i','what','how','do','does','can','course','courses','price','english','please','hello','hi','want','need','email','address','with','for','and','have','there','which','when','where'];
+  const sv=['och','är','jag','du','vad','hur','kurs','kurser','pris','har','kan','det','en','ett','för','med','inte','vill','finns','på'];
+  const e=ord.filter(w=>en.includes(w)).length, s=ord.filter(w=>sv.includes(w)).length;
+  return e>=2&&e>s;
+}
 function chatBot(qRaw){
   const q=qRaw.toLowerCase();
   const has=(...ws)=>ws.some(w=>q.includes(w));
+  // Formuläret är redan öppet och besökaren skriver sin e-post i chattrutan i stället:
+  // fyll i den i formuläret — öppna inget nytt (det var så frågan tappades 2026-10-18).
+  const oppet=document.querySelector('.chat-form');
+  const mejl=qRaw.match(/[^\s<>"']+@[^\s<>"']+\.[a-z]{2,}/i);
+  if(oppet&&mejl){
+    const f=oppet.querySelector('#cfEmail');if(f)f.value=mejl[0];
+    chatAddBot(chatEn?'Thanks! I have added your email to the form — press <b>Send</b> below.':'Tack! Jag har fyllt i din e-post i formuläret — tryck på <b>Skicka</b> nedan.');
+    oppet.scrollIntoView({block:'end'});
+    return;
+  }
+  if(chatArEngelska(qRaw)){
+    chatEn=true;
+    chatAddBot('Hi! 👋 Our chat assistant only answers in Swedish, but a colleague will reply to you <b>in English</b> by email — usually the same day. We have <b>25 courses in English</b>, from 795 SEK excl. VAT: <a onclick="setFilter(\'english\');scrollToCourses();toggleChat()">see them here</a>. Leave your email and your question below:');
+    chatShowForm(qRaw,true);
+    return;
+  }
 
   // kurssök: matcha mot kursnamn och nyckelord
   const hits=COURSES.filter(c=>{
@@ -3230,17 +3258,21 @@ function chatBot(qRaw){
     chatShowForm(qRaw);
   }
 }
-function chatShowForm(prefill){
+function chatShowForm(prefill,en){
   chatChips([]);
+  document.querySelectorAll('.chat-form').forEach(f=>f.remove()); // aldrig två formulär med samma fält
   const m=document.getElementById('chatMsgs');
   const d=document.createElement('div');
   d.className='chat-form';
   d.innerHTML=`
-    <input id="cfName" placeholder="Ditt namn">
-    <input id="cfEmail" type="email" placeholder="Din e-post *">
-    <textarea id="cfMsg" rows="3" placeholder="Din fråga *">${(prefill||'').replace(/</g,'&lt;')}</textarea>
+    <input id="cfName" placeholder="${en?'Your name':'Ditt namn'}">
+    <input id="cfEmail" type="email" placeholder="${en?'Your email *':'Din e-post *'}">
+    <textarea id="cfMsg" rows="3" placeholder="${en?'Your question *':'Din fråga *'}">${(prefill||'').replace(/</g,'&lt;')}</textarea>
     <input id="cfHp" style="display:none" tabindex="-1" autocomplete="off">
-    <button onclick="chatSubmitForm(this)">Skicka till Nordic Agir Academy</button>`;
+    <button onclick="chatSubmitForm(this)">${en?'Send to Nordic Agir Academy':'Skicka till Nordic Agir Academy'}</button>`;
+  // Står e-postadressen redan i meddelandet («my email address is …»)? Fyll i den.
+  const funnen=(prefill||'').match(/[^\s<>"']+@[^\s<>"']+\.[a-z]{2,}/i);
+  if(funnen)setTimeout(()=>{const f=document.getElementById('cfEmail');if(f&&!f.value)f.value=funnen[0];},0);
   m.appendChild(d);
   m.scrollTop=m.scrollHeight;
 }
@@ -3251,7 +3283,7 @@ async function chatSubmitForm(btn){
   btn.disabled=true;btn.textContent='Skickar …';
   try{
     const res=await fetch('/api/chat-message',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({name:document.getElementById('cfName').value,email,message:msg,website:document.getElementById('cfHp').value})});
+      body:JSON.stringify({name:document.getElementById('cfName').value,email,message:msg,website:document.getElementById('cfHp').value,historik:chatLogg.slice(-30)})});
     if(res.ok){
       btn.closest('.chat-form').remove();
       chatAddBot('Tack! 📬 Din fråga är skickad — vi svarar till <b>'+email.replace(/</g,'&lt;')+'</b> så snart vi kan, oftast samma dag.');
