@@ -14,6 +14,18 @@
   gtag('js', new Date());
   gtag('config', 'AW-18318666112');
 </script>
+<!-- OpenAI Ads mätpixel (ChatGPT Ads) – laddas först när besökaren godkänt kakor (GDPR) -->
+<script>
+  window.__oaiInited=false;
+  window.oaiInit=function(){
+    try{
+      if(window.__oaiInited)return; window.__oaiInited=true;
+      (function(w,d,s,u){if(w.oaiq)return;var q=function(){q.q.push(arguments)};q.q=[];w.oaiq=q;var js=d.createElement(s);js.async=true;js.src=u;var f=d.getElementsByTagName(s)[0];f.parentNode.insertBefore(js,f)})(window,document,'script','https://bzrcdn.openai.com/sdk/oaiq.min.js');
+      oaiq('init',{pixelId:'HGhntdX5eBkuFChahPk7E2'});
+    }catch(e){}
+  };
+  try{if(localStorage.getItem('naaConsent')==='alla')window.oaiInit();}catch(e){}
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nordic Agir Academy — Utbildningar för dig som bygger Sverige</title>
@@ -699,7 +711,7 @@ body.fs-mode .player-actions,body.fs-mode .mobile-tip{display:none}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v8.13</span>
+    <span>Alla rättigheter förbehållna · v8.14</span>
   </div>
 </footer>
 
@@ -1513,6 +1525,10 @@ function track(ev,params){try{if(typeof gtag==='function')gtag('event',ev,params
    formatet är 'AW-18318666112/XXXXXXXXXXX'. Tom sträng = inget skickas (säkert läge). */
 const ADS_KONVERTERING='AW-18318666112/aXqQCJDqit4cEIDTgp9E';
 function trackKop(varde,ordernr){
+  // OpenAI Ads (ChatGPT Ads) – Kursköp / order_created (samtyckesstyrt via __oaiInited; belopp i öre)
+  // event_id = ordernumret, så att en omladdad tacksida inte räknas som två köp. Saknas
+  // ordernummer skickas inget event_id (ett tomt hade slagit ihop olika köp till ett).
+  try{if(typeof oaiq==='function'&&window.__oaiInited){oaiq('measure','order_created',{type:'contents',amount:Math.round((Number(varde)||0)*100),currency:'SEK'},ordernr?{event_id:String(ordernr)}:{});}}catch(e){}
   try{
     if(typeof gtag!=='function'||!ADS_KONVERTERING)return;
     gtag('event','conversion',{send_to:ADS_KONVERTERING,value:Number(varde)||0,currency:'SEK',transaction_id:ordernr||''});
@@ -3141,6 +3157,9 @@ function setConsent(val){
   if(val==='alla'&&typeof gtag==='function'){
     gtag('consent','update',{ad_storage:'granted',ad_user_data:'granted',ad_personalization:'granted',analytics_storage:'granted'});
   }
+  if(val==='alla'&&typeof window.oaiInit==='function')window.oaiInit();
+  // Återkallat samtycke: OpenAI-pixeln slutar mäta och tar bort sina kakor (__oppref, __obref)
+  if(val!=='alla'&&window.__oaiInited&&typeof oaiq==='function'){try{oaiq('consent',false);}catch(e){}}
   document.getElementById('cookieBar').style.display='none';
 }
 function visaKakruta(){
