@@ -244,6 +244,21 @@ ${sidfot(T.sv)}
 // ---- 4b. Prisguiden för BAS-P/BAS-U -------------------------------------------
 // Svarar på frågan «vad kostar BAS-P-utbildning?». Bara belagda uppgifter: våra egna priser
 // ur katalogen och allmänna fakta om formen — inga påhittade konkurrentpriser.
+// Kursens bild och produktuppgifter även på guiderna. ChatGPT citerade prisguiden (2026-10-28)
+// men hittade ingen bild där och lånade en konkurrents produktbild — nu har varje guide sin
+// kurs bild, synlig och i märkningen, och prisguiden dessutom kursen som produkt med pris.
+const bildFor = (c, w = 1200) => (c && c.img ? String(c.img).replace(/w=\d+/, 'w=' + w) : `${SAJT}/og-image.png`);
+const produktFor = (c) => ({
+  '@context': 'https://schema.org', '@type': 'Product', name: c.title, description: c.desc, image: bildFor(c),
+  sku: c.id, url: sida(c), category: arEngelsk(c) ? 'Online course' : 'Distanskurs',
+  brand: { '@type': 'Brand', name: 'Nordic Agir Academy' },
+  offers: { '@type': 'Offer', price: String(c.price), priceCurrency: 'SEK', url: sida(c),
+    availability: 'https://schema.org/InStock', itemCondition: 'https://schema.org/NewCondition',
+    seller: { '@type': 'Organization', name: 'Nordic Agir Academy' },
+    priceSpecification: { '@type': 'UnitPriceSpecification', price: c.price, priceCurrency: 'SEK', valueAddedTaxIncluded: false } },
+});
+const guidebild = (c) => (c && c.img ? `<img class="kursbild" src="${eh(bildFor(c, 800))}" alt="${eh(c.title)}" width="800" height="320" loading="lazy">\n` : '');
+
 function prisguide() {
   const b = perId.bas, be = perId['bas-en'];
   if (!b) throw new Error('Kursen bas saknas i katalogen — prisguiden kan inte byggas');
@@ -260,7 +275,7 @@ function prisguide() {
   const faq = { '@context': 'https://schema.org', '@type': 'FAQPage',
     mainEntity: fragor.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
   const artikel = { '@context': 'https://schema.org', '@type': 'Article', headline: `Vad kostar BAS-P-utbildning? Priser ${IDAG.slice(0, 4)}`,
-    dateModified: IDAG, inLanguage: 'sv', url: GUIDE, publisher: leverantor, about: { '@type': 'Course', name: b.title, url: sida(b) } };
+    dateModified: IDAG, inLanguage: 'sv', url: GUIDE, publisher: leverantor, image: bildFor(b), about: { '@type': 'Course', name: b.title, url: sida(b), image: bildFor(b) } };
   return `<!DOCTYPE html>
 <html lang="sv">
 <head>
@@ -270,10 +285,11 @@ function prisguide() {
 <link rel="canonical" href="${GUIDE}">
 <meta property="og:title" content="Vad kostar BAS-P-utbildning?">
 <meta property="og:url" content="${GUIDE}">
-<meta property="og:image" content="${SAJT}/og-image.png">
+<meta property="og:image" content="${eh(bildFor(b))}">
 <link rel="icon" href="${SAJT}/favicon.png">
 <script type="application/ld+json">${json(artikel)}</script>
 <script type="application/ld+json">${json(faq)}</script>
+<script type="application/ld+json">${json(produktFor(b))}</script>
 <style>${STIL}
 table{border-collapse:collapse;width:100%;margin:12px 0}td,th{border-bottom:1px solid #e3e1dc;padding:8px 6px;text-align:left;vertical-align:top;overflow-wrap:break-word}th{color:#5a5757;font-weight:600}</style>
 </head>
@@ -283,6 +299,7 @@ ${sidhuvud(T.sv)}
 <p class="sub">Prisguide · Uppdaterad ${IDAG}</p>
 <h1>Vad kostar BAS-P-utbildning?</h1>
 <p class="sub">Kort svar: hos Nordic Agir Academy kostar BAS-P och BAS-U <b>${kr(b.price)} exkl. moms</b> per deltagare — båda rollerna i samma kurs, på distans, med prov och certifikat.</p>
+${guidebild(b)}
 <div class="prisruta"><b>${kr(b.price)}</b> exkl. moms &nbsp;·&nbsp; ${kr(inklMoms(b.price))} inkl. moms${origOf(b) > b.price ? ` &nbsp;·&nbsp; <span class="gammalt">${kr(origOf(b))}</span> ordinarie` : ''}<br><span style="font-size:.9em">Per deltagare. Kort, Klarna eller faktura (30 dagar för företag).</span></div>
 <a class="cta" href="${sida(b)}">Se kursen BAS-P och BAS-U →</a>
 
@@ -321,7 +338,8 @@ function guidesida(g) {
     mainEntity: g.fragor.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
   const artikel = { '@context': 'https://schema.org', '@type': 'Article', headline: g.h1, description: g.beskrivning,
     dateModified: IDAG, inLanguage: g.lang, url: guideUrl(g), publisher: leverantor,
-    about: relaterade.map((c) => ({ '@type': 'Course', name: c.title, url: sida(c) })) };
+    image: bildFor(relaterade[0]),
+    about: relaterade.map((c) => ({ '@type': 'Course', name: c.title, url: sida(c), image: bildFor(c) })) };
   return `<!DOCTYPE html>
 <html lang="${g.lang}">
 <head>
@@ -332,7 +350,7 @@ function guidesida(g) {
 <meta property="og:title" content="${eh(g.h1)}">
 <meta property="og:description" content="${eh(g.beskrivning)}">
 <meta property="og:url" content="${guideUrl(g)}">
-<meta property="og:image" content="${SAJT}/og-image.png">
+<meta property="og:image" content="${eh(bildFor(relaterade[0]))}">
 <link rel="icon" href="${SAJT}/favicon.png">
 <script type="application/ld+json">${json(artikel)}</script>
 <script type="application/ld+json">${json(faq)}</script>
@@ -345,6 +363,7 @@ ${sidhuvud(t)}
 <p class="sub">${en ? 'Guide · Updated' : 'Guide · Uppdaterad'} ${IDAG}</p>
 <h1>${eh(g.h1)}</h1>
 <p class="sub">${eh(g.kort)}</p>
+${guidebild(relaterade[0])}
 ${g.delar.map(([h, html]) => `<h2>${eh(h)}</h2>${html}`).join('\n')}
 <h2>${en ? 'Courses' : 'Kurser'}</h2>
 <ul>${relaterade.map((c) => `<li><a href="${sida(c)}"${arEngelsk(c) !== en ? ` hreflang="${arEngelsk(c) ? 'en' : 'sv'}"` : ''}>${eh(c.title)}</a> — ${kr(c.price, arEngelsk(c))} ${arEngelsk(c) ? 'excl. VAT' : 'exkl. moms'}</li>`).join('')}</ul>
