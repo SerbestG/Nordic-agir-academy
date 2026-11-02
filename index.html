@@ -711,7 +711,7 @@ body.fs-mode .player-actions,body.fs-mode .mobile-tip{display:none}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v8.14</span>
+    <span>Alla rättigheter förbehållna · v8.15</span>
   </div>
 </footer>
 
@@ -2722,6 +2722,7 @@ async function renderPortal(){
     if(error)portalErr=error.message+(error.code?' (kod '+error.code+')':'');
     myRows=(data||[]).filter(r=>r.status!=='vantar'); // fakturaordrar syns först efter ert godkännande
     await loadCourseUrls();
+    await skickaKlarKo(); // examen som inte hann sparas förra gången
   }else myRows=DEMO_ROWS;
 
   const first=(portalUser.name||portalUser.email).split(/[@ ]/)[0];
@@ -2881,6 +2882,41 @@ function stopScormBridge(){
   scormRow=null;
   try{delete window.API;}catch(_){window.API=undefined;}
 }
+/* Examen sparas med en färsk inloggning och kontrolleras. En kurs tar flera timmar,
+   och en inloggning som hunnit gå ut sparade förr ingenting, utan fel. Lyckas det inte
+   sparas resultatet i webbläsaren och skickas nästa gång Mina sidor öppnas. */
+const KLAR_KO='naa_klar_ko';
+function klarKo(){try{return JSON.parse(localStorage.getItem(KLAR_KO)||'[]');}catch(_){return [];}}
+function klarKoSpara(k){try{k.length?localStorage.setItem(KLAR_KO,JSON.stringify(k)):localStorage.removeItem(KLAR_KO);}catch(_){}}
+async function sparaKlar(rad){
+  if(!supa)return true;
+  let {data:{session}}=await supa.auth.getSession();
+  const r=await supa.auth.refreshSession().catch(()=>null);
+  if(r?.data?.session)session=r.data.session;
+  if(!session)return false;
+  const {data,error}=await supa.from('enrollments')
+    .update({status:'klar',cert_id:rad.cert_id,cert_date:rad.cert_date})
+    .eq('id',rad.id).select('id');
+  if(error||!data||!data.length)return false;
+  try{
+    const nres=await fetch('/api/notify-completion',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({token:session.access_token,rowId:rad.id})});
+    if(!nres.ok)console.warn('Klarnotisen misslyckades:',nres.status,await nres.text().catch(()=>''));
+  }catch(e){console.warn('Klarnotisen misslyckades:',e.message);}
+  return true;
+}
+async function skickaKlarKo(){
+  const ko=klarKo();if(!ko.length||!supa)return;
+  const kvar=[];
+  for(const rad of ko){
+    const m=myRows.find(x=>String(x.id)===String(rad.id));
+    if(m&&m.status==='klar'&&m.cert_id)continue; // redan sparad
+    if(!m){kvar.push(rad);continue;}            // tillhör ett annat konto i webbläsaren
+    if(await sparaKlar(rad)){m.status='klar';m.cert_id=rad.cert_id;m.cert_date=rad.cert_date;}
+    else kvar.push(rad);
+  }
+  klarKoSpara(kvar);
+}
 async function autoComplete(){
   if(!scormRow||scormRow.status==='klar')return; // redan klar: inget nytt certifikat/mejl — firandet sköts ändå
   scormRow.status='klar';
@@ -2888,14 +2924,13 @@ async function autoComplete(){
     scormRow.cert_id='NAA-2026-'+String(Math.floor(1000+Math.random()*9000));
     scormRow.cert_date=new Date().toISOString().slice(0,10);
   }
-  if(supa)await supa.from('enrollments').update({status:'klar',cert_id:scormRow.cert_id,cert_date:scormRow.cert_date}).eq('id',scormRow.id);
-  // meddela Nordic Agir att certifikatet ska skickas
-  try{
-    const {data:{session}}=await supa.auth.getSession();
-    const nres=await fetch('/api/notify-completion',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({token:session?.access_token||'',rowId:scormRow.id})});
-    if(!nres.ok)console.warn('Klarnotisen misslyckades:',nres.status,await nres.text().catch(()=>''));
-  }catch(e){console.warn('Klarnotisen misslyckades:',e.message);}
+  const rad={id:scormRow.id,cert_id:scormRow.cert_id,cert_date:scormRow.cert_date};
+  let ok=false;
+  try{ok=await sparaKlar(rad);}catch(e){console.warn('Examen kunde inte sparas:',e.message);}
+  if(!ok){
+    klarKoSpara([...klarKo().filter(x=>String(x.id)!==String(rad.id)),rad]);
+    toast('Ditt resultat sparas när du loggar in igen. Hör av dig om certifikatet dröjer.');
+  }
   const pill=document.getElementById('playerPill');
   if(pill){pill.className='pill klar';pill.textContent='Klar';}
   const act=document.getElementById('playerDone');
