@@ -711,7 +711,7 @@ body.fs-mode .player-actions,body.fs-mode .mobile-tip{display:none}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v8.15</span>
+    <span>Alla rättigheter förbehållna · v8.16</span>
   </div>
 </footer>
 
@@ -2073,6 +2073,7 @@ async function renderAdmin(){
         <div class="field"><label>Namn</label><input id="certName" oninput="paintCert()"></div>
         <div class="field"><label>Personnummer</label><input id="certPnr" oninput="paintCert()" placeholder="ÅÅÅÅMMDD-XXXX"></div>
         <div class="field"><label>Kurs</label><input id="certCourse" oninput="paintCert()"></div>
+        <div class="field"><label>Omfattning (valfritt, syns på certifikatet)</label><input id="certOmf" oninput="paintCert()" placeholder="t.ex. ca 4 timmar"></div>
         <div class="field"><label>Datum för godkänd examen</label><input type="date" id="certDate" onchange="paintCert()"></div>
         <div class="field"><label>Deltagarens e-post</label><input type="email" id="certEmail" placeholder="namn@foretag.se"></div>
         <button class="btn btn-blue" onclick="downloadCert(this)">⬇️ Ladda ner PDF</button>
@@ -2094,6 +2095,7 @@ async function renderAdmin(){
             <p class="cert-course-label">med godkänt resultat har genomfört utbildningen</p>
             <div class="cert-course" id="cCourse">Kursens namn</div>
             <div class="cert-course-label" id="cExtra" style="margin-top:6px;font-style:italic"></div>
+            <div class="cert-course-label" id="cOmf" style="margin-top:4px"></div>
             <div class="cert-meta">
               <div>Examensdatum<b id="cDate">—</b></div>
               <div>Giltigt till<b id="cValid">—</b></div>
@@ -2277,6 +2279,9 @@ function fillCertFromPick(){
   document.getElementById('certDate').value=r.p.certDate||new Date().toISOString().slice(0,10);
   document.getElementById('certEmail').value=r.p.email||'';
   document.getElementById('certPnr').value=r.p.pnr||'';
+  const kc=COURSES.find(c=>c.id===r.courseId);
+  const om=document.getElementById('certOmf');
+  if(om)om.value=kc&&kc.dur?String(kc.dur).replace(/tim$/,'timmar').replace(/^approx\. (.+) h$/,'ca $1 timmar'):'';
   if(!r.p.certId){
     r.p.certId='NAA-2026-'+String(Math.floor(1000+Math.random()*9000));
     r.p.certDate=r.p.certDate||new Date().toISOString().slice(0,10);
@@ -2467,6 +2472,11 @@ async function buildCertPdf(status){
       pdf.setFont('helvetica','italic');pdf.setFontSize(11.5);pdf.setTextColor(...DIM);
       center(extra,y+13+rows.length*9+7);extraH=9;
     }
+    const omfLine=T('cOmf');
+    if(omfLine){
+      pdf.setFont('helvetica','normal');pdf.setFontSize(11.5);pdf.setTextColor(...DIM);
+      center(omfLine,y+13+rows.length*9+7+extraH);extraH+=9;
+    }
     const metaY=y+13+rows.length*9+13+extraH;
 
     // Metakolumnerna
@@ -2558,6 +2568,9 @@ function paintCert(certId){
   document.getElementById('cCourse').textContent=delat[0];
   const cx=document.getElementById('cExtra');
   if(cx)cx.textContent=delat.length>1?delat.slice(1).join(' — '):'';
+  const omf=(document.getElementById('certOmf')?.value||'').trim();
+  const co=document.getElementById('cOmf');
+  if(co)co.textContent=omf?('Omfattning: '+omf):'';
   if(d){
     const dd=new Date(d);
     document.getElementById('cDate').textContent=dd.toLocaleDateString('sv-SE');
