@@ -711,7 +711,7 @@ body.fs-mode .player-actions,body.fs-mode .mobile-tip{display:none}
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nordic Agir AB · Org.nr 559516-5373</span>
-    <span>Alla rättigheter förbehållna · v8.16</span>
+    <span>Alla rättigheter förbehållna · v8.17</span>
   </div>
 </footer>
 
@@ -891,7 +891,9 @@ const fmt=n=>n.toLocaleString('sv-SE')+' kr';
 /* Nylanseringskampanj: ordinarie pris (genomstruket) per kampanjpris */
 /* Certifikatets kursnamn: huvudnamnet utan tilläggstext (allt före tankstrecket).
    APV behåller sin officiella beteckning. */
-const certTitleOf=c=>(c.title||''); // fulla formella kursnamnet på certifikatet
+// Certifikatets namn där kursnamnet inte säger allt kursen innehåller
+const CERT_TITEL={'ama-anl':'AMA Anläggning — allmän material- och arbetsbeskrivning samt MER Anläggning (mät- och ersättningsregler)'};
+const certTitleOf=c=>(CERT_TITEL[c.id]||c.title||''); // fulla formella kursnamnet på certifikatet
 const origOf=c=>c.orig||c.price;
 const saleOff=c=>Math.round((1-c.price/origOf(c))*100);
 
