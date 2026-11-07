@@ -1,5 +1,12 @@
 {
   "crons": [
-    { "path": "/api/indexnow", "schedule": "0 6 * * *" }
+    {
+      "path": "/api/indexnow",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/certifikat-vantar",
+      "schedule": "30 6 * * *"
+    }
   ]
 }
